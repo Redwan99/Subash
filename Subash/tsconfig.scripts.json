@@ -4,7 +4,8 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "outDir": ".ts-out"
+    "outDir": ".ts-out",
+    "noEmit": false
   },
   "include": ["prisma/**/*.ts"]
 }
