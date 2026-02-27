@@ -17,8 +17,17 @@ const prisma = new PrismaClient();
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const LIMIT = 500;        // Max rows to insert this test run
-const BATCH_SIZE = 1_000; // Rows per createMany call
+// Rows to insert: unlimited by default. Override with IMPORT_LIMIT=500 env var.
+const LIMIT: number | undefined = process.env.IMPORT_LIMIT
+  ? parseInt(process.env.IMPORT_LIMIT, 10)
+  : undefined;
+
+const BATCH_SIZE = 500; // rows per createMany call
+
+// CSV files live in prisma/ locally. When running from the compiled seed.js
+// inside the Docker image they live at /app/prisma/. Using CSV_DIR env var
+// allows overriding for any layout.
+const CSV_DIR = process.env.CSV_DIR ?? path.join(__dirname, "..", "prisma");
 
 /**
  * Extract the numeric Fragrantica perfume ID from the URL.
@@ -137,8 +146,8 @@ function loadCsv(
 async function buildDescriptionMap(): Promise<
   Map<string, { description: string; perfumer: string }>
 > {
-  const filePath = path.join(__dirname, "fra_perfumes.csv");
-  console.log(`📂 Loading fra_perfumes.csv…`);
+  const filePath = path.join(CSV_DIR, "fra_perfumes.csv");
+  console.log(`📂 Loading fra_perfumes.csv from ${filePath}…`);
 
   const rows = await loadCsv(filePath, ",");
   const map = new Map<string, { description: string; perfumer: string }>();
@@ -162,8 +171,9 @@ async function buildDescriptionMap(): Promise<
 async function importCleaned(
   descMap: Map<string, { description: string; perfumer: string }>
 ): Promise<void> {
-  const filePath = path.join(__dirname, "fra_cleaned.csv");
-  console.log(`📂 Reading fra_cleaned.csv (limit: ${LIMIT} rows)…\n`);
+  const filePath = path.join(CSV_DIR, "fra_cleaned.csv");
+  const limitLabel = LIMIT === undefined ? "all" : String(LIMIT);
+  console.log(`📂 Reading fra_cleaned.csv (limit: ${limitLabel} rows)…\n`);
 
   // Collect rows safely into memory (up to LIMIT) before async work.
   const rawRows = await loadCsv(filePath, ";", LIMIT);
