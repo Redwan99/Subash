@@ -64,13 +64,16 @@ NEXT_PUBLIC_SITE_URL=http://<casaos-ip>:3000
 
 ---
 
-## Step 3 — Build and start
+## Step 3 — Pull and start
 
 ```bash
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
-First build: **4–8 min** (compiles Next.js, downloads base images).
+The pre-built image is downloaded from `ghcr.io/redwan002117/subash:latest`
+(published automatically by GitHub Actions on every push to `main`).
+No compilation happens on the CasaOS box — pull takes ~1 min on a fast connection.
 
 Watch live:
 ```bash
@@ -84,7 +87,6 @@ Output during first boot:
 🔄  Syncing database schema...
 🌱  DB is empty — importing all perfumes from CSV...
   📦 Flushed batch → 500 inserted (running total: 500)
-  📦 Flushed batch → 500 inserted (running total: 1000)
   ...
 ✅  Seed complete.
 🚀  Starting Subash on port 3000...
@@ -111,22 +113,25 @@ Restarts now take **under 10 seconds**.
 ```bash
 # On Windows dev machine:
 git push
+# GitHub Actions builds and publishes a new Docker image automatically.
 
-# On CasaOS via SSH — one command does everything:
+# On CasaOS via SSH — pull the new image and restart:
 bash /DATA/AppData/subash/scripts/update.sh
 ```
 
 The script:
-- Pulls latest code from GitHub
-- Skips the rebuild if nothing changed
-- Rebuilds the Docker image and restarts the container
+- Checks GitHub for new commits (skips if already current)
+- `git pull` to sync compose files and shell scripts
+- `docker compose pull web` — downloads the pre-built image from ghcr.io (no build!)
+- Restarts the container
 - Waits for a health check before exiting
 - Logs everything to `logs/update.log`
 
 **Options:**
 ```bash
-./scripts/update.sh --force     # rebuild even if no git changes
-./scripts/update.sh --no-build  # git pull only, no Docker rebuild
+./scripts/update.sh --force        # restart even if already up to date
+./scripts/update.sh --git-only     # git pull only, no image pull/restart
+./scripts/update.sh --local-build  # build image locally instead of pulling
 ```
 
 **Auto-update via cron (e.g. daily at 3 AM):**
@@ -136,7 +141,7 @@ crontab -e
 0 3 * * * /DATA/AppData/subash/scripts/update.sh >> /DATA/AppData/subash/logs/update.log 2>&1
 ```
 
-Database is in a Docker volume — rebuilds never touch it.
+Database is in a Docker volume — updates never touch it.
 
 ---
 
@@ -164,12 +169,13 @@ Or use TablePlus / DBeaver pointing at `<casaos-ip>:5432`.
 
 ```bash
 docker compose logs -f web            # live app logs
-docker compose up -d                  # restart (env change only)
-docker compose up -d --build          # rebuild after code change
+docker compose pull && docker compose up -d  # pull latest image + restart
+docker compose up -d                  # restart (no image pull)
+docker compose up -d --build          # build image locally (skip ghcr.io)
 docker compose down                   # stop (keeps DB)
 docker compose down -v                # stop + wipe DB
 
-# Auto-update (pull + rebuild + health check)
+# Auto-update (pull image from ghcr.io + health check)
 bash /DATA/AppData/subash/scripts/update.sh
 
 # Re-run seed manually (e.g. after wiping DB)
@@ -190,11 +196,15 @@ cat backup.sql | docker exec -i subash_db psql -U subash_user -d subash_db
 Dev machine (Windows)
   └── git push → GitHub (Redwan002117/Subash)
                         │
-                   git pull (SSH)
+              GitHub Actions builds Docker image
+              publishes → ghcr.io/redwan002117/subash:latest
+                        │
+              scripts/update.sh  (cron or manual SSH)
+              docker compose pull web
                         ↓
 CasaOS machine
   ├── subash_db   postgres:16-alpine  :5432 (LAN only)
-  └── subash_web  Next.js 15          :3000
+  └── subash_web  ghcr.io/redwan002117/subash:latest  :3000
         │  scripts/entrypoint.sh
         │    ├─ prisma db push  (schema sync, every start)
         │    ├─ seed.js         (first boot only: 70k perfumes)

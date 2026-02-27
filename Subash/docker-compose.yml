@@ -35,6 +35,7 @@ services:
   #  Next.js Web Application
   # ------------------------------------------
   web:
+    image: ghcr.io/redwan002117/subash:latest
     build:
       context: .
       dockerfile: Dockerfile
