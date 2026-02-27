@@ -1,0 +1,25 @@
+# Default: normalize all text files to LF in the repo
+* text=auto eol=lf
+
+# Shell scripts must always be LF (or they break on Linux/CasaOS)
+*.sh text eol=lf
+
+# Windows-only scripts can use CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files — never modify
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.svg binary
+*.csv binary
