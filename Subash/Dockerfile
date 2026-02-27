@@ -1,4 +1,4 @@
-# =============================================
+﻿# =============================================
 #  Subash — Multi-Stage Dockerfile
 #  Produces a minimal production image using
 #  Next.js standalone output mode.
@@ -24,7 +24,17 @@ COPY . .
 RUN npx prisma generate
 
 # Build the Next.js app in standalone mode
+# Dummy build-time env vars prevent Prisma/NextAuth from retrying
+# connections to a DB that doesn't exist during the build stage.
+# These are overridden by real values in docker-compose.yml at runtime.
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public
+ENV AUTH_SECRET=build-time-dummy-secret-not-used-at-runtime
+ENV AUTH_URL=http://localhost:3000
+ENV GOOGLE_CLIENT_ID=build-dummy
+ENV GOOGLE_CLIENT_SECRET=build-dummy
+ENV FACEBOOK_CLIENT_ID=build-dummy
+ENV FACEBOOK_CLIENT_SECRET=build-dummy
 RUN npm run build
 
 # Compile the CSV seed script so it can run with plain node in production
