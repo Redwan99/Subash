@@ -1,0 +1,306 @@
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================
+   Subash | Global Design System
+   Glassmorphism · Violet Accents · Dark/Light
+   ============================================= */
+
+/* --- CSS Custom Properties (Design Tokens) --- */
+:root {
+  /* Light Mode Defaults */
+  --bg-primary: #F8FAFC;       /* pearlescent off-white */
+  --bg-base:    #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.45);
+  --bg-glass-border: rgba(255, 255, 255, 0.65);
+
+  --text-primary: #0D0D0D;
+  --text-secondary: #4A4A4A;
+  --text-muted: #8A8A8A;
+
+  --border-color: rgba(0, 0, 0, 0.08);
+  --shadow-glass: 0 8px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+
+  --accent: #8B5CF6;
+  --accent-light: #A78BFA;
+  --accent-dark: #6D28D9;
+  --accent-glow: rgba(139, 92, 246, 0.3);
+  --bg-glow-color: rgba(139, 92, 246, 0.18);
+
+  --sidebar-width: 260px;
+  --sidebar-right-width: 300px;
+  --topnav-height: 60px;
+  --topbar-height: 60px;
+  --bottom-nav-height: 64px;
+
+  --radius-glass: 16px;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+
+  --blur-glass: 12px;
+  --blur-backdrop: 20px;
+
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dark Mode Tokens */
+.dark {
+  --bg-primary: #050505;       /* deep obsidian */
+  --bg-base:    #050505;
+  --bg-surface: #111111;
+  --bg-elevated: #181818;
+  --bg-glass: rgba(10, 10, 10, 0.60);
+  --bg-glass-border: rgba(255, 255, 255, 0.07);
+
+  --text-primary: #E6EDF3;
+  --text-secondary: #8B949E;
+  --text-muted: #484F58;
+
+  --border-color: rgba(255, 255, 255, 0.07);
+  --shadow-glass: 0 8px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.05);
+  --bg-glow-color: rgba(139, 92, 246, 0.20);
+}
+
+/* =============================================
+   Fragrance-Mood Weather Themes
+   Applied via data-weather-theme on <html>.
+   Only accent + glow tokens change — dark/light
+   bg and text tokens remain controlled by .dark.
+   ============================================= */
+
+/* 1. Bergamot — Hot / Sunny / Clear Day: soft citrus gold */
+[data-weather-theme="theme-bergamot"] {
+  --accent:         #C9A84C;
+  --accent-light:   #E2C97A;
+  --accent-dark:    #A07830;
+  --accent-glow:    rgba(201, 168, 76, 0.32);
+  --bg-glow-color:  rgba(201, 168, 76, 0.18);
+}
+
+/* 2. Neroli — Sunset / Golden Hour: warm amber orange */
+[data-weather-theme="theme-neroli"] {
+  --accent:         #C87C42;
+  --accent-light:   #E09B68;
+  --accent-dark:    #9E5A28;
+  --accent-glow:    rgba(200, 124, 66, 0.32);
+  --bg-glow-color:  rgba(200, 124, 66, 0.20);
+}
+
+/* 3. Vetiver — Humid / Tropical: deep mint teal */
+[data-weather-theme="theme-vetiver"] {
+  --accent:         #3D9E8C;
+  --accent-light:   #62BAA9;
+  --accent-dark:    #2A7A6C;
+  --accent-glow:    rgba(61, 158, 140, 0.30);
+  --bg-glow-color:  rgba(61, 158, 140, 0.18);
+}
+
+/* 4. Petrichor — Rain / Monsoon: slate blue with cyan whisper */
+[data-weather-theme="theme-petrichor"] {
+  --accent:         #5882A8;
+  --accent-light:   #7AAACE;
+  --accent-dark:    #3D6282;
+  --accent-glow:    rgba(88, 130, 168, 0.32);
+  --bg-glow-color:  rgba(88, 130, 168, 0.22);
+}
+
+/* 5. Frost — Cold / Crisp: icy silver pale sky */
+[data-weather-theme="theme-frost"] {
+  --accent:         #8BAEC8;
+  --accent-light:   #AECDE0;
+  --accent-dark:    #6A90AD;
+  --accent-glow:    rgba(139, 174, 200, 0.28);
+  --bg-glow-color:  rgba(139, 174, 200, 0.18);
+}
+
+/* 6. Rose — Mild / Breezy: muted rose gold */
+[data-weather-theme="theme-rose"] {
+  --accent:         #B58B9A;
+  --accent-light:   #CFA8B5;
+  --accent-dark:    #8E6678;
+  --accent-glow:    rgba(181, 139, 154, 0.30);
+  --bg-glow-color:  rgba(181, 139, 154, 0.20);
+}
+
+/* 7. Oud — Night / Clear: warm gold on midnight indigo */
+[data-weather-theme="theme-oud"] {
+  --accent:         #A8893C;
+  --accent-light:   #C9AC65;
+  --accent-dark:    #7D6420;
+  --accent-glow:    rgba(168, 137, 60, 0.32);
+  --bg-glow-color:  rgba(168, 137, 60, 0.22);
+}
+
+/* =============================================
+   Base Reset & Typography
+   ============================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  line-height: 1.6;
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+/* =============================================
+   Glassmorphism Utility Classes
+   ============================================= */
+@layer utilities {
+  /* Glass Panel — True Glassmorphism */
+  .glass {
+    background: rgba(255, 255, 255, 0.45);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow: var(--shadow-glass);
+  }
+  .dark .glass {
+    background: rgba(10, 10, 10, 0.55);
+    border-color: rgba(255, 255, 255, 0.07);
+  }
+
+  /* Subtle glass — for cards */
+  .glass-subtle {
+    background: rgba(255, 255, 255, 0.30);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+  }
+  .dark .glass-subtle {
+    background: rgba(10, 10, 10, 0.45);
+  }
+
+  /* Accent gradient text */
+  .text-accent-gradient {
+    background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 50%, #6D28D9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gold shimmer animation for skeleton loaders */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--border-color) 25%,
+      var(--bg-elevated) 50%,
+      var(--border-color) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* Scrollbar Styling */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+
+  /* Content layout helpers */
+  .content-with-sidebars {
+    /* Pushed by left sidebar on desktop */
+    margin-left: var(--sidebar-width);
+    /* Pushed by right sidebar on desktop */
+    margin-right: var(--sidebar-right-width);
+  }
+}
+
+/* =============================================
+   Keyframes
+   ============================================= */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes accentPulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+  50%       { box-shadow: 0 0 0 8px transparent; }
+}
+
+/* Ambient background orb drift animations */
+@keyframes orbDrift {
+  0%   { transform: translate(0px,   0px)  scale(1);    }
+  33%  { transform: translate(40px, -28px) scale(1.06); }
+  66%  { transform: translate(-20px, 35px) scale(0.96); }
+  100% { transform: translate(0px,   0px)  scale(1);    }
+}
+
+@keyframes orbDriftAlt {
+  0%   { transform: translate(0px,    0px)  scale(1);    }
+  33%  { transform: translate(-35px, 25px)  scale(1.08); }
+  66%  { transform: translate(28px, -20px)  scale(0.94); }
+  100% { transform: translate(0px,    0px)  scale(1);    }
+}
+
+@keyframes orbDriftSlow {
+  0%   { transform: translate(0px,  0px) scale(1);    }
+  50%  { transform: translate(24px, 18px) scale(1.05); }
+  100% { transform: translate(0px,  0px) scale(1);    }
+}
+
+/* =============================================
+   Selection & Focus
+   ============================================= */
+::selection {
+  background-color: var(--accent);
+  color: #FFFFFF;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* =============================================
+   Link defaults
+   ============================================= */
+a {
+  color: inherit;
+  text-decoration: none;
+}
