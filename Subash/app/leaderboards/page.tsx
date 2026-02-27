@@ -8,8 +8,8 @@ import { Trophy, Star } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-// Cache for 24 hours — the leaderboard is recalculated once a day.
-export const revalidate = 86400;
+// Always render at request time — no DB connection available at build time.
+export const dynamic = 'force-dynamic';
 
 // ─── Badge helper ──────────────────────────────────────────────────────────────
 

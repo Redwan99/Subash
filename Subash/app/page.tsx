@@ -5,8 +5,8 @@ import prisma from "@/lib/prisma";
 import { truncate } from "@/lib/utils";
 import { ClimateSection } from "@/components/ClimateSection";
 
-// ISR: page shell cached 1 hour; individual data tagged for finer invalidation
-export const revalidate = 3600;
+// Data is cached via unstable_cache; page rendered dynamically (no DB at build time)
+export const dynamic = 'force-dynamic';
 
 type PerfumeCard = {
   id: string;
@@ -15,8 +15,6 @@ type PerfumeCard = {
   brand: string;
   image_url: string | null;
 };
-
-type TrendingPerfume = PerfumeCard & { _count: { reviews: number } };
 
 /** Convert OWM data into universal climate tags that match Review.weather_tags */
 function computeClimateTags(

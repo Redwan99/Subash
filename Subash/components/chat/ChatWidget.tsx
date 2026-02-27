@@ -88,7 +88,6 @@ function NoseAITab() {
   const [input, setInput]            = useState("");
   const [isPending, startTransition] = useTransition();
   const bottomRef                    = useRef<HTMLDivElement>(null);
-  const shouldReduceMotion           = useReducedMotion();
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 

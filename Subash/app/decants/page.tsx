@@ -7,6 +7,8 @@ import { type DecantCardData } from "@/components/marketplace/DecantCard";
 import { DecantMarketClient } from "@/components/marketplace/DecantMarketClient";
 import { ShieldCheck, Package } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 // ─── Data fetching ─────────────────────────────────────────────────────────────
 
 async function getListings(): Promise<DecantCardData[]> {

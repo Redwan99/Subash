@@ -10,6 +10,8 @@ import { Search } from "lucide-react";
 import type { Metadata } from "next";
 import { SearchInput } from "./SearchInput";
 
+export const dynamic = 'force-dynamic';
+
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({

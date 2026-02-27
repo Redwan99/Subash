@@ -140,6 +140,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
       },
       { timeout: 5500, maximumAge: 300_000 }
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchIpWeather() {

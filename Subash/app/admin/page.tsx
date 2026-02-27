@@ -11,6 +11,7 @@ import { Users, BookOpen, Package, ShoppingBag, Shield, Star } from "lucide-reac
 import { SetPOTDForm } from "./SetPOTDForm";
 import type { Metadata } from "next";
 
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: "Admin Dashboard" };
 
 // ─── KPI Card ─────────────────────────────────────────────────────────────────

@@ -11,6 +11,7 @@ import { DealForm } from "./DealForm";
 import { DealActions } from "./DealActions";
 import type { Metadata } from "next";
 
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: "My Deals Dashboard" };
 
 // ─── Types ────────────────────────────────────────────────────────────────────

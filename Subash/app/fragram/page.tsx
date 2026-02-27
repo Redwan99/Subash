@@ -7,6 +7,8 @@ import Link from "next/link";
 import { FragramUpload } from "./FragramUpload";
 import { FragramLikeButton } from "./FragramLikeButton";
 
+export const dynamic = 'force-dynamic';
+
 type FragramPostCard = {
   id:        string;
   imageUrl:  string;

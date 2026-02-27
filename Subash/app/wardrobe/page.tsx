@@ -11,6 +11,7 @@ import type { WardrobePerfume } from "@/types/wardrobe";
 import type { Metadata } from "next";
 import { Archive } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: "My Wardrobe",
   description: "Your personal fragrance wardrobe — collection, wishlist, and signature scent.",
