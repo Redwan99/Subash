@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import { Providers } from "./providers";
-import { LayoutShell } from "@/components/layout/LayoutShell";
+import { TopNavbar } from "@/components/layout/TopNavbar";
 import "./globals.css";
 
 const inter = Inter({
@@ -62,19 +62,24 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+import { getFeatureMap } from "@/lib/features";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const featureToggles = await getFeatureMap();
+
   return (
     <html lang="bn" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${playfair.variable} antialiased scrollbar-thin`}
+        className={`${inter.variable} ${playfair.variable} antialiased scrollbar-thin overflow-x-hidden`}
         suppressHydrationWarning
       >
         <Providers>
-          <LayoutShell>{children}</LayoutShell>
+          <TopNavbar featureToggles={featureToggles} />
+          {children}
         </Providers>
       </body>
     </html>

@@ -151,7 +151,12 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* ── Global scrollbar hide — invisible tech ── */
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE / Edge */
 }
+html::-webkit-scrollbar { display: none; }  /* Chrome / Safari */
 
 body {
   background-color: var(--bg-primary);
@@ -159,7 +164,10 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
   line-height: 1.6;
   transition: background-color var(--transition-base), color var(--transition-base);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+body::-webkit-scrollbar { display: none; }
 
 /* =============================================
    Glassmorphism Utility Classes

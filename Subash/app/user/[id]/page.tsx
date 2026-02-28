@@ -31,10 +31,10 @@ export async function generateMetadata({
 // ─── Badge helper ─────────────────────────────────────────────────────────────
 
 function getBadge(count: number) {
-  if (count >= 150) return { emoji: "🥇", label: "VIP Nose",   color: "text-[#8B5CF6]" };
-  if (count >= 50)  return { emoji: "🥈", label: "Collector",  color: "text-[#9CA3AF]" };
-  if (count >= 11)  return { emoji: "🥉", label: "Enthusiast", color: "text-[#A0684A]" };
-  return               { emoji: "🌱", label: "Novice",       color: "text-[#34D399]" };
+  if (count >= 150) return { emoji: "🥇", label: "VIP Nose", color: "text-[#8B5CF6]" };
+  if (count >= 50) return { emoji: "🥈", label: "Collector", color: "text-[#9CA3AF]" };
+  if (count >= 11) return { emoji: "🥉", label: "Enthusiast", color: "text-[#A0684A]" };
+  return { emoji: "🌱", label: "Novice", color: "text-[#34D399]" };
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -52,37 +52,37 @@ export default async function UserProfilePage({
     prisma.user.findUnique({
       where: { id },
       select: {
-        id:           true,
-        name:         true,
-        image:        true,
-        bio:          true,
-        role:         true,
+        id: true,
+        name: true,
+        image: true,
+        bio: true,
+        role: true,
         review_count: true,
-        phoneVerified:true,
-        createdAt:    true,
+        phoneVerified: true,
+        createdAt: true,
         reviews: {
           orderBy: { createdAt: "desc" },
           take: 10,
           select: {
-            id:             true,
-            text:           true,
+            id: true,
+            text: true,
             overall_rating: true,
-            longevity_score:true,
-            sillage_score:  true,
-            createdAt:      true,
-            upvote_count:   true,
+            longevity_score: true,
+            sillage_score: true,
+            createdAt: true,
+            upvote_count: true,
             perfume: {
-              select: { id: true, name: true, brand: true, image_url: true },
+              select: { id: true, name: true, brand: true, image_url: true, slug: true },
             },
           },
         },
       },
     }),
     prisma.wardrobeItem.findMany({
-      where:   { userId: id },
+      where: { userId: id },
       orderBy: { createdAt: "desc" },
       include: {
-        perfume: { select: { id: true, name: true, brand: true, image_url: true } },
+        perfume: { select: { id: true, name: true, brand: true, image_url: true, slug: true } },
       },
     }),
   ]);
@@ -96,10 +96,11 @@ export default async function UserProfilePage({
     const shelf = item.shelf as string;
     if (!grouped[shelf]) grouped[shelf] = [];
     grouped[shelf].push({
-      id:        item.perfume.id,
-      name:      item.perfume.name,
-      brand:     item.perfume.brand,
+      id: item.perfume.id,
+      name: item.perfume.name,
+      brand: item.perfume.brand,
       image_url: item.perfume.image_url,
+      slug: item.perfume.slug,
       shelf,
     });
   }
@@ -189,7 +190,7 @@ export default async function UserProfilePage({
           ) : (
             <div className="space-y-3">
               {user.reviews.map((r) => (
-                <Link key={r.id} href={`/perfume/${r.perfume.id}`} prefetch={false}>
+                <Link key={r.id} href={`/perfume/${r.perfume.slug}`} prefetch={false}>
                   <div className="rounded-2xl px-4 py-4 cursor-pointer transition-all bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] hover:border-[#8B5CF6]/30 hover:-translate-y-[1px]">
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="min-w-0">

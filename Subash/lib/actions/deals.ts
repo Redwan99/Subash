@@ -11,9 +11,9 @@ import { revalidatePath } from "next/cache";
 
 const CreateDealSchema = z.object({
   perfumeId: z.string().min(1),
-  sellerId:  z.string().min(1),
-  price:     z.number().int().positive(),
-  link:      z.string().url().optional(),
+  sellerId: z.string().min(1),
+  price: z.number().int().positive(),
+  link: z.string().url().optional(),
 });
 
 export async function createDeal(input: z.infer<typeof CreateDealSchema>): Promise<{
@@ -46,14 +46,15 @@ export async function createDeal(input: z.infer<typeof CreateDealSchema>): Promi
       perfumeId,
       sellerId,
       price,
-      link:       link ?? null,
-      is_active:  true,
+      link: link ?? null,
+      is_active: true,
       is_featured: false,
     },
   });
 
   revalidatePath("/dashboard/deals");
-  revalidatePath(`/perfume/${perfumeId}`);
+  const p = await prisma.perfume.findUnique({ where: { id: perfumeId }, select: { slug: true } });
+  if (p) revalidatePath(`/perfume/${p.slug}`);
 
   return { success: true, dealId: deal.id };
 }
@@ -68,7 +69,7 @@ export async function toggleDealActive(
   if (!session?.user?.id) return { success: false, error: "Not authenticated." };
 
   // Verify ownership
-  const deal = await prisma.deal.findUnique({ where: { id: dealId }, select: { sellerId: true, perfumeId: true } });
+  const deal = await prisma.deal.findUnique({ where: { id: dealId }, select: { sellerId: true, perfumeId: true, perfume: { select: { slug: true } } } });
   if (
     !deal ||
     (deal.sellerId !== session.user.id && session.user.role !== "SUPER_ADMIN")
@@ -79,7 +80,7 @@ export async function toggleDealActive(
   await prisma.deal.update({ where: { id: dealId }, data: { is_active } });
 
   revalidatePath("/dashboard/deals");
-  revalidatePath(`/perfume/${deal.perfumeId}`);
+  if (deal.perfume?.slug) revalidatePath(`/perfume/${deal.perfume.slug}`);
 
   return { success: true };
 }
@@ -90,7 +91,7 @@ export async function deleteDeal(dealId: string): Promise<{ success: boolean; er
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Not authenticated." };
 
-  const deal = await prisma.deal.findUnique({ where: { id: dealId }, select: { sellerId: true, perfumeId: true } });
+  const deal = await prisma.deal.findUnique({ where: { id: dealId }, select: { sellerId: true, perfumeId: true, perfume: { select: { slug: true } } } });
   if (
     !deal ||
     (deal.sellerId !== session.user.id && session.user.role !== "SUPER_ADMIN")
@@ -101,7 +102,7 @@ export async function deleteDeal(dealId: string): Promise<{ success: boolean; er
   await prisma.deal.delete({ where: { id: dealId } });
 
   revalidatePath("/dashboard/deals");
-  revalidatePath(`/perfume/${deal.perfumeId}`);
+  if (deal.perfume?.slug) revalidatePath(`/perfume/${deal.perfume.slug}`);
 
   return { success: true };
 }

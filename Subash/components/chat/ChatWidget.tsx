@@ -19,9 +19,9 @@ import { askScentBot, type BotPerfume } from "@/lib/actions/bot";
 type Role = "bot" | "user";
 
 type Message = {
-  role:     Role;
-  text:     string;
-  time:     string;
+  role: Role;
+  text: string;
+  time: string;
   perfumes?: BotPerfume[]; // only on AI bot responses
 };
 
@@ -84,10 +84,10 @@ function PerfumeCard({ p }: { p: BotPerfume }) {
 }
 
 function NoseAITab() {
-  const [messages, setMessages]      = useState<Message[]>([AI_WELCOME]);
-  const [input, setInput]            = useState("");
+  const [messages, setMessages] = useState<Message[]>([AI_WELCOME]);
+  const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
-  const bottomRef                    = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
@@ -202,8 +202,8 @@ const MODERATOR_WHATSAPP =
 
 function SupportTab() {
   const [messages, setMessages] = useState<Message[]>([FAQ_WELCOME]);
-  const [input, setInput]       = useState("");
-  const bottomRef               = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
@@ -288,8 +288,8 @@ function SupportTab() {
 type Tab = "ai" | "support";
 
 export function ChatWidget() {
-  const [open, setOpen]    = useState(false);
-  const [tab, setTab]      = useState<Tab>("ai");
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<Tab>("ai");
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -299,10 +299,10 @@ export function ChatWidget() {
         onClick={() => setOpen((o) => !o)}
         aria-label="Open Nose AI"
         whileHover={shouldReduceMotion ? {} : { scale: 1.08 }}
-        whileTap={shouldReduceMotion  ? {} : { scale: 0.93 }}
+        whileTap={shouldReduceMotion ? {} : { scale: 0.93 }}
         transition={{ type: "spring", stiffness: 400, damping: 22 }}
         className={cn(
-          "fixed z-[150] bottom-20 right-4 md:bottom-6 md:right-6",
+          "fixed z-50 bottom-20 right-4 md:bottom-6 md:right-6",
           "w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-white",
           "bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)]",
           "shadow-[0_8px_28px_rgba(139,92,246,0.55),0_0_0_1px_rgba(139,92,246,0.25)]"
@@ -331,10 +331,10 @@ export function ChatWidget() {
           <motion.div
             initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.92, y: shouldReduceMotion ? 0 : 18 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{   opacity: 0, scale: shouldReduceMotion ? 1 : 0.92, y: 18 }}
+            exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.92, y: 18 }}
             transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 26 }}
             className={cn(
-              "fixed z-[149]",
+              "fixed z-50",
               "bottom-[calc(52px+1.25rem+3.5rem)] right-4",
               "md:bottom-[calc(52px+1.25rem+1.5rem)] md:right-6",
               "w-[calc(100vw-2rem)] max-w-[380px]",
@@ -387,7 +387,7 @@ export function ChatWidget() {
               <motion.div key={tab}
                 initial={{ opacity: 0, x: shouldReduceMotion ? 0 : (tab === "ai" ? -12 : 12) }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{   opacity: 0, x: shouldReduceMotion ? 0 : (tab === "ai" ? -12 : 12) }}
+                exit={{ opacity: 0, x: shouldReduceMotion ? 0 : (tab === "ai" ? -12 : 12) }}
                 transition={{ duration: 0.18, ease: "easeOut" }}
                 className="flex flex-col flex-1 overflow-hidden"
               >

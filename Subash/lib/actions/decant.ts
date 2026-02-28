@@ -10,10 +10,10 @@ import prisma from "@/lib/prisma";
 // ─── Create Decant Listing ─────────────────────────────────────────────────────
 
 const CreateDecantSchema = z.object({
-  perfumeId:     z.string().min(1, "Please select a perfume."),
-  batch_code:    z.string().min(1, "Batch code is required.").max(30),
-  price_5ml:     z.coerce.number().int().positive().optional().or(z.literal(0)).transform((v) => (v === 0 ? undefined : v)),
-  price_10ml:    z.coerce.number().int().positive().optional().or(z.literal(0)).transform((v) => (v === 0 ? undefined : v)),
+  perfumeId: z.string().min(1, "Please select a perfume."),
+  batch_code: z.string().min(1, "Batch code is required.").max(30),
+  price_5ml: z.coerce.number().int().positive().optional().or(z.literal(0)).transform((v) => (v === 0 ? undefined : v)),
+  price_10ml: z.coerce.number().int().positive().optional().or(z.literal(0)).transform((v) => (v === 0 ? undefined : v)),
   proof_image_url: z.string().url("Must be a valid URL (e.g. Imgur link)."),
 });
 
@@ -34,10 +34,10 @@ export async function createDecantListing(
   }
 
   const raw = {
-    perfumeId:      formData.get("perfumeId"),
-    batch_code:     formData.get("batch_code"),
-    price_5ml:      formData.get("price_5ml") || 0,
-    price_10ml:     formData.get("price_10ml") || 0,
+    perfumeId: formData.get("perfumeId"),
+    batch_code: formData.get("batch_code"),
+    price_5ml: formData.get("price_5ml") || 0,
+    price_10ml: formData.get("price_10ml") || 0,
     proof_image_url: formData.get("proof_image_url"),
   };
 
@@ -61,7 +61,7 @@ export async function createDecantListing(
       perfumeId,
       sellerId: session.user.id,
       batch_code,
-      price_5ml:  price_5ml  ?? null,
+      price_5ml: price_5ml ?? null,
       price_10ml: price_10ml ?? null,
       proof_image_url,
       status: "AVAILABLE",
@@ -69,7 +69,8 @@ export async function createDecantListing(
   });
 
   revalidatePath("/decants");
-  revalidatePath(`/perfume/${perfumeId}`);
+  const p = await prisma.perfume.findUnique({ where: { id: perfumeId }, select: { slug: true } });
+  if (p) revalidatePath(`/perfume/${p.slug}`);
 
   return { success: true, listingId: listing.id };
 }
@@ -91,7 +92,7 @@ export async function upsertWardrobeItem(
   if (!session?.user?.id) return { success: false, error: "Sign in required." };
 
   await prisma.wardrobeItem.upsert({
-    where:  { userId_perfumeId: { userId: session.user.id, perfumeId } },
+    where: { userId_perfumeId: { userId: session.user.id, perfumeId } },
     update: { shelf },
     create: { userId: session.user.id, perfumeId, shelf },
   });

@@ -3,11 +3,12 @@
 // app/user/[id]/page.tsx and components/wardrobe/WardrobePanel.tsx.
 
 export type WardrobePerfume = {
-  id:        string;
-  name:      string;
-  brand:     string;
+  id: string;
+  name: string;
+  brand: string;
   image_url: string | null;
-  shelf:     string;
+  slug: string;
+  shelf: string;
 };
 
 export type WardrobeShelf = "HAVE" | "HAD" | "WANT" | "SIGNATURE";

@@ -20,6 +20,10 @@ import {
   Settings,
   Bell,
   CheckCheck,
+  Shield,
+  BookOpen,
+  Users2,
+  Store,
   type LucideIcon,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
@@ -32,10 +36,13 @@ import {
 // ─── Top Nav Links ────────────────────────────────────────────────────────────
 
 const NAV_LINKS: { href: string; icon: LucideIcon; label: string }[] = [
-  { href: "/leaderboards", icon: Trophy,      label: "Leaderboards" },
-  { href: "/fragram",      icon: Camera,      label: "Fragram" },
-  { href: "/decants",      icon: ShoppingBag, label: "Decants" },
-  { href: "/wardrobe",     icon: Briefcase,   label: "Wardrobe" },
+  { href: "/leaderboards", icon: Trophy, label: "Leaderboards" },
+  { href: "/fragram", icon: Camera, label: "Fragram" },
+  { href: "/perfume", icon: BookOpen, label: "Encyclopedia" },
+  { href: "/creators", icon: Users2, label: "Creators" },
+  { href: "/shops", icon: Store, label: "Boutiques" },
+  { href: "/decants", icon: ShoppingBag, label: "Decants" },
+  { href: "/wardrobe", icon: Briefcase, label: "Wardrobe" },
 ];
 
 // ─── Nav Link Item ────────────────────────────────────────────────────────────
@@ -59,11 +66,10 @@ function NavLink({
         whileHover={shouldReduceMotion ? {} : { y: -1 }}
         whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 28 }}
-        className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl border ${
-          active
-            ? "bg-[rgba(139,92,246,0.14)] border-[rgba(139,92,246,0.28)]"
-            : "border-transparent"
-        }`}
+        className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl border ${active
+          ? "bg-[rgba(139,92,246,0.14)] border-[rgba(139,92,246,0.28)]"
+          : "border-transparent"
+          }`}
       >
         <Icon
           size={15}
@@ -71,9 +77,8 @@ function NavLink({
           className={active ? "text-[var(--accent)]" : "text-[var(--text-muted)]"}
         />
         <span
-          className={`text-sm font-medium hidden lg:block ${
-            active ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
-          }`}
+          className={`text-sm font-medium hidden lg:block ${active ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
+            }`}
         >
           {label}
         </span>
@@ -94,24 +99,24 @@ function NavLink({
 // ─── Notification Bell ────────────────────────────────────────────────
 
 type NotificationItem = {
-  id:        string;
-  type:      string;
-  message:   string;
-  link:      string | null;
-  read:      boolean;
+  id: string;
+  type: string;
+  message: string;
+  link: string | null;
+  read: boolean;
   createdAt: string;
 };
 
 function NotificationBell() {
   const { data: session } = useSession();
-  const router             = useRouter();
+  const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
-  const [open, setOpen]    = useState(false);
-  const ref                = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
   const [, startTransition] = useTransition();
 
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [unreadCount, setUnreadCount]     = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Close on outside click
   useEffect(() => {
@@ -128,7 +133,7 @@ function NotificationBell() {
 
     const fetchNotes = async () => {
       try {
-        const res  = await fetch("/api/notifications", { cache: "no-store" });
+        const res = await fetch("/api/notifications", { cache: "no-store" });
         const data = await res.json() as { notifications: NotificationItem[]; unreadCount: number };
         setNotifications(data.notifications);
         setUnreadCount(data.unreadCount);
@@ -166,9 +171,9 @@ function NotificationBell() {
 
   const ICON_FOR_TYPE: Record<string, string> = {
     REVIEW_UPVOTE: "⭐",
-    DUPE_VOTE:     "👍",
-    FRAGRAM_LIKE:  "❤️",
-    REVIEW_REPLY:  "💬",
+    DUPE_VOTE: "👍",
+    FRAGRAM_LIKE: "❤️",
+    REVIEW_REPLY: "💬",
   };
 
   return (
@@ -177,7 +182,7 @@ function NotificationBell() {
       <motion.button
         onClick={() => setOpen((o) => !o)}
         whileHover={shouldReduceMotion ? {} : { scale: 1.1 }}
-        whileTap={shouldReduceMotion  ? {} : { scale: 0.9 }}
+        whileTap={shouldReduceMotion ? {} : { scale: 0.9 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
         aria-label="Notifications"
         aria-expanded={open}
@@ -202,14 +207,14 @@ function NotificationBell() {
         {open && (
           <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0,   scale: 1 }}
-            exit={  { opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={
               shouldReduceMotion
                 ? { duration: 0 }
                 : { type: "spring", stiffness: 380, damping: 26 }
             }
-            className="absolute right-0 top-10 w-80 rounded-2xl overflow-hidden z-50
+            className="absolute right-0 top-10 w-80 rounded-2xl overflow-hidden z-[100]
               bg-white/60 dark:bg-black/60 backdrop-blur-2xl
               border border-white/30 dark:border-white/10
               shadow-[0_8px_40px_rgba(0,0,0,0.22)]"
@@ -241,11 +246,10 @@ function NotificationBell() {
                   <button
                     key={n.id}
                     onClick={() => handleNotificationClick(n)}
-                    className={`w-full text-left flex items-start gap-3 px-4 py-3 transition-colors duration-150 ${
-                      n.read
-                        ? "bg-transparent hover:bg-white/10 dark:hover:bg-white/5"
-                        : "bg-[var(--accent)]/8 hover:bg-[var(--accent)]/12"
-                    }`}
+                    className={`w-full text-left flex items-start gap-3 px-4 py-3 transition-colors duration-150 ${n.read
+                      ? "bg-transparent hover:bg-white/10 dark:hover:bg-white/5"
+                      : "bg-[var(--accent)]/8 hover:bg-[var(--accent)]/12"
+                      }`}
                   >
                     {/* Type emoji */}
                     <span className="mt-0.5 text-base leading-none shrink-0">
@@ -253,14 +257,13 @@ function NotificationBell() {
                     </span>
 
                     <div className="flex-1 min-w-0">
-                      <p className={`text-xs leading-relaxed break-words ${
-                        n.read ? "text-[var(--text-secondary)]" : "font-semibold text-[var(--text-primary)]"
-                      }`}>
+                      <p className={`text-xs leading-relaxed break-words ${n.read ? "text-[var(--text-secondary)]" : "font-semibold text-[var(--text-primary)]"
+                        }`}>
                         {n.message}
                       </p>
                       <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
                         {new Date(n.createdAt).toLocaleDateString("en-GB", {
-                          day:  "numeric",
+                          day: "numeric",
                           month: "short",
                           hour: "2-digit",
                           minute: "2-digit",
@@ -287,9 +290,9 @@ function NotificationBell() {
 
 function AvatarMenu() {
   const { data: session, status } = useSession();
-  const [open, setOpen]           = useState(false);
-  const ref                       = useRef<HTMLDivElement>(null);
-  const shouldReduceMotion        = useReducedMotion();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   // Close on outside click
   useEffect(() => {
@@ -337,9 +340,8 @@ function AvatarMenu() {
         whileHover={shouldReduceMotion ? {} : { scale: 1.06 }}
         whileTap={shouldReduceMotion ? {} : { scale: 0.94 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden focus-visible:outline-none border-2 border-[var(--accent)] text-white ${
-          session.user?.image ? "bg-transparent" : "bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)]"
-        }`}
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden focus-visible:outline-none border-2 border-[var(--accent)] text-white ${session.user?.image ? "bg-transparent" : "bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)]"
+          }`}
         aria-label="Open profile menu"
         aria-expanded={open}
       >
@@ -365,7 +367,7 @@ function AvatarMenu() {
             transition={
               shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 380, damping: 26 }
             }
-            className="absolute right-0 top-10 min-w-[180px] rounded-2xl overflow-hidden z-50 glass"
+            className="absolute right-0 top-10 min-w-[180px] rounded-2xl overflow-hidden z-[100] glass"
           >
             {/* User info header */}
             <div className="px-4 py-3 border-b border-[var(--border-color)]">
@@ -379,9 +381,10 @@ function AvatarMenu() {
 
             {/* Menu items */}
             {[
-              { href: "/profile", icon: User,     label: "My Profile" },
+              { href: "/profile", icon: User, label: "My Profile" },
               { href: "/wardrobe", icon: Briefcase, label: "Wardrobe" },
               { href: "/profile/edit", icon: Settings, label: "Settings" },
+              { href: "/admin", icon: Shield, label: "Admin Panel" },
             ].map(({ href, icon: Icon, label }) => (
               <Link key={href} href={href} onClick={() => setOpen(false)}>
                 <motion.div
@@ -413,8 +416,8 @@ function AvatarMenu() {
 
 // ─── Top Navbar ───────────────────────────────────────────────────────────────
 
-export function TopNavbar() {
-  const pathname           = usePathname();
+export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, boolean> }) {
+  const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -447,14 +450,19 @@ export function TopNavbar() {
 
       {/* ── Center: Search ───────────────────────────────────── */}
       <div className="flex-1 max-w-md mx-auto">
-        <SmartSearch />
+        <SmartSearch id="top-nav-search" />
       </div>
 
       {/* ── Right: Nav Links + Theme + Avatar ────────────────── */}
       <div className="flex items-center gap-1 shrink-0">
         {/* Nav links — hidden on very small screens */}
         <nav className="hidden sm:flex items-center gap-0.5">
-          {NAV_LINKS.map(({ href, icon, label }) => {
+          {NAV_LINKS.filter(l => {
+            if (l.label === "Encyclopedia" && featureToggles?.ENABLE_ENCYCLOPEDIA === false) return false;
+            if (l.label === "Creators" && featureToggles?.ENABLE_CREATORS === false) return false;
+            if (l.label === "Boutiques" && featureToggles?.ENABLE_SHOPS === false) return false;
+            return true;
+          }).map(({ href, icon, label }) => {
             const active =
               href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (

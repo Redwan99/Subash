@@ -9,18 +9,10 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Search, X, Loader2 } from "lucide-react";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
+import { incrementPerfumeSearch } from "@/lib/actions/search";
 import { cn } from "@/lib/utils";
+import { useDebounce } from "use-debounce";
 
-// ─── Debounce hook ────────────────────────────────────────────────────────────
-
-function useDebounce<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
-}
 
 // ─── Result Row ───────────────────────────────────────────────────────────────
 
@@ -74,26 +66,32 @@ function ResultRow({
 // ─── Smart Search ─────────────────────────────────────────────────────────────
 
 type SmartSearchProps = {
+  id?: string;
+  className?: string;
+  containerClassName?: string;
   onSelectResult?: (result: PerfumeSearchResult) => void;
   placeholder?: string;
   autoNavigate?: boolean;
 };
 
 export function SmartSearch({
+  id = "smart-search",
+  className,
+  containerClassName,
   onSelectResult,
   placeholder = "Search perfumes, brands, notes…",
   autoNavigate = true,
 }: SmartSearchProps) {
-  const [query, setQuery]       = useState("");
-  const [results, setResults]   = useState<PerfumeSearchResult[]>([]);
-  const [open, setOpen]         = useState(false);
-  const [focused, setFocused]   = useState(false);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<PerfumeSearchResult[]>([]);
+  const [open, setOpen] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const inputRef                = useRef<HTMLInputElement>(null);
-  const containerRef            = useRef<HTMLDivElement>(null);
-  const router                  = useRouter();
-  const shouldReduceMotion      = useReducedMotion();
-  const debounced               = useDebounce(query, 280);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const shouldReduceMotion = useReducedMotion();
+  const [debounced] = useDebounce(query, 300);
 
   // Fire search when debounced query changes
   useEffect(() => {
@@ -134,28 +132,35 @@ export function SmartSearch({
   const navigate = (result: PerfumeSearchResult) => {
     setOpen(false);
     setQuery("");
+
+    // Background tracking
+    incrementPerfumeSearch(result.id).catch(console.error);
+
     if (onSelectResult) {
       onSelectResult(result);
       return;
     }
-    if (autoNavigate) router.push(`/perfume/${result.id}`);
+    if (autoNavigate) router.push(`/perfume/${result.slug}`);
   };
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div ref={containerRef} className={cn("relative w-full", containerClassName)}>
       {/* ── Input pill ──────────────────────────────────────── */}
       <motion.div
         animate={
           shouldReduceMotion
             ? {}
             : {
-                boxShadow: focused
-                  ? "0 0 0 2px rgba(139,92,246,0.40), 0 4px 24px rgba(0,0,0,0.15)"
-                  : "0 0 0 1px var(--border-color)",
-              }
+              boxShadow: focused
+                ? "0 0 0 2px rgba(139,92,246,0.40), 0 4px 24px rgba(0,0,0,0.15)"
+                : "0 0 0 1px var(--border-color)",
+            }
         }
         transition={{ duration: 0.2 }}
-        className="flex items-center gap-2 rounded-full px-3 py-2 bg-[var(--bg-glass)] backdrop-blur-[12px] border border-[var(--border-color)]"
+        className={cn(
+          "flex items-center gap-2 rounded-full px-3 py-2 bg-[var(--bg-glass)] backdrop-blur-[12px] border border-[var(--border-color)]",
+          className
+        )}
       >
         {isPending ? (
           <Loader2
@@ -173,6 +178,7 @@ export function SmartSearch({
         )}
 
         <input
+          id={id}
           ref={inputRef}
           type="text"
           value={query}

@@ -18,12 +18,14 @@ export function FragramUpload({
 }) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<{ id: string; name: string; brand: string } | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState("");
   const [state, formAction] = useActionState(createFragramPost, initialState);
 
   useEffect(() => {
     if (state.success) {
       setOpen(false);
       setSelected(null);
+      setUploadedUrl("");
     }
   }, [state.success]);
 
@@ -104,14 +106,41 @@ export function FragramUpload({
 
               <div>
                 <label className="text-xs font-semibold text-[var(--text-secondary)]">
-                  Image URL
+                  Photo
                 </label>
                 <input
-                  name="imageUrl"
-                  type="url"
-                  placeholder="https://..."
-                  className="w-full mt-2 px-4 py-2.5 rounded-xl text-sm outline-none bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)]"
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    try {
+                      // Optionally show a loading state here
+                      const res = await fetch("/api/upload", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      const data = await res.json();
+                      if (data.success) {
+                        setUploadedUrl(data.url);
+                      } else {
+                        alert(data.error || "Upload failed");
+                      }
+                    } catch (err) {
+                      alert("Upload failed");
+                    }
+                  }}
+                  className="w-full mt-2 px-4 py-2.5 rounded-xl text-sm outline-none bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#8B5CF6]/10 file:text-[#8B5CF6] hover:file:bg-[#8B5CF6]/20"
                 />
+                <input type="hidden" name="imageUrl" value={uploadedUrl} />
+                {uploadedUrl && (
+                  <div className="mt-2 text-xs text-[#34D399]">
+                    Photo uploaded successfully!
+                  </div>
+                )}
               </div>
 
               <div>

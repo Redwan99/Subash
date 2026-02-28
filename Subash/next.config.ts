@@ -3,47 +3,69 @@
 const nextConfig: NextConfig = {
   output: "standalone",
 
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-DNS-Prefetch-Control",
+            value: "on",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "SAMEORIGIN",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+    ];
+  },
+
   images: {
-    formats: ["image/avif", "image/webp"],  // AVIF is ~50% smaller than WebP
-    minimumCacheTTL: 86400,                  // cache optimised images for 24h
+    formats: ["image/avif", "image/webp"],  // AVIF ~50% smaller than WebP
+    minimumCacheTTL: 31536000,               // cache optimised images for 1 year
+    // Wildcard: allow any remote image URL (Kaggle data has many CDN hosts)
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "fimgs.net", // Fragrantica image CDN
+        hostname: "**",   // all HTTPS image domains
       },
       {
-        protocol: "https",
-        hostname: "**.fragrantica.com",
-      },
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com", // Google profile pics
-      },
-      {
-        protocol: "https",
-        hostname: "firebasestorage.googleapis.com", // Firebase Storage (decant proof images)
-      },
-      {
-        protocol: "https",
-        hostname: "graph.facebook.com", // FB profile pics
-      },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com", // Perfume bottle images from import
-      },
-      {
-        protocol: "https",
-        hostname: "picsum.photos", // Reliable placeholder images
+        protocol: "http",
+        hostname: "**",   // all HTTP image domains (fallback / local seeds)
       },
     ],
   },
 
   experimental: {
     serverActions: {
-      // Local dev + production domain both allowed
-      allowedOrigins: ["localhost:3000", "localhost:3001", "subash.com.bd", "www.subash.com.bd"],
+      // Local dev + production domain + CasaOS allowed
+      allowedOrigins: [
+        "localhost:3000",
+        "localhost:3001",
+        "subash.com.bd",
+        "www.subash.com.bd",
+        "192.168.10.8:3000",
+      ],
     },
   },
 };
 
 export default nextConfig;
+

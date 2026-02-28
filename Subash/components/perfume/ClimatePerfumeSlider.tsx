@@ -80,8 +80,8 @@ function FloatingBottle({
             alt={name}
             width={active ? 180 : 110}
             height={active ? 220 : 150}
-            className="object-contain w-auto select-none pointer-events-none"
-            style={{ maxWidth: active ? 180 : 110, height: active ? 220 : 150 }}
+            className="object-contain select-none pointer-events-none"
+            style={{ width: "auto", height: active ? 220 : 150, maxWidth: active ? 180 : 110 }}
             unoptimized
             draggable={false}
             priority={active}

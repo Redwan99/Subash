@@ -9,6 +9,7 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 // ─── Validation schemas ───────────────────────────────────────────────────────
 
@@ -23,6 +24,7 @@ const RegisterSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .max(100, "Password is too long"),
   confirmPassword: z.string(),
+  turnstileToken: z.string().min(1, "Please complete the security check"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -50,6 +52,7 @@ export async function registerUser(
     email: formData.get("email"),
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
+    turnstileToken: formData.get("turnstileToken"),
   };
 
   // 1. Validate input
@@ -58,7 +61,16 @@ export async function registerUser(
     return { success: false, errors: parsed.error.flatten().fieldErrors };
   }
 
-  const { name, email, password } = parsed.data;
+  const { name, email, password, turnstileToken } = parsed.data;
+
+  // 1.5 Verify bot token
+  const isHuman = await verifyTurnstile(turnstileToken);
+  if (!isHuman) {
+    return {
+      success: false,
+      errors: { _form: ["Security check failed. Automated bots are not allowed."] },
+    };
+  }
 
   // 2. Check for existing account
   const existing = await prisma.user.findUnique({ where: { email } });

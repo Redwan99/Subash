@@ -4,7 +4,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { TopNavbar } from "./TopNavbar";
 import { LeftSidebar } from "./LeftSidebar";
 import { RightSidebar } from "./RightSidebar";
 import { BottomNav } from "./BottomNav";
@@ -19,8 +18,8 @@ function isAuthRoute(pathname: string) {
 
 const pageVariants = {
   initial: { opacity: 0, y: 8 },
-  enter:   { opacity: 1, y: 0 },
-  exit:    { opacity: 0, y: -4 },
+  enter: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -4 },
 };
 
 const pageTransition = {
@@ -60,7 +59,7 @@ function AmbientOrbs() {
   );
 }
 
-export function LayoutShell({ children }: { children: React.ReactNode }) {
+export function LayoutShell({ children, featureToggles }: { children: React.ReactNode; featureToggles?: Record<string, boolean> }) {
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
   const authPage = isAuthRoute(pathname);
@@ -88,8 +87,6 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       <WeatherThemeProvider />
       <AmbientOrbs />
 
-      {/* ── Top Navbar (full-width, z-50) ────────────────────── */}
-      <TopNavbar />
 
       {/* ── Left Sidebar ─────────────────────────────────────── */}
       <LeftSidebar />
@@ -101,7 +98,7 @@ export function LayoutShell({ children }: { children: React.ReactNode }) {
       <BottomNav />
 
       {/* ── Floating Chat Widget ─────────────────────────────── */}
-      <ChatWidget />
+      {featureToggles?.ENABLE_AI_BOT !== false && <ChatWidget />}
 
       {/* ── Main Content Area ────────────────────────────────── */}
       {/*

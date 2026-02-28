@@ -4,6 +4,8 @@ import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
 import { truncate } from "@/lib/utils";
 import { ClimateSection } from "@/components/ClimateSection";
+import { SmartSearch } from "@/components/ui/SmartSearch";
+import { LiveReviewFeed, type LiveReview } from "@/components/feed/LiveReviewFeed";
 
 // Data is cached via unstable_cache; page rendered dynamically (no DB at build time)
 export const dynamic = 'force-dynamic';
@@ -86,20 +88,26 @@ const getTrending = unstable_cache(
   { revalidate: 3600, tags: ["trending"] }
 );
 
-const getLatestReviews = unstable_cache(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const _getCachedReviews = unstable_cache(
   async () =>
-    prisma.review.findMany({
+    (prisma as any).review.findMany({
+      where: { status: "APPROVED" },
       orderBy: { createdAt: "desc" },
-      take: 5,
+      take: 8,
       select: {
         id: true, text: true, overall_rating: true,
-        user:    { select: { id: true, name: true, image: true } },
+        longevity_score: true, sillage_score: true,
+        time_tags: true, weather_tags: true, upvote_count: true, createdAt: true,
+        user: { select: { id: true, name: true, image: true } },
         perfume: { select: { id: true, slug: true, name: true, brand: true, image_url: true } },
       },
     }),
   ["homepage-latest-reviews"],
   { revalidate: 300, tags: ["reviews"] }
 );
+const getLatestReviews = () => _getCachedReviews() as Promise<LiveReview[]>;
+
 
 async function getClimatePicks(climateTags: string[]) {
   // Parallel: run groupBy and a fallback prefetch together — if groupBy
@@ -138,9 +146,9 @@ async function getClimatePicks(climateTags: string[]) {
       return { ...perfume, rating: g._avg?.overall_rating ?? 0, reviewCount: g._count?.id ?? 0 };
     })
     .filter(Boolean) as Array<{
-    id: string; slug: string; name: string; brand: string;
-    image_url: string | null; rating: number; reviewCount: number;
-  }>;
+      id: string; slug: string; name: string; brand: string;
+      image_url: string | null; rating: number; reviewCount: number;
+    }>;
 }
 
 export default async function HomePage() {
@@ -163,6 +171,22 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen px-4 md:px-6 pt-20 md:pt-24 pb-20">
+
+      {/* ── Hero Search Section ────────────────────────────────────────────── */}
+      <section className="max-w-4xl mx-auto text-center pt-8 pb-16 md:pt-16 md:pb-20">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight text-[var(--text-primary)] mb-4">
+          Discover Your Signature Scent.
+        </h1>
+        <p className="text-base md:text-lg text-[var(--text-secondary)] mb-10 max-w-2xl mx-auto leading-relaxed">
+          Search Bangladesh&apos;s largest fragrance encyclopedia and community.
+        </p>
+        <div className="max-w-2xl mx-auto shadow-2xl shadow-[var(--accent)]/10 rounded-full">
+          <SmartSearch
+            id="hero-search"
+            className="h-14 md:h-16 px-6 text-base md:text-lg"
+          />
+        </div>
+      </section>
 
       {/* Weather Picks — live geolocation via ClimateSection client component */}
       <section className="max-w-6xl mx-auto">
@@ -237,50 +261,8 @@ export default async function HomePage() {
         </div>
 
         <div className="space-y-4">
-          <h2 className="text-xl font-display font-semibold text-[var(--text-primary)]">
-            Latest Community Reviews
-          </h2>
-          <div className="space-y-3">
-            {latestReviews.map((review) => (
-              <Link
-                key={review.id}
-                href={`/perfume/${review.perfume.slug}`}
-                className="block rounded-2xl p-4 transition glass-subtle"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full overflow-hidden flex items-center justify-center bg-[rgba(139,92,246,0.15)]">
-                    {review.user.image ? (
-                      <Image
-                        src={review.user.image}
-                        alt={review.user.name ?? "User"}
-                        width={36}
-                        height={36}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-xs font-bold text-[var(--accent)]">
-                        {(review.user.name ?? "U").slice(0, 2).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold truncate text-[var(--text-primary)]">
-                      {review.user.name ?? "Anonymous"}
-                    </p>
-                    <p className="text-[11px] truncate text-[var(--text-secondary)]">
-                      {review.perfume.name} · {review.perfume.brand}
-                    </p>
-                  </div>
-                  <span className="text-[11px] px-2 py-1 rounded-full bg-[rgba(139,92,246,0.12)] text-[var(--accent)]">
-                    {review.overall_rating.toFixed(1)}★
-                  </span>
-                </div>
-                <p className="text-xs mt-3 text-[var(--text-secondary)]">
-                  {truncate(review.text, 120)}
-                </p>
-              </Link>
-            ))}
-          </div>
+          {/* Live Feed — SWR polls /api/reviews every 5 s */}
+          <LiveReviewFeed initialReviews={latestReviews} />
         </div>
       </section>
     </main>

@@ -23,9 +23,9 @@ import type { WardrobePerfume, WardrobeShelf as WardrobeShelfType } from "@/type
 type Shelf = WardrobeShelfType;
 
 const SHELVES: { key: Shelf; label: string; emoji: string; desc: string }[] = [
-  { key: "HAVE",      label: "Have",      emoji: "✅", desc: "Owns it" },
-  { key: "HAD",       label: "Had",       emoji: "📦", desc: "Owned before" },
-  { key: "WANT",      label: "Want",      emoji: "💛", desc: "On the wish list" },
+  { key: "HAVE", label: "Have", emoji: "✅", desc: "Owns it" },
+  { key: "HAD", label: "Had", emoji: "📦", desc: "Owned before" },
+  { key: "WANT", label: "Want", emoji: "💛", desc: "On the wish list" },
   { key: "SIGNATURE", label: "Signature", emoji: "✍️", desc: "Go-to scent" },
 ];
 
@@ -59,7 +59,7 @@ function BottleCard({
       transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 28 }}
       className="relative group"
     >
-      <Link href={`/perfume/${perfume.id}`} prefetch={false}>
+      <Link href={`/perfume/${perfume.slug}`} prefetch={false}>
         <div className="rounded-2xl overflow-hidden p-3 text-center bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
           {/* Bottle image */}
           <div className="w-full h-24 flex items-center justify-center rounded-xl mb-2 overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6]/20">
@@ -113,14 +113,14 @@ function AddModal({
   onClose: () => void;
   onAdded: (perfume: WardrobePerfume, shelf: Shelf) => void;
 }) {
-  const [query,    setQuery]    = useState("");
-  const [results,  setResults]  = useState<PerfumeSearchResult[]>([]);
-  const [selected, setSel]      = useState<PerfumeSearchResult | null>(null);
-  const [shelf,    setShelf]    = useState<Shelf>("HAVE");
-  const [isPending, start]      = useTransition();
-  const [done,     setDone]     = useState(false);
-  const shouldReduceMotion      = useReducedMotion();
-  const timerRef                = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<PerfumeSearchResult[]>([]);
+  const [selected, setSel] = useState<PerfumeSearchResult | null>(null);
+  const [shelf, setShelf] = useState<Shelf>("HAVE");
+  const [isPending, start] = useTransition();
+  const [done, setDone] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const search = useCallback((q: string) => {
     setQuery(q);
@@ -301,9 +301,9 @@ export function WardrobePanel({
   userId: string;
 }) {
   const [activeShelf, setActiveShelf] = useState<Shelf>("HAVE");
-  const [items, setItems]             = useState(grouped);
-  const [showModal, setShowModal]     = useState(false);
-  const shouldReduceMotion            = useReducedMotion();
+  const [items, setItems] = useState(grouped);
+  const [showModal, setShowModal] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const handleRemove = (shelfKey: string, perfumeId: string) => {
     setItems((prev) => ({
@@ -359,7 +359,7 @@ export function WardrobePanel({
         className="flex gap-1 p-1 rounded-xl mb-5 overflow-x-auto bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)]"
       >
         {SHELVES.map(({ key, label, emoji }) => {
-          const count   = items[key]?.length ?? 0;
+          const count = items[key]?.length ?? 0;
           const isActive = activeShelf === key;
           return (
             <button

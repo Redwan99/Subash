@@ -8,20 +8,22 @@ import { useFormStatus } from "react-dom";
 import { registerUser, type ActionResult } from "@/lib/actions/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { BotShield } from "@/components/ui/BotShield";
 
 // ─── Submit Button (reads pending state from nearest form) ─────────────────
 
-function SubmitButton() {
+function SubmitButton({ disabledOverride }: { disabledOverride: boolean }) {
   const { pending } = useFormStatus();
+  const isDisabled = pending || disabledOverride;
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={isDisabled}
       className={cn(
         "w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 border",
-        pending
+        isDisabled
           ? "bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-color)]"
           : "bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)] text-white border-[var(--border-color)]"
       )}
@@ -85,6 +87,7 @@ function Input({
 
 export function RegisterForm() {
   const router = useRouter();
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [state, formAction] = useActionState<ActionResult | null, FormData>(
     registerUser,
     null
@@ -133,7 +136,10 @@ export function RegisterForm() {
       <Input id="password" name="password" type="password" placeholder="Password (min. 8 characters)" errors={fieldErrors.password} />
       <Input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" errors={fieldErrors.confirmPassword} />
 
-      <SubmitButton />
+      <BotShield onVerify={setTurnstileToken} />
+      <input type="hidden" name="turnstileToken" value={turnstileToken} />
+
+      <SubmitButton disabledOverride={!turnstileToken} />
 
       <p className="text-center text-xs text-[var(--text-muted)]">
         Already have an account?{" "}

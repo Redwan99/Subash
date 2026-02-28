@@ -23,7 +23,7 @@ interface SidebarData {
     top_notes: string[];
   } | null;
   trendingBrands: { brand: string; count: number; badge: string }[];
-  trendingPerfumes: { id: string; slug: string; name: string; brand: string }[];
+  trendingPerfumes: { id: string; slug: string; name: string; brand: string; image_url: string | null }[];
   activity: unknown[];
 }
 
@@ -55,9 +55,7 @@ function POTDCard({ potd }: { potd: SidebarData["potd"] }) {
           </div>
           <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">Scent of the Day</span>
         </div>
-        <div className="w-full h-28 rounded-xl bg-[rgba(139,92,246,0.06)] flex items-center justify-center">
-          <Loader2 size={20} className="animate-spin text-[var(--accent)] opacity-40" />
-        </div>
+        <div className="w-full h-28 rounded-xl skeleton" />
       </SideCard>
     );
   }
@@ -98,88 +96,52 @@ function POTDCard({ potd }: { potd: SidebarData["potd"] }) {
   );
 }
 
-// Trending Brands Card (live from DB)
-function TrendingBrandsCard({ brands }: { brands: SidebarData["trendingBrands"] }) {
+// Trending Perfumes Card (live from DB)
+function TrendingPerfumesCard({ perfumes }: { perfumes: SidebarData["trendingPerfumes"] }) {
   const reduced = useReducedMotion();
   const BADGES = ["🔥", "📈", "⭐", "🏆", "💎"];
-  const list = brands.length > 0 ? brands : Array.from({ length: 5 }, (_, i) => ({ brand: "—", count: 0, badge: BADGES[i] }));
+
+  if (!perfumes || perfumes.length === 0) return null;
+
   return (
     <SideCard delay={0.16}>
       <div className="flex items-center gap-2 mb-3">
         <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-[rgba(99,211,155,0.15)]">
           <TrendingUp size={13} className="text-[#34D399]" />
         </div>
-        <span className="text-[10px] font-bold tracking-widest uppercase text-[#34D399]">Trending Houses</span>
+        <span className="text-[10px] font-bold tracking-widest uppercase text-[#34D399]">Trending Perfumes</span>
       </div>
       <ul className="space-y-1.5">
-        {list.map(({ brand, count, badge }, i) => (
-          <li key={`${brand}-${i}`}>
-            <motion.div
-              whileHover={reduced ? {} : { x: 3 }}
-              transition={{ type: "spring", stiffness: 400, damping: 28 }}
-              className={`flex items-center justify-between px-2 py-1.5 rounded-lg ${i === 0 ? "bg-[rgba(139,92,246,0.08)]" : ""}`}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold w-4 text-center text-[var(--text-muted)]">{i + 1}</span>
-                <span className="text-sm font-medium text-[var(--text-primary)]">{brand}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {count > 0 && <span className="text-[9px] text-[var(--text-muted)]">{count}</span>}
-                <span>{badge}</span>
-              </div>
-            </motion.div>
+        {perfumes.map((p, i) => (
+          <li key={p.id}>
+            <Link href={`/perfume/${p.slug}`} prefetch={false}>
+              <motion.div
+                whileHover={reduced ? {} : { x: 3 }}
+                transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                className={`flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors hover:bg-[rgba(139,92,246,0.1)] ${i === 0 ? "bg-[rgba(139,92,246,0.08)]" : ""}`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-xs font-bold w-4 text-center text-[var(--text-muted)] shrink-0">{i + 1}</span>
+                  <div className="w-6 h-6 rounded bg-[rgba(255,255,255,0.05)] flex items-center justify-center shrink-0 overflow-hidden">
+                    {p.image_url ? (
+                      <Image src={p.image_url} alt={p.name} width={24} height={24} className="object-cover" />
+                    ) : (
+                      <span className="text-[10px]">🧴</span>
+                    )}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-medium text-[var(--text-primary)] truncate">{p.name}</span>
+                    <span className="text-[9px] text-[var(--text-muted)] truncate">{p.brand}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0 pl-2">
+                  <span>{BADGES[i] || ""}</span>
+                </div>
+              </motion.div>
+            </Link>
           </li>
         ))}
       </ul>
-    </SideCard>
-  );
-}
-
-// Fragram CTA
-function FragramCard() {
-  return (
-    <SideCard delay={0.22} href="/fragram">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-[rgba(139,92,246,0.18)]">
-          <Camera size={13} className="text-[var(--accent)]" />
-        </div>
-        <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">Fragram</span>
-      </div>
-      <div className="w-full h-16 rounded-xl mb-3 flex items-center justify-center bg-[linear-gradient(135deg,rgba(139,92,246,0.10),rgba(139,92,246,0.03))] border border-[rgba(139,92,246,0.15)]">
-        <span className="text-3xl">📸</span>
-      </div>
-      <p className="text-sm font-bold leading-snug text-[var(--text-primary)]">Scent of the Day Feed</p>
-      <p className="text-[11px] leading-snug mt-1 text-[var(--text-secondary)]">Share your bottle. See what the community is wearing.</p>
-      <div className="flex items-center justify-between mt-2.5">
-        <span className="text-[11px] font-semibold text-[var(--accent)]">Upload SOTD</span>
-        <span className="flex items-center gap-1 text-[11px] text-[var(--text-muted)]">Open <ExternalLink size={10} /></span>
-      </div>
-    </SideCard>
-  );
-}
-
-// Deal CTA
-function TopDealCard() {
-  return (
-    <SideCard delay={0.28} href="/decants">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-[rgba(239,68,68,0.15)]">
-          <Flame size={13} className="text-[#EF4444]" />
-        </div>
-        <span className="text-[10px] font-bold tracking-widest uppercase text-[#EF4444]">Deal of the Week</span>
-        <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[rgba(52,211,153,0.15)] text-[#34D399]">✓ Live</span>
-      </div>
-      <p className="text-sm font-bold leading-snug mb-0.5 text-[var(--text-primary)]">Armaf Club de Nuit Intense EDP</p>
-      <p className="text-[11px] mb-2.5 text-[var(--text-muted)]">Armaf · PerfumeBD</p>
-      <div className="flex items-center gap-2">
-        <span className="text-base font-bold text-[var(--accent)]">৳ 2,450</span>
-        <span className="text-xs line-through text-[var(--text-muted)]">৳ 3,200</span>
-        <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-[rgba(239,68,68,0.15)] text-[#EF4444]">23% off</span>
-      </div>
-      <div className="flex items-center gap-1.5 mt-2.5">
-        <Tag size={11} className="text-[var(--text-muted)]" />
-        <span className="text-[11px] text-[var(--text-muted)]">Limited time offer</span>
-      </div>
     </SideCard>
   );
 }
@@ -206,9 +168,7 @@ export function LeftSidebar() {
     >
       <div className="p-3 space-y-3 flex-1">
         <POTDCard potd={data?.potd ?? null} />
-        <TrendingBrandsCard brands={data?.trendingBrands ?? []} />
-        <FragramCard />
-        <TopDealCard />
+        <TrendingPerfumesCard perfumes={data?.trendingPerfumes ?? []} />
       </div>
       <p className="text-center text-[10px] py-3 shrink-0 text-[var(--text-muted)]">Subash · সুবাশ</p>
     </motion.aside>

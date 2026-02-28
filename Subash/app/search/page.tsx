@@ -43,12 +43,12 @@ async function search(q: string): Promise<PerfumeResult[]> {
   const results = await prisma.perfume.findMany({
     where: {
       OR: [
-        { name:        { contains: q, mode: "insensitive" } },
-        { brand:       { contains: q, mode: "insensitive" } },
-        { top_notes:   { hasSome: [q] } },
+        { name: { contains: q, mode: "insensitive" } },
+        { brand: { contains: q, mode: "insensitive" } },
+        { top_notes: { hasSome: [q] } },
         { heart_notes: { hasSome: [q] } },
-        { base_notes:  { hasSome: [q] } },
-        { perfumer:    { contains: q, mode: "insensitive" } },
+        { base_notes: { hasSome: [q] } },
+        { perfumer: { contains: q, mode: "insensitive" } },
       ],
     },
     select: {
@@ -65,7 +65,7 @@ async function search(q: string): Promise<PerfumeResult[]> {
 
 function ResultCard({ p }: { p: PerfumeResult }) {
   return (
-    <Link href={`/perfume/${p.id}`} prefetch={false}>
+    <Link href={`/perfume/${p.slug}`} prefetch={false}>
       <div className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] hover:border-[#8B5CF6]/35 hover:-translate-y-[2px] hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)]">
         {/* Image */}
         <div className="shrink-0 w-12 h-16 rounded-xl flex items-center justify-center overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6]/20">

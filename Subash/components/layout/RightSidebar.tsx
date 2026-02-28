@@ -5,8 +5,9 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { Activity, Star, Camera, Zap, Loader2 } from "lucide-react";
+import { Activity, Star, Camera, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
+import { LeaderboardWidget } from "@/components/ui/LeaderboardWidget";
 
 // Types
 interface ActivityItem {
@@ -106,8 +107,12 @@ export function RightSidebar() {
       className="fixed right-0 hidden lg:flex flex-col z-40 overflow-y-auto top-[var(--topnav-height,60px)] h-[calc(100vh-var(--topnav-height,60px))] w-[var(--sidebar-right-width)] bg-[var(--bg-glass)] backdrop-blur-[var(--blur-backdrop)] border-l border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] [scrollbar-width:none]"
       aria-label="Live community activity"
     >
+      <div className="pt-6">
+        <LeaderboardWidget />
+      </div>
+
       {/* Header */}
-      <div className="px-4 pt-6 pb-3">
+      <div className="px-4 pt-2 pb-3">
         <div className="flex items-center gap-2">
           <Activity size={14} className="text-[var(--accent)]" />
           <h2 className="text-xs font-bold tracking-widest uppercase text-[var(--text-secondary)]">Live Activity</h2>
@@ -119,13 +124,21 @@ export function RightSidebar() {
         </div>
       </div>
 
-      <div className="mx-4 h-px bg-[var(--border-color)]" />
+      <div className="mx-4 h-px bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)]" />
 
       {/* Activity Feed */}
       <div className="flex-1 px-3 py-3 space-y-2">
         {!data ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 size={18} className="animate-spin text-[var(--accent)] opacity-40" />
+          <div className="space-y-2 py-4">
+            {[0.9, 0.7, 0.8].map((w, i) => (
+              <div key={i} className="flex items-center gap-2.5 px-1">
+                <div className="w-7 h-7 rounded-lg skeleton shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="skeleton h-2 rounded-full" style={{ width: `${w * 100}%` }} />
+                  <div className="skeleton h-1.5 rounded-full w-2/5" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : activity.length === 0 ? (
           <p className="text-[11px] text-center py-6 text-[var(--text-muted)]">No recent activity yet</p>
@@ -137,27 +150,27 @@ export function RightSidebar() {
       </div>
 
       {/* Footer: Trending */}
-      <div className="px-4 py-4 border-t border-[var(--border-color)]">
+      <div className="px-4 py-4 border-t border-[linear-gradient(90deg,transparent,var(--border-color),transparent)]">
         <p className="text-[10px] font-semibold tracking-widest uppercase mb-2 text-[var(--text-muted)]">Trending This Week</p>
         <div className="space-y-1.5">
           {trending.length > 0
             ? trending.map(({ id, slug, name, brand }, i) => (
-                <Link key={id} href={`/perfume/${slug}`} prefetch={false}>
-                  <div className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                    <span className="text-[10px] font-bold w-4 text-right text-[var(--accent)]">{i + 1}</span>
-                    <div className="min-w-0">
-                      <span className="text-xs truncate block text-[var(--text-secondary)]">{name}</span>
-                      <span className="text-[10px] text-[var(--text-muted)]">{brand}</span>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            : ["—", "—", "—"].map((_, i) => (
-                <div key={i} className="flex items-center gap-2">
+              <Link key={id} href={`/perfume/${slug}`} prefetch={false}>
+                <div className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                   <span className="text-[10px] font-bold w-4 text-right text-[var(--accent)]">{i + 1}</span>
-                  <span className="text-xs text-[var(--text-muted)]">Loading…</span>
+                  <div className="min-w-0">
+                    <span className="text-xs truncate block text-[var(--text-secondary)]">{name}</span>
+                    <span className="text-[10px] text-[var(--text-muted)]">{brand}</span>
+                  </div>
                 </div>
-              ))}
+              </Link>
+            ))
+            : ["—", "—", "—"].map((_, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="text-[10px] font-bold w-4 text-right text-[var(--accent)]">{i + 1}</span>
+                <span className="text-xs text-[var(--text-muted)]">Loading…</span>
+              </div>
+            ))}
         </div>
       </div>
     </motion.aside>

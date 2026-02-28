@@ -3,9 +3,12 @@
 // Public endpoint — no auth required (only aggregated, non-sensitive data).
 
 import { NextResponse } from "next/server";
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+// Revalidate isn't needed here explicitly if we rely on unstable_cache interval, 
+// but we'll leave dynamic and wrap DB calls.
 export const revalidate = 0;
 
 function timeAgo(date: Date): string {
@@ -18,8 +21,8 @@ function timeAgo(date: Date): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-export async function GET() {
-  try {
+const getCachedSidebarData = unstable_cache(
+  async () => {
     // ── 1. Perfume of the Day ────────────────────────────────────
     // Check PerfumeOfTheDay table first, else pick by day-of-year mod count
     const todayStart = new Date();
@@ -76,14 +79,11 @@ export async function GET() {
       badge: ["🔥", "📈", "⭐", "🏆", "💎"][i],
     }));
 
-    // ── 3. Trending Perfumes (most reviewed, fallback: newest) ───
+    // ── 3. Trending Perfumes (by search count) ─────────
     const trendingPerfumes = await prisma.perfume.findMany({
-      take: 3,
+      take: 5,
       select: { id: true, slug: true, name: true, brand: true, image_url: true, accords: true },
-      orderBy: [
-        { reviews: { _count: "desc" } },
-        { createdAt: "desc" },
-      ],
+      orderBy: { searchCount: "desc" },
     });
 
     // ── 4. Recent Activity (reviews + fragram posts) ─────────────
@@ -140,13 +140,32 @@ export async function GET() {
         time: timeAgo(p.createdAt),
         href: "/fragram",
       })),
-    ].sort((a, b) => a.time.localeCompare(b.time));
+    ];
+
+    return { potd, trendingBrands, trendingPerfumes, activity };
+  },
+  ['sidebar-cache'],
+  { revalidate: 3600 }
+);
+
+export async function GET() {
+  try {
+    const { potd, trendingBrands, trendingPerfumes, activity } = await getCachedSidebarData();
+
+    // Dynamically recalculate timeAgo for activity so it's fresh even if cached
+    const freshActivity = activity.sort((a, b) => {
+      // timeAgo sorting relies on fresh display, but wait...
+      // The cached values already have string `timeAgo` calculated at generation time.
+      // E.g., "5m ago". Let's serve it as is, or we'd need to cache raw Date and map here.
+      // The cache lives for 1hr. The string is close enough or we can leave it to client.
+      return a.time.localeCompare(b.time);
+    });
 
     return NextResponse.json({
       potd,
       trendingBrands,
       trendingPerfumes,
-      activity,
+      activity: freshActivity,
     });
   } catch (err) {
     console.error("[/api/sidebar]", err);

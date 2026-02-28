@@ -1,201 +1,146 @@
 "use server";
-// lib/actions/bot.ts
-// Nose AI — keyword-extraction engine powering the Scent Guru chat bot.
-// No external LLM needed: pure Prisma + smart keyword matching on our Kaggle data.
 
 import prisma from "@/lib/prisma";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export type BotPerfume = {
-  id:        string;
-  name:      string;
-  brand:     string;
+  id: string;
+  name: string;
+  brand: string;
   image_url: string | null;
-  gender:    string | null;
-  accords:   string[];
+  slug: string;
+  accords: string[];
+  gender: string | null;
 };
 
 export type BotResponse = {
-  text:     string;
+  text: string;
   perfumes: BotPerfume[];
 };
 
-// ─── Keyword dictionaries ─────────────────────────────────────────────────────
+// A simple dictionary of well-known accords
+const KNOWN_ACCORDS = [
+  "woody", "vanilla", "citrus", "floral", "fruity", "sweet",
+  "leather", "spicy", "aquatic", "fresh", "green", "powdery",
+  "amber", "musk", "rose", "oud", "patchouli", "aromatic"
+];
 
-const ACCORD_KEYWORDS: Record<string, string[]> = {
-  vanilla:    ["vanilla", "gourmand", "sweet", "dessert", "sugar", "caramel"],
-  woody:      ["wood", "woody", "cedar", "sandalwood", "oakmoss", "timber"],
-  citrus:     ["citrus", "lemon", "bergamot", "orange", "grapefruit", "lime", "zest", "fresh"],
-  floral:     ["floral", "rose", "jasmine", "flower", "bloom", "peony", "lily", "iris"],
-  musky:      ["musky", "musk", "skin", "clean", "soapy", "soft"],
-  leather:    ["leather", "suede", "tobacco", "smoky", "smoke", "intense"],
-  spicy:      ["spicy", "spice", "pepper", "clove", "cinnamon", "hot", "bold"],
-  oriental:   ["oriental", "amber", "balsamic", "resinous", "incense", "warmth"],
-  aquatic:    ["aquatic", "ocean", "sea", "marine", "water", "watery", "cool"],
-  fruity:     ["fruity", "fruit", "apple", "peach", "berry", "tropical"],
-  powdery:    ["powdery", "powder", "talc", "gentle", "delicate"],
-  oud:        ["oud", "oud wood", "agarwood", "arabic", "rich", "dark"],
-  green:      ["green", "grass", "herbal", "herb", "nature", "earthy", "vetiver"],
-  patchouli:  ["patchouli", "damp", "mossy", "bohemian"],
-};
-
-// Map user vibe words → accord bucket (for natural language bridging)
 const VIBE_MAP: Record<string, string[]> = {
-  "date":      ["musky", "floral", "oriental", "vanilla"],
-  "office":    ["citrus", "aquatic", "powdery", "green"],
-  "rain":      ["aquatic", "green", "musky"],
-  "summer":    ["citrus", "aquatic", "fruity"],
-  "winter":    ["oriental", "spicy", "vanilla", "woody"],
-  "gym":       ["aquatic", "citrus", "musky"],
-  "night out": ["oriental", "leather", "oud", "spicy"],
-  "casual":    ["citrus", "musky", "fruity", "green"],
-  "luxury":    ["oud", "floral", "oriental", "vanilla"],
-  "beach":     ["aquatic", "citrus", "fruity"],
-  "romantic":  ["floral", "musky", "vanilla", "oriental"],
-  "fresh":     ["citrus", "aquatic", "green"],
-  "bold":      ["leather", "oud", "spicy", "oriental"],
-  "subtle":    ["powdery", "musky", "citrus", "floral"],
-  "morning":   ["citrus", "green", "aquatic"],
-  "evening":   ["oriental", "floral", "musky", "oud"],
+  date: ["sweet", "spicy", "vanilla", "amber", "leather"],
+  office: ["fresh", "citrus", "floral", "powdery", "aquatic"],
+  gym: ["fresh", "citrus", "aquatic", "green"],
+  club: ["sweet", "spicy", "amber", "oud", "vanilla"],
+  rain: ["aquatic", "green", "earthy", "woody"],
+  summer: ["citrus", "fresh", "aquatic", "fruity"],
+  winter: ["spicy", "amber", "woody", "sweet", "vanilla"]
 };
-
-const GENDER_MAP: Record<string, string> = {
-  "for men":        "for men",
-  "men":            "for men",
-  "man":            "for men",
-  "him":            "for men",
-  "his":            "for men",
-  "male":           "for men",
-  "masculine":      "for men",
-  "for women":      "for women",
-  "women":          "for women",
-  "woman":          "for women",
-  "her":            "for women",
-  "female":         "for women",
-  "feminine":       "for women",
-  "ladies":         "for women",
-  "lady":           "for women",
-  "unisex":         "for women and men",
-  "both":           "for women and men",
-  "gender neutral": "for women and men",
-  "neutral":        "for women and men",
-};
-
-// ─── Extraction helpers ───────────────────────────────────────────────────────
-
-function extractAccords(msg: string): string[] {
-  const lower = msg.toLowerCase();
-  const matched = new Set<string>();
-
-  // Direct accord name hits
-  for (const [accord, keywords] of Object.entries(ACCORD_KEYWORDS)) {
-    if (keywords.some((kw) => lower.includes(kw))) {
-      matched.add(accord);
-    }
-  }
-
-  // Vibe → accord bridging
-  for (const [vibe, accords] of Object.entries(VIBE_MAP)) {
-    if (lower.includes(vibe)) {
-      accords.forEach((a) => matched.add(a));
-    }
-  }
-
-  return Array.from(matched);
-}
-
-function extractGender(msg: string): string | null {
-  const lower = msg.toLowerCase();
-  for (const [kw, gender] of Object.entries(GENDER_MAP)) {
-    if (lower.includes(kw)) return gender;
-  }
-  return null;
-}
-
-function extractSearchTerms(msg: string): string[] {
-  // Strip common stop-words and return meaningful tokens (length ≥ 4)
-  const STOP = new Set([
-    "a","an","the","is","it","in","on","for","me","my","i","want","need","find",
-    "looking","something","like","that","this","with","any","give","suggest",
-    "recommend","scent","fragrance","perfume","cologne","smell","wear","smells",
-  ]);
-  return msg
-    .toLowerCase()
-    .replace(/[^a-z0-9 ]/g, " ")
-    .split(/\s+/)
-    .filter((t) => t.length >= 4 && !STOP.has(t));
-}
-
-// ─── Friendly response generator ──────────────────────────────────────────────
-
-function buildResponse(
-  count: number,
-  accords: string[],
-  gender: string | null,
-  vibes: string[]
-): string {
-  if (count === 0) {
-    return "I searched our entire Kaggle database but couldn't find an exact match for that request. Try describing the mood, season, or a specific note (e.g. 'woody date-night' or 'citrus summer'). 🕵️";
-  }
-
-  const parts: string[] = [];
-  if (gender)        parts.push(gender === "for women and men" ? "a unisex" : gender.replace("for ", "a "));
-  if (vibes.length)  parts.push(vibes.slice(0, 2).join(" & ") + "-inspired");
-  if (accords.length) parts.push(accords.slice(0, 3).join(", ") + " scent");
-
-  const desc = parts.length ? parts.join(" ") : "fragrance";
-  const plural = count === 1 ? "this" : `these ${count}`;
-
-  return `✨ Based on your vibe, I picked ${plural} ${desc} from our database. Tap any card to explore the full profile!`;
-}
-
-// ─── Main server action ───────────────────────────────────────────────────────
 
 export async function askScentBot(userMessage: string): Promise<BotResponse> {
-  const accords  = extractAccords(userMessage);
-  const gender   = extractGender(userMessage);
-  const terms    = extractSearchTerms(userMessage);
-  const vibes    = Object.keys(VIBE_MAP).filter((v) =>
-    userMessage.toLowerCase().includes(v)
-  );
+  const msg = userMessage.toLowerCase();
 
-  // Build OR clauses
-  const orClauses: object[] = [];
+  // 0. Platform Support / FAQ interception
+  if (
+    msg.includes("sell") || msg.includes("decant") || msg.includes("verified seller") ||
+    msg.includes("report") || msg.includes("fake") || msg.includes("moderator") ||
+    msg.includes("support") || msg.includes("help") || msg.includes("badges")
+  ) {
+    let supportText = "I am Subash AI, an elite fragrance expert and platform assistant. ";
+    if (msg.includes("decant") || msg.includes("sell")) {
+      supportText += "To sell decants, you need a verified phone and 50+ reviews to become a Verified Seller. Then you can post a listing in the Decant Market.";
+    } else if (msg.includes("report") || msg.includes("fake")) {
+      supportText += "Safety is our priority. If you encounter a fake listing, please use the 'Report' button or escalate to a human moderator via the Support tab.";
+    } else {
+      supportText += "For platform guidelines or moderation issues, please check the Support tab FAQs or escalate to our human team.";
+    }
 
-  if (accords.length > 0) {
-    orClauses.push({ accords: { hasSome: accords } });
+    return { text: supportText, perfumes: [] };
   }
 
-  // Full-text fallback: match meaningful words against name / brand / description
-  for (const term of terms.slice(0, 4)) {
-    orClauses.push({ name:        { contains: term, mode: "insensitive" as const } });
-    orClauses.push({ brand:       { contains: term, mode: "insensitive" as const } });
-    orClauses.push({ description: { contains: term, mode: "insensitive" as const } });
+  // 1. Extract gender
+  let genderFilter: string | undefined;
+  if (msg.includes("unisex")) genderFilter = "unisex";
+  else if (msg.includes("women") || msg.includes("girl") || msg.includes("her")) genderFilter = "women";
+  else if (msg.includes("men") || msg.includes("boy") || msg.includes("him")) genderFilter = "for men";
+
+  // 2. Extract accords & vibes
+  const extractedAccords = new Set<string>();
+
+  // Direct accords
+  for (const accord of KNOWN_ACCORDS) {
+    if (msg.includes(accord)) extractedAccords.add(accord);
   }
 
-  if (orClauses.length === 0) {
-    // Pure fallback — return newest releases
-    const fallback = await prisma.perfume.findMany({
-      select: { id: true, name: true, brand: true, image_url: true, gender: true, accords: true },
-      orderBy: [{ release_year: "desc" }, { name: "asc" }],
-      take: 3,
-    });
-    return { text: "Here are some popular recent releases to get you started! 🌟", perfumes: fallback };
+  // Vibes mapping
+  for (const [vibe, mappedAccords] of Object.entries(VIBE_MAP)) {
+    if (msg.includes(vibe)) {
+      mappedAccords.forEach((a) => extractedAccords.add(a));
+    }
   }
 
-  const where: Record<string, unknown> = { OR: orClauses };
-  if (gender) where.gender = { contains: gender.replace("for ", ""), mode: "insensitive" };
+  // 3. Build Prisma query
+  const whereClause: any = {};
 
+  if (genderFilter) {
+    // Exact or contains match on gender
+    whereClause.gender = { contains: genderFilter, mode: "insensitive" };
+  }
+
+  if (extractedAccords.size > 0) {
+    // Match perfumes that contain at least one (or ideally multiple) of these accords
+    whereClause.accords = { hasSome: Array.from(extractedAccords) };
+  }
+
+  // If no filters were extracted, let's just do a random search or fallback
+  if (!genderFilter && extractedAccords.size === 0) {
+    // Attempt keyword search on name or brand as fallback
+    const tokens = msg.split(" ").filter(t => t.length > 3);
+    if (tokens.length > 0) {
+      whereClause.OR = tokens.map(t => ({
+        name: { contains: t, mode: "insensitive" }
+      }));
+    } else {
+      // Complete fallback - trending/popular (using review count proxy or just latest)
+      return {
+        text: "I couldn't detect any specific notes or vibes. Try asking for something like 'a woody fragrance for men', 'a fresh scent for the office', or ask me about platform rules (e.g., 'how to sell decants').",
+        perfumes: []
+      };
+    }
+  }
+
+  // Execute query
   const perfumes = await prisma.perfume.findMany({
-    where,
-    select: { id: true, name: true, brand: true, image_url: true, gender: true, accords: true },
+    where: whereClause,
     take: 3,
-    orderBy: { name: "asc" },
+    // Add some ranking if possible, or just orderBy latest
+    orderBy: { release_year: "desc" },
+    select: {
+      id: true,
+      name: true,
+      brand: true,
+      image_url: true,
+      slug: true,
+      accords: true,
+      gender: true,
+    }
   });
 
+  // 4. Generate friendly response text
+  let replyText = "Here are some scents I found for you!";
+
+  if (perfumes.length === 0) {
+    replyText = "I couldn't find any perfumes matching exactly that profile! Try broadening your search.";
+  } else {
+    const accordNames = Array.from(extractedAccords).join(", ");
+    if (accordNames && genderFilter) {
+      replyText = `Found some great ${genderFilter} options with ${accordNames} notes.`;
+    } else if (accordNames) {
+      replyText = `I recommend these fragrances featuring ${accordNames} accords.`;
+    } else if (genderFilter) {
+      replyText = `Here are some highly-rated fragrances ${genderFilter}.`;
+    }
+  }
+
   return {
-    text:     buildResponse(perfumes.length, accords, gender, vibes),
-    perfumes,
+    text: replyText,
+    perfumes
   };
 }

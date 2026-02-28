@@ -12,6 +12,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { Send, Star, LogIn, CheckCircle, AlertCircle } from "lucide-react";
 import { submitReview, type ReviewFormState } from "@/lib/actions/perfume";
+import { BotShield } from "@/components/ui/BotShield";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -19,22 +20,22 @@ type WeatherTag = "HOT" | "MILD" | "COLD" | "HUMID" | "DRY" | "RAINY";
 type TimeTag = "DAY" | "NIGHT" | "BOTH";
 
 const WEATHER_CONDITIONS: { value: WeatherTag; label: string; emoji: string; desc: string }[] = [
-  { value: "HOT",   label: "Hot",   emoji: "☀️",  desc: "> 28°C"       },
-  { value: "MILD",  label: "Mild",  emoji: "⛅",   desc: "15–28°C"      },
-  { value: "COLD",  label: "Cold",  emoji: "❄️",  desc: "< 15°C"       },
-  { value: "HUMID", label: "Humid", emoji: "💧",  desc: "Humidity > 70%" },
-  { value: "DRY",   label: "Dry",   emoji: "🏜️",  desc: "Humidity < 40%" },
-  { value: "RAINY", label: "Rainy", emoji: "🌧️",  desc: "Rain / Drizzle" },
+  { value: "HOT", label: "Hot", emoji: "☀️", desc: "> 28°C" },
+  { value: "MILD", label: "Mild", emoji: "⛅", desc: "15–28°C" },
+  { value: "COLD", label: "Cold", emoji: "❄️", desc: "< 15°C" },
+  { value: "HUMID", label: "Humid", emoji: "💧", desc: "Humidity > 70%" },
+  { value: "DRY", label: "Dry", emoji: "🏜️", desc: "Humidity < 40%" },
+  { value: "RAINY", label: "Rainy", emoji: "🌧️", desc: "Rain / Drizzle" },
 ];
 
 const TIMES: { value: TimeTag; label: string; emoji: string }[] = [
-  { value: "DAY",   label: "Day",       emoji: "🌤️" },
-  { value: "NIGHT", label: "Night",     emoji: "🌙" },
-  { value: "BOTH",  label: "Anytime",   emoji: "⚡" },
+  { value: "DAY", label: "Day", emoji: "🌤️" },
+  { value: "NIGHT", label: "Night", emoji: "🌙" },
+  { value: "BOTH", label: "Anytime", emoji: "⚡" },
 ];
 
-const LONGEVITY_LABELS = ["", "Very Weak", "Weak", "Moderate", "Strong", "Eternal"];
-const SILLAGE_LABELS   = ["", "Intimate", "Soft", "Moderate", "Strong", "Enormous"];
+const LONGEVITY_LABELS = ["", "Fades in mins", "Under 2h", "2-3h", "3-4h", "4-5h", "5-6h", "6-8h", "8-12h", "12h+", "Eternal"];
+const SILLAGE_LABELS = ["", "On skin only", "Intimate", "Personal", "Noticeable", "Soft aura", "Moderate", "Filling room", "Heavy", "Enormous", "Nuclear"];
 
 // ─── Star Rating ──────────────────────────────────────────────────────────────
 
@@ -61,11 +62,10 @@ function StarRating({
           <Star
             size={24}
             fill={(hover || value) >= star ? "currentColor" : "none"}
-            className={`transition-colors duration-150 ${
-              (hover || value) >= star
-                ? "text-[var(--accent)]"
-                : "text-[var(--border-color)]"
-            }`}
+            className={`transition-colors duration-150 ${(hover || value) >= star
+              ? "text-[var(--accent)]"
+              : "text-[var(--border-color)]"
+              }`}
           />
         </button>
       ))}
@@ -87,7 +87,7 @@ function LiquidSlider({
 }: {
   label: string;
   sublabel: string;
-  value: number; // 1–5
+  value: number; // 1–10
   onChange: (v: number) => void;
   labelMap: string[];
   valueClass: string;
@@ -101,7 +101,7 @@ function LiquidSlider({
     if (!trackRef.current) return;
     const rect = trackRef.current.getBoundingClientRect();
     const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const newVal = Math.round(pct * 4) + 1; // maps 0..1 → 1..5
+    const newVal = Math.round(pct * 9) + 1; // maps 0..1 → 1..10
     onChange(newVal);
   }, [onChange]);
 
@@ -109,7 +109,7 @@ function LiquidSlider({
     calcValue(info.point.x);
   };
 
-  const pct = ((value - 1) / 4) * 100;
+  const pct = ((value - 1) / 9) * 100;
 
   return (
     <div>
@@ -123,7 +123,7 @@ function LiquidSlider({
           </span>
         </div>
         <span className={`text-sm font-bold ${valueClass}`}>
-          {value}/5 — {labelMap[value]}
+          {value}/10 — {labelMap[value]}
         </span>
       </div>
 
@@ -155,13 +155,13 @@ function LiquidSlider({
           role="slider"
           aria-valuenow={value}
           aria-valuemin={1}
-          aria-valuemax={5}
+          aria-valuemax={10}
         />
       </div>
 
       {/* Step markers */}
       <div className="flex justify-between mt-1 px-1">
-        {[1, 2, 3, 4, 5].map((s) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((s) => (
           <span key={s} className="text-[9px] text-[var(--text-muted)]">
             {s}
           </span>
@@ -192,11 +192,10 @@ function ToggleChip({
       onClick={onToggle}
       whileTap={shouldReduceMotion ? {} : { scale: 0.92 }}
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer select-none border transition-colors duration-150 ${
-        active
-          ? "bg-[#8B5CF6]/20 border-[#8B5CF6]/40 text-[var(--accent)]"
-          : "bg-[var(--border-color)] border-transparent text-[var(--text-muted)]"
-      }`}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer select-none border transition-colors duration-150 ${active
+        ? "bg-[#8B5CF6]/20 border-[#8B5CF6]/40 text-[var(--accent)]"
+        : "bg-[var(--border-color)] border-transparent text-[var(--text-muted)]"
+        }`}
       aria-pressed={active}
     >
       <span>{emoji}</span>
@@ -235,17 +234,18 @@ function SignInCTA() {
 // ─── Review Form ──────────────────────────────────────────────────────────────
 
 export function ReviewForm({ perfumeId }: { perfumeId: string }) {
-  const { data: session }   = useSession();
-  const shouldReduceMotion  = useReducedMotion();
+  const { data: session } = useSession();
+  const shouldReduceMotion = useReducedMotion();
 
-  const [text,     setText]     = useState("");
-  const [rating,   setRating]   = useState(3);
-  const [longevity, setLongevity] = useState(3);
-  const [sillage,  setSillage]  = useState(3);
+  const [text, setText] = useState("");
+  const [rating, setRating] = useState(3);
+  const [longevity, setLongevity] = useState(5);
+  const [sillage, setSillage] = useState(5);
   const [weatherTags, setWeatherTags] = useState<WeatherTag[]>([]);
-  const [times,    setTimes]    = useState<TimeTag[]>([]);
-  const [state,    setState]    = useState<ReviewFormState | null>(null);
-  const [loading,  setLoading]  = useState(false);
+  const [times, setTimes] = useState<TimeTag[]>([]);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [state, setState] = useState<ReviewFormState | null>(null);
+  const [loading, setLoading] = useState(false);
 
   if (!session?.user) return <SignInCTA />;
 
@@ -266,12 +266,13 @@ export function ReviewForm({ perfumeId }: { perfumeId: string }) {
       sillage_score: sillage,
       time_tags: times,
       weather_tags: weatherTags,
+      turnstileToken,
     });
     setState(result);
     setLoading(false);
     if (result.success) {
-      setText(""); setRating(3); setLongevity(3); setSillage(3);
-      setWeatherTags([]); setTimes([]);
+      setText(""); setRating(3); setLongevity(5); setSillage(5);
+      setWeatherTags([]); setTimes([]); setTurnstileToken("");
     }
   };
 
@@ -286,11 +287,10 @@ export function ReviewForm({ perfumeId }: { perfumeId: string }) {
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`flex items-start gap-2 p-3 rounded-xl mb-5 text-sm border ${
-            state.success
-              ? "bg-[#34D399]/15 border-[#34D399]/30 text-[#34D399]"
-              : "bg-[#EF4444]/15 border-[#EF4444]/30 text-[#EF4444]"
-          }`}
+          className={`flex items-start gap-2 p-3 rounded-xl mb-5 text-sm border ${state.success
+            ? "bg-[#34D399]/15 border-[#34D399]/30 text-[#34D399]"
+            : "bg-[#EF4444]/15 border-[#EF4444]/30 text-[#EF4444]"
+            }`}
         >
           {state.success ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
           <span>{state.success ? "Review submitted! Thank you." : state.error}</span>
@@ -365,11 +365,10 @@ export function ReviewForm({ perfumeId }: { perfumeId: string }) {
                 whileTap={shouldReduceMotion ? {} : { scale: 0.92 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
                 title={desc}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer select-none border transition-all duration-150 ${
-                  weatherTags.includes(value)
-                    ? "bg-[var(--accent)]/20 border-[var(--accent)]/50 text-[var(--accent)] shadow-[0_0_8px_var(--accent-glow,rgba(139,92,246,0.25))]"
-                    : "bg-[var(--border-color)] border-transparent text-[var(--text-muted)] hover:border-[var(--accent)]/30"
-                }`}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer select-none border transition-all duration-150 ${weatherTags.includes(value)
+                  ? "bg-[var(--accent)]/20 border-[var(--accent)]/50 text-[var(--accent)] shadow-[0_0_8px_var(--accent-glow,rgba(139,92,246,0.25))]"
+                  : "bg-[var(--border-color)] border-transparent text-[var(--text-muted)] hover:border-[var(--accent)]/30"
+                  }`}
                 aria-pressed={weatherTags.includes(value)}
               >
                 <span>{emoji}</span>
@@ -399,18 +398,19 @@ export function ReviewForm({ perfumeId }: { perfumeId: string }) {
           </div>
         </div>
 
+        <BotShield onVerify={setTurnstileToken} />
+
         {/* Submit */}
         <motion.button
           type="submit"
-          disabled={loading || text.trim().length < 10}
-          whileHover={shouldReduceMotion || loading ? {} : { scale: 1.02 }}
-          whileTap={shouldReduceMotion  || loading ? {} : { scale: 0.97 }}
+          disabled={!turnstileToken || loading || text.trim().length < 10}
+          whileHover={shouldReduceMotion || !turnstileToken || loading ? {} : { scale: 1.02 }}
+          whileTap={shouldReduceMotion || !turnstileToken || loading ? {} : { scale: 0.97 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors ${
-            loading
-              ? "bg-[var(--border-color)] text-[var(--text-muted)] cursor-not-allowed"
-              : "bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white"
-          }`}
+          className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors ${loading
+            ? "bg-[var(--border-color)] text-[var(--text-muted)] cursor-not-allowed"
+            : "bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white"
+            }`}
         >
           <Send size={15} />
           {loading ? "Submitting…" : "Submit Review"}

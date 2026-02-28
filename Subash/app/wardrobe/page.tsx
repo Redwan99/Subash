@@ -24,14 +24,14 @@ async function getWardrobe(userId: string): Promise<Record<string, WardrobePerfu
     where: { userId },
     orderBy: { createdAt: "desc" },
     include: {
-      perfume: { select: { id: true, name: true, brand: true, image_url: true } },
+      perfume: { select: { id: true, name: true, brand: true, image_url: true, slug: true } },
     },
   });
 
   const grouped: Record<string, WardrobePerfume[]> = {
-    HAVE:      [],
-    HAD:       [],
-    WANT:      [],
+    HAVE: [],
+    HAD: [],
+    WANT: [],
     SIGNATURE: [],
   };
 
@@ -39,10 +39,11 @@ async function getWardrobe(userId: string): Promise<Record<string, WardrobePerfu
     const shelf = item.shelf as string;
     if (!grouped[shelf]) grouped[shelf] = [];
     grouped[shelf].push({
-      id:        item.perfume.id,
-      name:      item.perfume.name,
-      brand:     item.perfume.brand,
+      id: item.perfume.id,
+      name: item.perfume.name,
+      brand: item.perfume.brand,
       image_url: item.perfume.image_url,
+      slug: item.perfume.slug,
       shelf,
     });
   }
@@ -59,9 +60,9 @@ export default async function WardrobePage() {
     redirect("/auth/signin?callbackUrl=/wardrobe");
   }
 
-  const userId  = session.user.id;
+  const userId = session.user.id;
   const grouped = await getWardrobe(userId);
-  const total   = Object.values(grouped).reduce((s, a) => s + a.length, 0);
+  const total = Object.values(grouped).reduce((s, a) => s + a.length, 0);
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">

@@ -23,6 +23,7 @@ export type DupeVoteData = {
     name: string;
     brand: string;
     image_url: string | null;
+    slug: string;
   };
 };
 
@@ -65,11 +66,11 @@ function DupeCard({
   originalPerfumeId: string;
   index: number;
 }) {
-  const [votes, setVotes]     = useState({ up: dupe.upvotes, down: dupe.downvotes });
-  const [isPending, start]    = useTransition();
-  const [voted, setVoted]     = useState<"up" | "down" | null>(null);
-  const shouldReduceMotion    = useReducedMotion();
-  const { data: session }     = useSession();
+  const [votes, setVotes] = useState({ up: dupe.upvotes, down: dupe.downvotes });
+  const [isPending, start] = useTransition();
+  const [voted, setVoted] = useState<"up" | "down" | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+  const { data: session } = useSession();
 
   const pct = matchPercent(votes.up, votes.down);
   const badge = matchClasses(pct);
@@ -99,7 +100,7 @@ function DupeCard({
       className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]"
     >
       {/* Bottle image */}
-      <Link href={`/perfume/${dupe.clone.id}`} prefetch={false}>
+      <Link href={`/perfume/${dupe.clone.slug}`} prefetch={false}>
         <div className="shrink-0 w-10 h-12 rounded-xl flex items-center justify-center overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6]/15">
           {dupe.clone.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -116,7 +117,7 @@ function DupeCard({
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <Link href={`/perfume/${dupe.clone.id}`} prefetch={false}>
+        <Link href={`/perfume/${dupe.clone.slug}`} prefetch={false}>
           <p className="text-sm font-semibold truncate text-[var(--text-primary)]">
             {dupe.clone.name}
           </p>
@@ -138,11 +139,10 @@ function DupeCard({
           disabled={!session || !!voted || isPending}
           whileTap={shouldReduceMotion || !!voted ? {} : { scale: 0.82 }}
           transition={{ type: "spring", stiffness: 500, damping: 20 }}
-          className={`p-1 rounded-lg transition-colors ${
-            voted === "up"
-              ? "text-[#34D399] bg-[#34D399]/15"
-              : "text-[var(--text-muted)]"
-          } ${!session || voted ? "cursor-not-allowed" : "cursor-pointer"}`}
+          className={`p-1 rounded-lg transition-colors ${voted === "up"
+            ? "text-[#34D399] bg-[#34D399]/15"
+            : "text-[var(--text-muted)]"
+            } ${!session || voted ? "cursor-not-allowed" : "cursor-pointer"}`}
 
           aria-label="Upvote"
         >
@@ -158,11 +158,10 @@ function DupeCard({
           disabled={!session || !!voted || isPending}
           whileTap={shouldReduceMotion || !!voted ? {} : { scale: 0.82 }}
           transition={{ type: "spring", stiffness: 500, damping: 20 }}
-          className={`p-1 rounded-lg transition-colors ${
-            voted === "down"
-              ? "text-[#EF4444] bg-[#EF4444]/15"
-              : "text-[var(--text-muted)]"
-          } ${!session || voted ? "cursor-not-allowed" : "cursor-pointer"}`}
+          className={`p-1 rounded-lg transition-colors ${voted === "down"
+            ? "text-[#EF4444] bg-[#EF4444]/15"
+            : "text-[var(--text-muted)]"
+            } ${!session || voted ? "cursor-not-allowed" : "cursor-pointer"}`}
 
           aria-label="Downvote"
         >
@@ -182,12 +181,12 @@ function AddClonePanel({
   originalPerfumeId: string;
   onAdded: () => void;
 }) {
-  const [query,    setQuery]   = useState("");
-  const [results,  setResults] = useState<PerfumeSearchResult[]>([]);
-  const [isPending, start]     = useTransition();
-  const [added,    setAdded]   = useState<string | null>(null);
-  const [err,      setErr]     = useState<string | null>(null);
-  const shouldReduceMotion     = useReducedMotion();
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<PerfumeSearchResult[]>([]);
+  const [isPending, start] = useTransition();
+  const [added, setAdded] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const search = (q: string) => {
     setQuery(q);

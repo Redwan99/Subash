@@ -10,31 +10,31 @@ import { FragramLikeButton } from "./FragramLikeButton";
 export const dynamic = 'force-dynamic';
 
 type FragramPostCard = {
-  id:        string;
-  imageUrl:  string;
-  caption:   string | null;
+  id: string;
+  imageUrl: string;
+  caption: string | null;
   likeCount: number;
-  user:    { id: string; name: string | null; image: string | null };
-  perfume: { id: string; name: string; brand: string } | null;
-  likes:   { userId: string }[];
+  user: { id: string; name: string | null; image: string | null };
+  perfume: { id: string; name: string; brand: string; slug: string } | null;
+  likes: { userId: string }[];
 };
 
 export default async function FragramPage() {
-  const session  = await auth();
+  const session = await auth();
   const isAuthed = Boolean(session?.user?.id);
-  const myId     = session?.user?.id ?? null;
+  const myId = session?.user?.id ?? null;
 
   const posts: FragramPostCard[] = await prisma.fragramPost.findMany({
     orderBy: { createdAt: "desc" },
-    take:    40,
+    take: 40,
     select: {
-      id:        true,
-      imageUrl:  true,
-      caption:   true,
+      id: true,
+      imageUrl: true,
+      caption: true,
       likeCount: true,
-      user:    { select: { id: true, name: true, image: true } },
-      perfume: { select: { id: true, name: true, brand: true } },
-      likes:   { select: { userId: true } },
+      user: { select: { id: true, name: true, image: true } },
+      perfume: { select: { id: true, name: true, brand: true, slug: true } },
+      likes: { select: { userId: true } },
     },
   });
 
@@ -126,7 +126,7 @@ export default async function FragramPage() {
                   {/* Perfume pill */}
                   {post.perfume && (
                     <Link
-                      href={`/perfume/${post.perfume.id}`}
+                      href={`/perfume/${post.perfume.slug}`}
                       className="inline-flex items-center gap-1.5 text-[11px] px-3 py-1 rounded-full
                         bg-[var(--accent)]/12 text-[var(--accent)]
                         border border-[var(--accent)]/25
