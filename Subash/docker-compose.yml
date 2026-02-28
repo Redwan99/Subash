@@ -35,7 +35,7 @@ services:
     #   context: .
     #   dockerfile: Dockerfile
     # image: subash:latest
-    image: ghcr.io/redwan99/subash:latest
+    image: ghcr.io/redwan002117/subash:latest
     container_name: subash_web
     restart: unless-stopped
     depends_on:
@@ -78,10 +78,10 @@ x-casaos:
     en_us: Subash is an open-source clone of Fragrantica/Parfumo, with Next.js and PostgreSQL.
   tagline:
     en_us: Open-source perfume database and community.
-  developer: "Redwan99"
-  author: "Redwan99"
-  icon: https://raw.githubusercontent.com/Redwan99/Subash/main/public/favicon.ico
-  thumbnail: https://raw.githubusercontent.com/Redwan99/Subash/main/public/og-image.png
+  developer: "Redwan002117"
+  author: "Redwan002117"
+  icon: https://raw.githubusercontent.com/Redwan002117/Subash/main/public/favicon.ico
+  thumbnail: https://raw.githubusercontent.com/Redwan002117/Subash/main/public/og-image.png
   title:
     en_us: Subash
   category: Web
