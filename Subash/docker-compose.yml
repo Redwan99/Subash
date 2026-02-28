@@ -26,7 +26,7 @@ services:
       # your dev machine. Safe on a home LAN; remove on a public-facing server.
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -35,10 +35,11 @@ services:
   #  Next.js Web Application
   # ------------------------------------------
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: subash:latest
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    # image: subash:latest
+    image: ghcr.io/redwan99/subash:latest
     container_name: subash_web
     restart: unless-stopped
     depends_on:
@@ -71,3 +72,21 @@ services:
 volumes:
   postgres_data:
     driver: local
+
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+  main: web
+  description:
+    en_us: Subash is an open-source clone of Fragrantica/Parfumo, with Next.js and PostgreSQL.
+  tagline:
+    en_us: Open-source perfume database and community.
+  developer: "Redwan99"
+  author: "Redwan99"
+  icon: https://raw.githubusercontent.com/Redwan99/Subash/main/public/favicon.ico
+  thumbnail: https://raw.githubusercontent.com/Redwan99/Subash/main/public/og-image.png
+  title:
+    en_us: Subash
+  category: Web
+  port_map: "9864"
