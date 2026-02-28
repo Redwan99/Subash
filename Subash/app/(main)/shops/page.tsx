@@ -8,6 +8,8 @@ import { getFeatureMap } from "@/lib/features";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
     title: "Boutiques & Verified Shops | Subash",
     description: "Discover verified perfume boutiques and retailers in Bangladesh and beyond.",

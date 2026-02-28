@@ -5,17 +5,19 @@ import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
+
+export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { Star, ShoppingCart, ExternalLink, Tag, Store } from "lucide-react";
-import dynamic from "next/dynamic";
+import NextDynamic from "next/dynamic";
 import { DecantCard, type DecantCardData } from "@/components/marketplace/DecantCard";
 import { auth } from "@/auth";
 import { checkWardrobeStatus } from "@/lib/actions/reviews";
 import { AddToWardrobeButton } from "@/components/perfume/AddToWardrobeButton";
 
 // Lazy-load the heavy interactive client bundle (ScentProfile, DupeEngine, ReviewForm)
-const PerfumeInteractive = dynamic(
+const PerfumeInteractive = NextDynamic(
   () => import("./PerfumeInteractive").then((m) => m.PerfumeInteractive),
   { loading: () => <div className="h-32 rounded-2xl animate-pulse bg-[var(--bg-glass)]" /> }
 );

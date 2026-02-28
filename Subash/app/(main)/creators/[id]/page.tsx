@@ -8,6 +8,8 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Globe, BookOpen, ChevronLeft } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const anyPrisma = prisma as any;
 
