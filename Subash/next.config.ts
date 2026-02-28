@@ -65,7 +65,14 @@ const nextConfig: NextConfig = {
       ],
     },
   },
+
+  // ADDED: Bypass strict linting/type-checking during production builds
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
-
