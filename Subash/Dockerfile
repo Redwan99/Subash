@@ -53,21 +53,19 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser  --system --uid 1001 nextjs
 
+# Create scripts directory
+RUN mkdir -p /app/scripts
+
 # Copy the standalone build output
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-# Copy Prisma schema + generated client (needed for runtime queries + db push)
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-# Prisma CLI binary (needed for db push in entrypoint)
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+# Copy entire node_modules to ensure all Prisma dependencies are available
+COPY --from=builder /app/node_modules ./node_modules
 
-# Copy csv-parser (needed by seed.js at runtime)
-COPY --from=builder /app/node_modules/csv-parser ./node_modules/csv-parser
+# Copy Prisma schema (needed for runtime queries + db push)
+COPY --from=builder /app/prisma ./prisma
 
 # Compiled seed script — runs at first boot to import all perfumes
 COPY --from=builder /app/.ts-out/import-csv.js ./scripts/seed.js
@@ -79,6 +77,12 @@ COPY --from=builder /app/prisma/fra_cleaned.csv  ./prisma/fra_cleaned.csv
 # Entrypoint: migrate → conditional seed → start
 COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh
 RUN chmod +x /app/scripts/entrypoint.sh
+
+# Create and set permissions for .next/cache so nextjs user can write to it
+RUN mkdir -p /app/.next/cache && chown -R nextjs:nodejs /app/.next
+
+# Fix permissions for scripts and prisma directories
+RUN chown -R nextjs:nodejs /app/scripts /app/prisma
 
 USER nextjs
 

@@ -35,10 +35,10 @@ services:
   #  Next.js Web Application
   # ------------------------------------------
   web:
-    image: ghcr.io/redwan99/subash:sha-27105d8
     build:
       context: .
       dockerfile: Dockerfile
+    image: subash:latest
     container_name: subash_web
     restart: unless-stopped
     depends_on:
@@ -66,7 +66,7 @@ services:
       # subsequent restarts don’t re-check the DB on every boot.
       SEED_DB: ${SEED_DB:-false}
     ports:
-      - "3000:3000"
+      - "9864:3000"
 
 volumes:
   postgres_data:
