@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 const getCachedLeaderboard = unstable_cache(
     async (timeframe: string) => {
         const now = new Date();
-        let startDate = new Date();
+        const startDate = new Date();
 
         if (timeframe === "today") {
             startDate.setHours(0, 0, 0, 0);

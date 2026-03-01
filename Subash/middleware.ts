@@ -1,8 +1,12 @@
 ﻿// middleware.ts
 // Phase 2.3 — Auth.js v5 middleware with full RBAC guards.
+// Uses authConfig (edge-safe: no Prisma / bcryptjs) for the middleware runtime.
 
-import { auth } from "@/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/auth.config";
 import { NextResponse } from "next/server";
+
+const { auth } = NextAuth(authConfig);
 
 // ── Rate Limiter State (In-Memory) ──
 const rateLimitMap = new Map<string, { count: number; lastReset: number }>();

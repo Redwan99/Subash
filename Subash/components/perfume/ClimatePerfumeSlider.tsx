@@ -46,8 +46,7 @@ function FloatingBottle({
 }) {
   return (
     <motion.div
-      className="relative flex items-end justify-center"
-      style={{ height: active ? 230 : 175 }}
+      className={`relative flex items-end justify-center ${active ? "h-[230px]" : "h-[175px]"}`}
       animate={
         active && !reduced
           ? { y: [0, -12, 0] }
@@ -64,46 +63,39 @@ function FloatingBottle({
         // In dark mode: bg is transparent (dark:bg-transparent), blend resets to
         // normal — bottle renders naturally against the dark card.
         <div
-          className="mix-blend-multiply dark:mix-blend-normal bg-white dark:bg-transparent"
-          style={{
-            display: "inline-flex",
-            alignItems: "flex-end",
-            justifyContent: "center",
-            borderRadius: 12,
-            filter: active
-              ? "drop-shadow(0 20px 28px rgba(0,0,0,0.20)) drop-shadow(0 4px 8px rgba(0,0,0,0.14))"
-              : "drop-shadow(0 8px 12px rgba(0,0,0,0.10))",
-          }}
+          className={`inline-flex items-end justify-center rounded-[12px] mix-blend-multiply dark:mix-blend-normal bg-white dark:bg-transparent ${
+            active
+              ? "drop-shadow-[0_20px_28px_rgba(0,0,0,0.20)]"
+              : "drop-shadow-[0_8px_12px_rgba(0,0,0,0.10)]"
+          }`}
         >
           <Image
             src={src}
             alt={name}
             width={active ? 180 : 110}
             height={active ? 220 : 150}
-            className="object-contain select-none pointer-events-none"
-            style={{ width: "auto", height: active ? 220 : 150, maxWidth: active ? 180 : 110 }}
+            className={`object-contain select-none pointer-events-none ${
+              active ? "max-h-[220px] max-w-[180px]" : "max-h-[150px] max-w-[110px]"
+            }`}
             unoptimized
             draggable={false}
             priority={active}
           />
         </div>
       ) : (
-        <span className="text-7xl select-none" style={{ fontSize: active ? 80 : 52 }}>🧴</span>
+        <span className={`select-none ${active ? "text-[80px]" : "text-[52px]"}`}>🧴</span>
       )}
       {/* Elliptical ground shadow */}
       <motion.div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full"
+        className={`absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse,rgba(0,0,0,0.35)_0%,transparent_70%)] ${
+          active ? "w-[90px] h-[18px]" : "w-[60px] h-[12px]"
+        }`}
         animate={
           active && !reduced
             ? { scaleX: [1, 0.78, 1], opacity: [0.18, 0.08, 0.18] }
             : { scaleX: 1, opacity: 0.10 }
         }
         transition={active && !reduced ? { duration: 3.8, repeat: Infinity, ease: "easeInOut" } : { duration: 0.4 }}
-        style={{
-          width: active ? 90 : 60,
-          height: active ? 18 : 12,
-          background: "radial-gradient(ellipse, rgba(0,0,0,0.35) 0%, transparent 70%)",
-        }}
       />
     </motion.div>
   );
@@ -198,8 +190,7 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
 
   return (
     <div
-      className="relative w-full select-none overflow-hidden"
-      style={{ perspective: "1200px" }}
+      className="relative w-full select-none overflow-hidden [perspective:1200px]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={() => setPaused(true)}
@@ -213,13 +204,12 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
       />
 
       {/* ── Peek / side thumbnails ─── */}
-      <div className="relative flex items-end justify-center gap-0" style={{ minHeight: "clamp(230px, 36vw, 300px)" }}>
+      <div className="relative flex items-end justify-center gap-0 [min-height:clamp(230px,36vw,300px)]">
 
         {/* Prev peek */}
         <motion.div
           key={`prev-${prevIdx}`}
-          className="absolute left-0 flex-shrink-0 cursor-pointer z-10 hidden sm:flex"
-          style={{ width: 80, opacity: 0.4 }}
+          className="absolute left-0 flex-shrink-0 cursor-pointer z-10 hidden sm:flex w-20 opacity-40"
           whileHover={{ opacity: 0.65, x: 6 }}
           onClick={() => go(-1)}
           aria-label="Previous perfume"
@@ -230,7 +220,7 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
         </motion.div>
 
         {/* ── Main slide ──────────────── */}
-        <div className="flex-1 flex items-center justify-center relative" style={{ minWidth: 0 }}>
+        <div className="flex-1 flex items-center justify-center relative min-w-0">
           <AnimatePresence custom={direction} mode="popLayout">
             <motion.div
               key={current}
@@ -253,8 +243,7 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
                 }
                 dragX.set(0);
               }}
-              className="flex flex-col items-center gap-4 cursor-grab active:cursor-grabbing"
-              style={{ width: "100%" }}
+              className="flex flex-col items-center gap-4 cursor-grab active:cursor-grabbing w-full"
             >
               <Link
                 href={`/perfume/${picks[current].slug}`}
@@ -295,8 +284,7 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
         {/* Next peek */}
         <motion.div
           key={`next-${nextIdx}`}
-          className="absolute right-0 flex-shrink-0 cursor-pointer z-10 hidden sm:flex"
-          style={{ width: 80, opacity: 0.4 }}
+          className="absolute right-0 flex-shrink-0 cursor-pointer z-10 hidden sm:flex w-20 opacity-40"
           whileHover={{ opacity: 0.65, x: -6 }}
           onClick={() => go(1)}
           aria-label="Next perfume"
@@ -354,7 +342,6 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
           className="h-full bg-[var(--accent)] rounded-full origin-left"
           animate={{ scaleX: progressPercent / 100 }}
           transition={{ type: "spring", stiffness: 120, damping: 20 }}
-          style={{ transformOrigin: "left" }}
         />
       </div>
 

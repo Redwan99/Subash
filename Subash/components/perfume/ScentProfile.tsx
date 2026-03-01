@@ -7,11 +7,14 @@
 //   · Accord pills with accent glow on hover
 
 import { useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
+import { PenSquare, X } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type ScentProfileProps = {
+  perfumeId:   string;
   top_notes:    string[];
   heart_notes:  string[];
   base_notes:   string[];
@@ -24,6 +27,11 @@ export type ScentProfileProps = {
   perfumer:     string | null;
   accords:      string[];
 };
+
+const ReviewForm = dynamic(
+  () => import("./ReviewForm").then((m) => m.ReviewForm),
+  { ssr: false }
+);
 
 // ─── Note Chip ────────────────────────────────────────────────────────────────
 
@@ -183,6 +191,7 @@ function RadarBar({
 // ─── Scent Profile ────────────────────────────────────────────────────────────
 
 export function ScentProfile({
+  perfumeId,
   top_notes,
   heart_notes,
   base_notes,
@@ -195,6 +204,7 @@ export function ScentProfile({
 }: ScentProfileProps) {
   const shouldReduceMotion = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
 
   // Detect whether description needs a Read More toggle (>220 characters is a good proxy)
   const isLong = (description?.length ?? 0) > 220;
@@ -311,12 +321,25 @@ export function ScentProfile({
       {/* ── Performance Radar ─────────────────────────────────── */}
       <section className="rounded-2xl p-6 bg-[var(--bg-glass)] backdrop-blur-[10px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-[var(--text-primary)]">
-            Performance
-          </h2>
-          <span className="text-xs text-[var(--text-muted)]">
-            Based on {reviewCount} review{reviewCount !== 1 ? "s" : ""}
-          </span>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-[var(--text-primary)]">
+              Performance
+            </h2>
+            <span className="text-[10px] text-[var(--text-muted)]">
+              Based on {reviewCount} review{reviewCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsReviewOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold border border-[var(--border-color)] bg-[var(--bg-surface)]/80 hover:border-[var(--accent)]/60 hover:bg-[var(--accent)]/10 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
+            >
+              <PenSquare size={14} />
+              <span className="hidden sm:inline">Write a review</span>
+              <span className="sm:hidden">Review</span>
+            </button>
+          </div>
         </div>
 
         {reviewCount === 0 ? (
@@ -342,6 +365,50 @@ export function ScentProfile({
           </div>
         )}
       </section>
+
+      <AnimatePresence>
+        {isReviewOpen && (
+          <motion.div
+            className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="relative max-w-lg w-full max-h-[85vh] overflow-hidden rounded-2xl bg-[var(--bg-elevated)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]"
+              initial={{ scale: 0.9, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 12 }}
+              transition={{ type: "spring", stiffness: 260, damping: 24 }}
+            >
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--bg-glass-border)] bg-[var(--bg-glass)]/80 backdrop-blur-sm">
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+                    Quick Review
+                  </span>
+                  <span className="text-sm font-bold text-[var(--text-primary)]">
+                    {"Share your impression"}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsReviewOpen(false)}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--bg-glass-border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition-colors"
+                  aria-label="Close review"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+              <div className="p-4 sm:p-5 overflow-y-auto max-h-[calc(85vh-52px)]">
+                <ReviewForm
+                  perfumeId={perfumeId}
+                  onSubmitted={() => setIsReviewOpen(false)}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -11,43 +11,11 @@ import {
     Briefcase, Database
 } from "lucide-react";
 import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus } from "@/lib/actions/admin";
-import { Role, type FeatureToggle, type AuditLog } from "@prisma/client";
+import type { Role, FeatureToggle } from "@prisma/client";
 import { CsvImporter } from "@/components/admin/CsvImporter";
-
-// Local type until `npx prisma db push` regenerates the client with ReviewStatus
-type ReviewStatus = "APPROVED" | "PENDING" | "SPAM";
+import type { ReviewStatus, AdminReview as Review, AdminUser, BrandClaim, AuditLog } from "./types";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-
-export type Review = {
-    id: string;
-    text: string;
-    overall_rating: number;
-    status: ReviewStatus;
-    createdAt: Date;
-    user: { id: string; name: string | null; email: string | null; image: string | null };
-    perfume: { id: string; name: string; brand: string; slug: string } | null;
-};
-
-export type AdminUser = {
-    id: string;
-    name: string | null;
-    email: string | null;
-    image: string | null;
-    role: Role;
-    review_count: number;
-    createdAt: Date;
-};
-
-export type BrandClaim = {
-    id: string;
-    brandName: string;
-    officialEmail: string;
-    status: string;
-    message: string | null;
-    createdAt: Date;
-    user: { name: string | null; email: string | null };
-};
 
 type Props = {
     totalUsers: number;
@@ -410,7 +378,7 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
 
 type Tab = "overview" | "reviews" | "users" | "system" | "audit" | "claims" | "import";
 
-export function AdminDashboardClient({ totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, recentReviews, users, featureToggles, auditLogs, brandClaims }: Props) {
+export default function AdminDashboardClient({ totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, recentReviews, users, featureToggles, auditLogs, brandClaims }: Props) {
     const [tab, setTab] = useState<Tab>("overview");
 
     const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [

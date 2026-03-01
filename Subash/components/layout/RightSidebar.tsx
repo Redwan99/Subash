@@ -5,7 +5,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { Activity, Star, Camera, Zap } from "lucide-react";
+import { Activity, Star, Camera, Zap, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LeaderboardWidget } from "@/components/ui/LeaderboardWidget";
 
@@ -107,7 +107,15 @@ export function RightSidebar() {
       className="fixed right-0 hidden lg:flex flex-col z-40 overflow-y-auto top-[var(--topnav-height,60px)] h-[calc(100vh-var(--topnav-height,60px))] w-[var(--sidebar-right-width)] bg-[var(--bg-glass)] backdrop-blur-[var(--blur-backdrop)] border-l border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] [scrollbar-width:none]"
       aria-label="Live community activity"
     >
-      <div className="pt-6">
+      <div className="pt-6 px-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">
+            Leaderboards
+          </span>
+          <Link href="/leaderboards" className="text-[10px] font-medium text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors flex items-center gap-1">
+            View All <TrendingUp size={10} />
+          </Link>
+        </div>
         <LeaderboardWidget />
       </div>
 
@@ -130,11 +138,11 @@ export function RightSidebar() {
       <div className="flex-1 px-3 py-3 space-y-2">
         {!data ? (
           <div className="space-y-2 py-4">
-            {[0.9, 0.7, 0.8].map((w, i) => (
+            {["w-11/12", "w-3/4", "w-4/5"].map((widthClass, i) => (
               <div key={i} className="flex items-center gap-2.5 px-1">
                 <div className="w-7 h-7 rounded-lg skeleton shrink-0" />
                 <div className="flex-1 space-y-1.5">
-                  <div className="skeleton h-2 rounded-full" style={{ width: `${w * 100}%` }} />
+                  <div className={`skeleton h-2 rounded-full ${widthClass}`} />
                   <div className="skeleton h-1.5 rounded-full w-2/5" />
                 </div>
               </div>

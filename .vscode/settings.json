@@ -1,3 +1,5 @@
 {
-    "chat.agent.maxRequests": 50
+    "chat.agent.maxRequests": 50,
+    "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }

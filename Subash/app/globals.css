@@ -2,6 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --ambient-bg: #f8fafc;
+    --ambient-grad-1: rgba(210, 215, 230, 0.5); /* Soft lavender */
+    --ambient-grad-2: rgba(230, 225, 210, 0.5); /* Soft champagne */
+  }
+  .dark {
+    --ambient-bg: #050505;
+    --ambient-grad-1: rgba(40, 30, 15, 0.4); /* Amber glow */
+    --ambient-grad-2: rgba(20, 15, 40, 0.4); /* Violet glow */
+  }
+}
+
+.bg-ambient-dynamic {
+  background-color: var(--ambient-bg);
+  background-image:
+    radial-gradient(circle at 0% 0%, var(--ambient-grad-1) 0px, transparent 40%),
+    radial-gradient(circle at 100% 0%, var(--ambient-grad-2) 0px, transparent 40%);
+  background-attachment: fixed;
+  transition: background-color 0.3s ease;
+}
+
 /* =============================================
    Subash | Global Design System
    Glassmorphism · Violet Accents · Dark/Light
@@ -153,7 +175,6 @@ html {
   -moz-osx-font-smoothing: grayscale;
 
   /* ── Global scrollbar hide — invisible tech ── */
-  scrollbar-width: none;          /* Firefox */
   -ms-overflow-style: none;       /* IE / Edge */
 }
 html::-webkit-scrollbar { display: none; }  /* Chrome / Safari */
@@ -164,7 +185,6 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
   line-height: 1.6;
   transition: background-color var(--transition-base), color var(--transition-base);
-  scrollbar-width: none;
   -ms-overflow-style: none;
 }
 body::-webkit-scrollbar { display: none; }
@@ -195,6 +215,17 @@ body::-webkit-scrollbar { display: none; }
   }
   .dark .glass-subtle {
     background: rgba(10, 10, 10, 0.45);
+  }
+
+  /* Ambient orb animation helpers */
+  .orb-drift {
+    animation: orbDrift 22s ease-in-out infinite;
+  }
+  .orb-drift-alt {
+    animation: orbDriftAlt 28s ease-in-out infinite;
+  }
+  .orb-drift-slow {
+    animation: orbDriftSlow 18s ease-in-out infinite;
   }
 
   /* Accent gradient text */
@@ -239,6 +270,30 @@ body::-webkit-scrollbar { display: none; }
     margin-left: var(--sidebar-width);
     /* Pushed by right sidebar on desktop */
     margin-right: var(--sidebar-right-width);
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+
+  .safe-padding {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 

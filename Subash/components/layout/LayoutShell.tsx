@@ -4,8 +4,6 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { LeftSidebar } from "./LeftSidebar";
-import { RightSidebar } from "./RightSidebar";
 import { BottomNav } from "./BottomNav";
 import { WeatherThemeProvider } from "./WeatherThemeProvider";
 import { ChatWidget } from "@/components/chat/ChatWidget";
@@ -44,22 +42,29 @@ function AmbientOrbs() {
       className="fixed inset-0 -z-10 overflow-hidden pointer-events-none"
     >
       <div
-        style={{ animation: "orbDrift 22s ease-in-out infinite" }}
-        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full blur-[120px] opacity-[0.25] bg-[var(--bg-glow-color)] transition-colors duration-[2000ms]"
+        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full blur-[120px] opacity-[0.25] bg-[var(--bg-glow-color)] transition-colors duration-[2000ms] orb-drift"
       />
       <div
-        style={{ animation: "orbDriftAlt 28s ease-in-out infinite" }}
-        className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.20] bg-[var(--bg-glow-color)] transition-colors duration-[2000ms]"
+        className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.20] bg-[var(--bg-glow-color)] transition-colors duration-[2000ms] orb-drift-alt"
       />
       <div
-        style={{ animation: "orbDriftSlow 18s ease-in-out infinite" }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[100px] opacity-[0.12] bg-[var(--accent-glow,rgba(139,92,246,0.3))] transition-colors duration-[2000ms]"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[100px] opacity-[0.12] bg-[var(--accent-glow,rgba(139,92,246,0.3))] transition-colors duration-[2000ms] orb-drift-slow"
       />
     </div>
   );
 }
 
-export function LayoutShell({ children, featureToggles }: { children: React.ReactNode; featureToggles?: Record<string, boolean> }) {
+export function LayoutShell({
+  children,
+  featureToggles,
+  leftSidebar,
+  rightSidebar
+}: {
+  children: React.ReactNode;
+  featureToggles?: Record<string, boolean>;
+  leftSidebar?: React.ReactNode;
+  rightSidebar?: React.ReactNode;
+}) {
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
   const authPage = isAuthRoute(pathname);
@@ -89,10 +94,10 @@ export function LayoutShell({ children, featureToggles }: { children: React.Reac
 
 
       {/* ── Left Sidebar ─────────────────────────────────────── */}
-      <LeftSidebar />
+      {leftSidebar}
 
       {/* ── Right Sidebar ────────────────────────────────────── */}
-      <RightSidebar />
+      {rightSidebar}
 
       {/* ── Mobile Bottom Nav ────────────────────────────────── */}
       <BottomNav />
@@ -108,9 +113,7 @@ export function LayoutShell({ children, featureToggles }: { children: React.Reac
       */}
       <main
         className={[
-          "min-h-[calc(100vh-var(--topnav-height,60px))]",
-          // Push down below TopNavbar
-          "pt-[var(--topnav-height,60px)]",
+          "min-h-full",
           // Desktop sidebar offsets
           "md:ml-[var(--sidebar-width)]",
           "lg:mr-[var(--sidebar-right-width)]",

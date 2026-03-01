@@ -57,7 +57,7 @@ function BottleCard({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 28 }}
-      className="relative group"
+      className="relative group active:scale-[0.97] transition-transform duration-150"
     >
       <Link href={`/perfume/${perfume.slug}`} prefetch={false}>
         <div className="rounded-2xl overflow-hidden p-3 text-center bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
@@ -68,7 +68,7 @@ function BottleCard({
               <img
                 src={perfume.image_url}
                 alt={perfume.name}
-                className="h-full object-contain p-1"
+                className="h-full object-contain p-1 transition-transform duration-200 group-hover:scale-105"
               />
             ) : (
               <span className="text-[32px]">🧴</span>
@@ -331,10 +331,9 @@ export function WardrobePanel({
     <section>
       {/* Section header */}
       <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-lg font-bold text-[var(--text-primary)]">
-            Wardrobe 🧴
-          </h2>
+        <div
+          className="flex gap-1 p-1 rounded-xl mb-5 overflow-x-auto bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)]"
+        >
           <p className="text-xs mt-0.5 text-[var(--text-muted)]">
             {Object.values(items).reduce((s, a) => s + a.length, 0)} fragrance
             {Object.values(items).reduce((s, a) => s + a.length, 0) !== 1 ? "s" : ""}
@@ -366,7 +365,7 @@ export function WardrobePanel({
               key={key}
               onClick={() => setActiveShelf(key)}
               className={cn(
-                "relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium flex-1 whitespace-nowrap justify-center min-w-0 transition-colors",
+                "relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium flex-1 whitespace-nowrap justify-center min-w-0 transition-colors active:scale-[0.97]",
                 isActive ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]"
               )}
             >

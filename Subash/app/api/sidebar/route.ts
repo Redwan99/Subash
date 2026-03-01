@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { getTrendingPerfumes } from "@/lib/actions/search";
 
 export const dynamic = "force-dynamic";
 // Revalidate isn't needed here explicitly if we rely on unstable_cache interval, 
@@ -79,12 +80,8 @@ const getCachedSidebarData = unstable_cache(
       badge: ["🔥", "📈", "⭐", "🏆", "💎"][i],
     }));
 
-    // ── 3. Trending Perfumes (by search count) ─────────
-    const trendingPerfumes = await prisma.perfume.findMany({
-      take: 5,
-      select: { id: true, slug: true, name: true, brand: true, image_url: true, accords: true },
-      orderBy: { searchCount: "desc" },
-    });
+    // ── 3. Trending Perfumes (7‑day search activity) ────
+    const trendingPerfumes = await getTrendingPerfumes(5, 7);
 
     // ── 4. Recent Activity (reviews + fragram posts) ─────────────
     const [recentReviews, recentPosts] = await Promise.all([
@@ -145,7 +142,7 @@ const getCachedSidebarData = unstable_cache(
     return { potd, trendingBrands, trendingPerfumes, activity };
   },
   ['sidebar-cache'],
-  { revalidate: 3600 }
+  { revalidate: 120 }
 );
 
 export async function GET() {

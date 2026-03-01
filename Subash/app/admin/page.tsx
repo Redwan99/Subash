@@ -7,8 +7,9 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
-import { Role, type AuditLog } from "@prisma/client";
-import { AdminDashboardClient, type Review, type AdminUser } from "./AdminDashboardClient";
+import { Role } from "@prisma/client";
+import AdminDashboardClient from "./AdminDashboardClient";
+import type { AdminReview as Review, AdminUser, AuditLog } from "./types";
 
 async function getAdminData() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

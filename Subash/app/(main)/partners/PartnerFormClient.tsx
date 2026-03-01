@@ -97,7 +97,7 @@ export function PartnerFormClient() {
             </button>
 
             <p className="text-[10px] text-center text-[var(--text-muted)] mt-4">
-                By submitting, you agree to Subash's Partner Terms of Service.
+                By submitting, you agree to Subash&apos;s Partner Terms of Service.
             </p>
         </form>
     );

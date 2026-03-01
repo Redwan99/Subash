@@ -86,6 +86,8 @@ model User {
   decantListings  DecantListing[] @relation("UserDecants")
   notifications   Notification[]
   brandClaims     BrandClaim[]
+  comments        Comment[]
+  wearingStatus   WearingStatus?
 
   @@index([reputationScore])  // smart review sort: high-rep authors first
   @@index([review_count])     // fast leaderboard sorts
@@ -168,15 +170,53 @@ model Perfume {
   fragramPosts   FragramPost[]
   potdEntries    PerfumeOfTheDay[]
   decantListings DecantListing[]
+  searchStats    PerfumeSearchStat[]
   creator        Creator?        @relation(fields: [creatorId], references: [id], onDelete: SetNull)
   creatorId      String?
+  wearingStatuses WearingStatus[]
 
   @@index([name, brand])
   @@index([name])
   @@index([brand])           // groupBy brand in sidebar trending-brands query
   @@index([release_year])    // fallback climate-picks orderBy
   @@index([creatorId])       // creator portfolio lookups
+  @@index([searchCount])     // fast sort for Trending Perfumes sidebar widget
   @@map("perfumes")
+}
+
+// =============================================
+//  Wearing Status (Currently Wearing)
+// =============================================
+
+model WearingStatus {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  perfumeId  String?
+  perfume    Perfume? @relation(fields: [perfumeId], references: [id])
+  customName String?
+  timeTag    String?  // 'day', 'night', 'all'
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// =============================================
+//  PerfumeSearchStat
+//  Aggregated search clicks per perfume per day, used for
+//  "Trending This Week" and other time-windowed trends.
+// =============================================
+
+model PerfumeSearchStat {
+  id        String   @id @default(cuid())
+  perfume   Perfume  @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
+  perfumeId String
+  date      DateTime
+  count     Int      @default(0)
+
+  @@unique([perfumeId, date])
+  @@index([date])
+  @@index([perfumeId])
 }
 
 // =============================================
@@ -201,6 +241,9 @@ model Review {
   user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   perfume Perfume          @relation(fields: [perfumeId], references: [id], onDelete: Cascade)
   upvotes ReviewUpvote[]
+  title String?
+  imageUrl String?
+  comments Comment[]
 
   @@unique([userId, perfumeId])
   @@index([userId])
@@ -208,6 +251,16 @@ model Review {
   @@index([createdAt])       // homepage latest-reviews orderBy
   @@index([weather_tags])    // hasSome climate-picks filter (converted to GIN by Postgres)
   @@map("reviews")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ReviewUpvote {

@@ -57,7 +57,8 @@ export default function VerifyPhonePage() {
   // ─── Send OTP ─────────────────────────────────────────────────────────────
   async function handleSendOtp() {
     setError(null);
-    if (!/^\+8801[3-9]\d{8}$/.test(phone)) {
+    const sanitizedPhone = phone.replace(/[\s\-()]/g, "");
+    if (!/^\+8801[3-9]\d{8}$/.test(sanitizedPhone)) {
       setError("Enter a valid Bangladeshi number, e.g. +8801XXXXXXXXX");
       return;
     }
@@ -70,7 +71,7 @@ export default function VerifyPhonePage() {
     try {
       const result = await signInWithPhoneNumber(
         firebaseAuth,
-        phone,
+        sanitizedPhone,
         recaptchaVerifierRef.current
       );
       setConfirmation(result);
@@ -103,11 +104,12 @@ export default function VerifyPhonePage() {
 
     setPending(true);
     try {
+      const sanitizedPhone = phone.replace(/[\s\-()]/g, "");
       // 1. Verify OTP with Firebase (client-side)
       await confirmation.confirm(otp);
 
       // 2. Save to our DB via Server Action
-      const result = await saveVerifiedPhone(phone);
+      const result = await saveVerifiedPhone(sanitizedPhone);
       if (!result.success) {
         setError(result.error);
         return;

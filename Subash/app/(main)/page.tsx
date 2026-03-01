@@ -3,9 +3,12 @@ import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
 import { truncate } from "@/lib/utils";
+import { getTrendingPerfumes } from "@/lib/actions/search";
 import { ClimateSection } from "@/components/ClimateSection";
+import { LiveReviewFeed } from "@/components/feed/LiveReviewFeed";
 import { SmartSearch } from "@/components/ui/SmartSearch";
-import { LiveReviewFeed, type LiveReview } from "@/components/feed/LiveReviewFeed";
+import ReviewPosterCard from "@/components/reviews/ReviewPosterCard";
+import { Sparkles } from "lucide-react";
 
 // Data is cached via unstable_cache; page rendered dynamically (no DB at build time)
 export const dynamic = 'force-dynamic';
@@ -42,7 +45,6 @@ function pickWeatherTheme(tags: string[]): string {
   if (tags.includes("HOT")) return "theme-neroli";
   return "theme-rose";
 }
-
 async function getWeather(city: string) {
   const apiKey = process.env.OPENWEATHERMAP_API_KEY;
   if (!apiKey) return null;
@@ -75,38 +77,27 @@ async function getWeather(city: string) {
 // across ISR re-validation cycles without blocking the initial response.
 
 const getTrending = unstable_cache(
-  async () =>
-    prisma.perfume.findMany({
-      select: {
-        id: true, slug: true, name: true, brand: true, image_url: true,
-        _count: { select: { reviews: true } },
-      },
-      orderBy: [{ reviews: { _count: "desc" } }, { release_year: "desc" }],
-      take: 12,
-    }),
+  async () => getTrendingPerfumes(12, 7),
   ["homepage-trending"],
-  { revalidate: 3600, tags: ["trending"] }
+  { revalidate: 120, tags: ["trending"] }
 );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const _getCachedReviews = unstable_cache(
+const getLatestReviews = unstable_cache(
   async () =>
     (prisma as any).review.findMany({
       where: { status: "APPROVED" },
       orderBy: { createdAt: "desc" },
-      take: 8,
+      take: 6,
       select: {
-        id: true, text: true, overall_rating: true,
-        longevity_score: true, sillage_score: true,
-        time_tags: true, weather_tags: true, upvote_count: true, createdAt: true,
-        user: { select: { id: true, name: true, image: true } },
-        perfume: { select: { id: true, slug: true, name: true, brand: true, image_url: true } },
+        id: true, text: true, title: true, imageUrl: true, overall_rating: true,
+        createdAt: true,
+        user: { select: { name: true, image: true } },
+        perfume: { select: { name: true, brand: true, image_url: true } },
       },
     }),
-  ["homepage-latest-reviews"],
+  ["homepage-reviews-grid"],
   { revalidate: 300, tags: ["reviews"] }
 );
-const getLatestReviews = () => _getCachedReviews() as Promise<LiveReview[]>;
 
 
 async function getClimatePicks(climateTags: string[]) {
@@ -174,7 +165,7 @@ export default async function HomePage() {
 
       {/* ── Hero Search Section ────────────────────────────────────────────── */}
       <section className="max-w-4xl mx-auto text-center pt-8 pb-16 md:pt-16 md:pb-20">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight text-[var(--text-primary)] mb-4">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight text-gray-900 dark:text-white mb-4">
           Discover Your Signature Scent.
         </h1>
         <p className="text-base md:text-lg text-[var(--text-secondary)] mb-10 max-w-2xl mx-auto leading-relaxed">
@@ -206,7 +197,34 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Trending + Latest Reviews */}
+      {/* Latest Community Reviews Grid — Masonry Layout */}
+      <section className="max-w-7xl mx-auto mt-16 md:mt-24 px-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles size={16} className="text-[var(--accent)]" />
+              <span className="text-xs font-bold tracking-widest uppercase text-[var(--accent)]">Editorial</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-[var(--text-primary)]">
+              Latest Community Reviews
+            </h2>
+            <p className="text-[var(--text-muted)] mt-2">
+              Deep dives and fragrance stories from our top reviewers.
+            </p>
+          </div>
+          <Link href="/perfume" className="text-sm font-semibold text-[var(--accent)] hover:underline">
+            Write a Review →
+          </Link>
+        </div>
+
+        <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-3 gap-6 space-y-6">
+          {latestReviews.map((review: any) => (
+            <ReviewPosterCard key={review.id} review={review} />
+          ))}
+        </div>
+      </section>
+
+      {/* Trending + Latest Reviews Feed */}
       <section className="max-w-6xl mx-auto mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
@@ -219,44 +237,51 @@ export default async function HomePage() {
           </div>
           {/* auto-fill: columns size themselves to fit, min 140px each */}
           <div
-            className="grid gap-3"
-            style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}
+            className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]"
           >
-            {trending.map((p) => (
-              <Link
-                key={p.id}
-                href={`/perfume/${p.slug}`}
-                className="rounded-2xl p-3 transition glass-subtle flex flex-col"
-              >
-                {/* Image area — fixed height so all cards align */}
-                <div className="w-full rounded-xl flex items-center justify-center overflow-hidden bg-[rgba(139,92,246,0.06)] dark:bg-[rgba(139,92,246,0.10)]" style={{ height: 120 }}>
-                  {p.image_url ? (
-                    <Image
-                      src={p.image_url}
-                      alt={p.name}
-                      width={100}
-                      height={116}
-                      className="object-contain w-auto mix-blend-multiply dark:mix-blend-normal bg-white dark:bg-transparent rounded"
-                      style={{ maxHeight: 112 }}
-                      unoptimized
-                    />
-                  ) : (
-                    <span className="text-3xl">🧴</span>
-                  )}
-                </div>
-                <div className="mt-2 flex-1 min-w-0">
-                  <p className="text-xs font-semibold line-clamp-2 leading-snug text-[var(--text-primary)]">
-                    {p.name}
-                  </p>
-                  <p className="text-[11px] line-clamp-1 mt-0.5 text-[var(--text-secondary)]">
-                    {p.brand}
-                  </p>
-                  <p className="text-[10px] mt-1 text-[var(--text-muted)]">
-                    {p._count.reviews} {p._count.reviews === 1 ? "review" : "reviews"}
-                  </p>
-                </div>
-              </Link>
-            ))}
+            {trending.map((p, index) => {
+              const weekly = (p as any).weeklySearchCount ?? 0;
+              const hasTraffic = weekly > 0;
+
+              return (
+                <Link
+                  key={p.id}
+                  href={`/perfume/${p.slug}`}
+                  className={`rounded-2xl p-3 transition glass-subtle flex flex-col ${
+                    hasTraffic
+                      ? "bg-[rgba(16,185,129,0.06)] border border-[rgba(16,185,129,0.25)]"
+                      : ""
+                  }`}
+                >
+                  {/* Image area — fixed height so all cards align */}
+                  <div className="w-full h-[120px] rounded-xl flex items-center justify-center overflow-hidden bg-[rgba(139,92,246,0.06)] dark:bg-[rgba(139,92,246,0.10)]">
+                    {p.image_url ? (
+                      <Image
+                        src={p.image_url}
+                        alt={p.name}
+                        width={100}
+                        height={116}
+                        className="object-contain w-auto max-h-[112px] mix-blend-multiply dark:mix-blend-normal bg-white dark:bg-transparent rounded"
+                        unoptimized
+                      />
+                    ) : (
+                      <span className="text-3xl">🧴</span>
+                    )}
+                  </div>
+                  <div className="mt-2 flex-1 min-w-0">
+                    <p className="text-xs font-semibold line-clamp-2 leading-snug text-[var(--text-primary)]">
+                      {p.name}
+                    </p>
+                    <p className="text-[11px] line-clamp-1 mt-0.5 text-[var(--text-secondary)]">
+                      {p.brand}
+                    </p>
+                    <p className="text-[10px] mt-1 text-[var(--text-muted)]">
+                      {weekly > 0 ? `${weekly} searches this week` : "Warming up"} · #{index + 1}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 

@@ -19,10 +19,6 @@ const DupeEngine = dynamic(
   () => import("@/components/perfume/DupeEngine").then((m) => m.DupeEngine),
   { loading: () => <Skeleton h="h-40" /> }
 );
-const ReviewForm = dynamic(
-  () => import("@/components/perfume/ReviewForm").then((m) => m.ReviewForm),
-  { loading: () => <Skeleton h="h-48" /> }
-);
 
 export function PerfumeInteractive({
   perfumeId,
@@ -76,6 +72,7 @@ export function PerfumeInteractive({
     >
       <motion.div variants={item}>
         <ScentProfile
+          perfumeId={perfumeId}
           description={description}
           perfumer={perfumer}
           accords={accords}
@@ -89,9 +86,6 @@ export function PerfumeInteractive({
       </motion.div>
       <motion.div variants={item}>
         <DupeEngine perfumeId={perfumeId} initialDupes={initialDupes} />
-      </motion.div>
-      <motion.div variants={item}>
-        <ReviewForm perfumeId={perfumeId} />
       </motion.div>
     </motion.div>
   );

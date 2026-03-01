@@ -22,7 +22,7 @@ export default function PartnersPage() {
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#38BDF8]">Your Brand</span>
                     </h1>
                     <p className="text-lg md:text-xl text-[var(--text-secondary)] max-w-xl leading-relaxed">
-                        Join the world's fastest-growing fragrance platform. Highlight verified deals, directly respond to community reviews, and access powerful market analytics.
+                        Join the world&apos;s fastest-growing fragrance platform. Highlight verified deals, directly respond to community reviews, and access powerful market analytics.
                     </p>
                 </div>
 

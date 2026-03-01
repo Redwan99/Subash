@@ -52,11 +52,16 @@ jobs:
             org.opencontainers.image.description=Subash Open Source Perfume Database
             org.opencontainers.image.vendor=${{ github.repository_owner }}
 
+      - name: Set up QEMU (for ARM cross-compilation)
+        uses: docker/setup-qemu-action@v3
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
+          # Build for amd64 (standard servers) AND arm64 (CasaOS on Raspberry Pi / Odroid)
+          platforms: linux/amd64,linux/arm64
           # Attaches the tags extracted above (e.g., :latest or :v1.0.0)
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

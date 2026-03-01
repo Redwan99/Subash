@@ -20,6 +20,8 @@ export type PhoneActionResult =
   | { success: false; error: string };
 
 export async function saveVerifiedPhone(phone: string): Promise<PhoneActionResult> {
+  const sanitizedPhone = phone.replace(/[\s\-()]/g, "");
+
   // 1. Must be authenticated
   const session = await auth();
   if (!session?.user?.id) {
@@ -27,13 +29,13 @@ export async function saveVerifiedPhone(phone: string): Promise<PhoneActionResul
   }
 
   // 2. Validate format
-  const parsed = PhoneSchema.safeParse({ phone });
+  const parsed = PhoneSchema.safeParse({ phone: sanitizedPhone });
   if (!parsed.success) {
     return { success: false, error: parsed.error.issues[0].message };
   }
 
   // 3. Check if number is already in use by another account
-  const conflict = await prisma.user.findUnique({ where: { phone } });
+  const conflict = await prisma.user.findUnique({ where: { phone: sanitizedPhone } });
   if (conflict && conflict.id !== session.user.id) {
     return { success: false, error: "This phone number is already linked to another account." };
   }
@@ -41,7 +43,7 @@ export async function saveVerifiedPhone(phone: string): Promise<PhoneActionResul
   // 4. Persist to DB
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { phone, phoneVerified: true },
+    data: { phone: sanitizedPhone, phoneVerified: true },
   });
 
   return { success: true };

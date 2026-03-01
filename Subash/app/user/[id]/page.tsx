@@ -60,6 +60,9 @@ export default async function UserProfilePage({
         review_count: true,
         phoneVerified: true,
         createdAt: true,
+        wearingStatus: {
+          include: { perfume: { select: { id: true, name: true, brand: true, image_url: true, slug: true } } },
+        },
         reviews: {
           orderBy: { createdAt: "desc" },
           take: 10,
@@ -107,10 +110,56 @@ export default async function UserProfilePage({
 
   const badge = getBadge(user.review_count);
   const totalWardrobe = Object.values(grouped).reduce((s, a) => s + a.length, 0);
+  const status = user.wearingStatus;
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 space-y-8">
+
+        {/* ─── Currently Wearing Banner (if any) ─────────────── */}
+        {status && (
+          <div className="relative mb-4 overflow-hidden rounded-2xl p-4 md:p-5 bg-[linear-gradient(135deg,rgba(16,185,129,0.16)_0%,rgba(59,130,246,0.08)_50%,transparent_100%)] border border-emerald-400/40 shadow-[0_16px_45px_rgba(6,95,70,0.45)]">
+            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(16,185,129,0.35)_0%,transparent_70%)]" />
+            <div className="relative flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-black/40 flex items-center justify-center overflow-hidden border border-emerald-300/60">
+                {status.perfume?.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={status.perfume.image_url}
+                    alt={status.perfume.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-3xl">🧴</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-emerald-200/80">
+                  Currently Wearing
+                </p>
+                <p className="text-sm font-semibold text-[var(--text-primary)] truncate">
+                  {status.perfume?.name ?? status.customName ?? "Unknown scent"}
+                </p>
+                <div className="mt-1 flex items-center gap-2 text-[10px] text-emerald-100/90">
+                  {status.perfume?.brand && <span className="truncate">{status.perfume.brand}</span>}
+                  {status.timeTag && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-300/60 text-[10px] font-semibold capitalize">
+                      {status.timeTag === "day" && "☀️"}
+                      {status.timeTag === "night" && "🌙"}
+                      {status.timeTag === "all" && "🕒"}
+                      <span>{status.timeTag}</span>
+                    </span>
+                  )}
+                </div>
+                {status.comment && (
+                  <p className="mt-1 text-[11px] leading-relaxed text-emerald-50/90 line-clamp-2">
+                    “{status.comment}”
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ─── Profile Hero ──────────────────────────────────── */}
         <div className="relative overflow-hidden rounded-2xl p-6 bg-[linear-gradient(135deg,rgba(139,92,246,0.10)_0%,rgba(109,40,217,0.04)_60%,transparent_100%)] border border-[#8B5CF6]/20">

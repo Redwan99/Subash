@@ -92,7 +92,7 @@ Output during first boot:
 🚀  Starting Subash on port 3000...
 ```
 
-Open **`http://<casaos-ip>:3000`** — all 70k perfumes are live.
+Open **`http://<casaos-ip>:9864`** — all 70k perfumes are live.
 
 ---
 

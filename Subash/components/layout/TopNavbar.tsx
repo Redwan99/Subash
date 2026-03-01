@@ -27,11 +27,24 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
-import { SmartSearch } from "@/components/ui/SmartSearch";
+import dynamic from "next/dynamic";
+
+// SmartSearch and NotificationBell use useRouter(); render them client-only to
+// avoid "expected app router to be mounted" invariants during the HTML pass.
+const SmartSearch = dynamic(
+  () => import("@/components/ui/SmartSearch").then((m) => ({ default: m.SmartSearch })),
+  { ssr: false, loading: () => <div className="h-9 w-full rounded-full bg-[var(--surface-2)] animate-pulse" /> }
+);
+
+const NotificationBellDynamic = dynamic(
+  () => import("./NotificationBellClient").then((m) => ({ default: m.NotificationBellClient })),
+  { ssr: false }
+);
 import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "@/lib/actions/notifications";
+import { WearingStatusModal } from "@/components/profile/WearingStatusModal";
 
 // ─── Top Nav Links ────────────────────────────────────────────────────────────
 
@@ -195,7 +208,7 @@ function NotificationBell() {
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute top-1 right-1 flex items-center justify-center min-w-[14px] h-[14px] px-0.5 rounded-full text-[9px] font-bold leading-none bg-[#EF4444] text-white shadow-[0_0_6px_rgba(239,68,68,0.6)]"
+            className="absolute top-1 right-1 flex items-center justify-center min-w-[14px] h-[14px] px-0.5 rounded-full text-[9px] font-bold leading-none bg-[#EF4444] text-gray-900 dark:text-white shadow-[0_0_6px_rgba(239,68,68,0.6)]"
           >
             {unreadCount > 9 ? "9+" : unreadCount}
           </motion.span>
@@ -215,8 +228,8 @@ function NotificationBell() {
                 : { type: "spring", stiffness: 380, damping: 26 }
             }
             className="absolute right-0 top-10 w-80 rounded-2xl overflow-hidden z-[100]
-              bg-white/60 dark:bg-black/60 backdrop-blur-2xl
-              border border-white/30 dark:border-white/10
+              bg-black/40 dark:bg-black/60 backdrop-blur-2xl
+              border border-black/10 dark:border-white/10
               shadow-[0_8px_40px_rgba(0,0,0,0.22)]"
           >
             {/* Header */}
@@ -316,7 +329,7 @@ function AvatarMenu() {
           whileHover={shouldReduceMotion ? {} : { scale: 1.04 }}
           whileTap={shouldReduceMotion ? {} : { scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-gray-900 dark:text-white active:scale-[0.97]"
         >
           <LogIn size={14} />
           <span className="hidden sm:block">Sign In</span>
@@ -330,8 +343,6 @@ function AvatarMenu() {
     .map((w) => w[0])
     .slice(0, 2)
     .join("")
-    .toUpperCase();
-
   return (
     <div ref={ref} className="relative">
       {/* Avatar button */}
@@ -417,8 +428,30 @@ function AvatarMenu() {
 // ─── Top Navbar ───────────────────────────────────────────────────────────────
 
 export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, boolean> }) {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = typeof rawPathname === "string" ? rawPathname : "";
   const shouldReduceMotion = useReducedMotion();
+
+  const [showSearch, setShowSearch] = useState(false);
+
+  useEffect(() => {
+    if (pathname !== "/") {
+      setShowSearch(true);
+      return;
+    }
+
+    const handleScroll = () => {
+      if (window.scrollY > 350) {
+        setShowSearch(true);
+      } else {
+        setShowSearch(false);
+      }
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname]);
 
   return (
     <motion.header
@@ -448,9 +481,9 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
         </motion.div>
       </Link>
 
-      {/* ── Center: Search ───────────────────────────────────── */}
+      {/* ── Center: Search (scroll-aware on homepage) ────────── */}
       <div className="flex-1 max-w-md mx-auto">
-        <SmartSearch id="top-nav-search" />
+        {showSearch && <SmartSearch id="top-nav-search" />}
       </div>
 
       {/* ── Right: Nav Links + Theme + Avatar ────────────────── */}
@@ -463,8 +496,8 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
             if (l.label === "Boutiques" && featureToggles?.ENABLE_SHOPS === false) return false;
             return true;
           }).map(({ href, icon, label }) => {
-            const active =
-              href === "/" ? pathname === "/" : pathname.startsWith(href);
+            const current = pathname || "";
+            const active = href === "/" ? current === "/" : current.startsWith(href);
             return (
               <NavLink key={href} href={href} icon={icon} label={label} active={active} />
             );
@@ -480,8 +513,14 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
         {/* Spacer */}
         <div className="w-1" />
 
+        {/* Currently Wearing status trigger */}
+        <WearingStatusModal />
+
+        {/* Spacer */}
+        <div className="w-1" />
+
         {/* Notification Bell */}
-        <NotificationBell />
+        <NotificationBellDynamic />
 
         {/* Avatar / sign-in */}
         <AvatarMenu />

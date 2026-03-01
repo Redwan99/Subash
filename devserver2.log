@@ -1,0 +1,129 @@
+[32m✔[0m [33mConsole Ninja[0m extension is connected to [33mNext.js[0m, see [36mhttps://tinyurl.com/2vt8jxzw[0m
+   ▲ Next.js 15.5.12
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.10.4:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 5.2s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 4.7s (247 modules)
+ ○ Compiling / ...
+ GET / 200 in 514ms
+ GET /perfume 404 in 2349ms
+ GET /search 200 in 1346ms
+ GET /reviews 200 in 1452ms
+ GET /fragram 200 in 3154ms
+ GET /perfume 404 in 228ms
+ GET /creators 404 in 1828ms
+ GET /leaderboards 200 in 1593ms
+ GET / 200 in 207ms
+ GET / 200 in 183ms
+ GET /admin 200 in 3617ms
+ GET / 200 in 623ms
+ GET / 200 in 639ms
+ GET /admin 200 in 199ms
+ GET /admin 200 in 160ms
+   ▲ Next.js 15.5.12
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.10.4:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 10.8s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1493ms (247 modules)
+ ○ Compiling /admin ...
+ GET /admin 200 in 10748ms
+ GET / 200 in 4520ms
+ GET / 200 in 205ms
+ GET / 200 in 1111ms
+   ▲ Next.js 15.5.12
+   - Local:        http://localhost:3000
+   - Network:      http://192.168.10.4:3000
+   - Environments: .env.local, .env
+   - Experiments (use with caution):
+     · serverActions
+
+ ✓ Starting...
+ ✓ Ready in 11.7s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 2.1s (247 modules)
+ ○ Compiling / ...
+ GET / 200 in 22945ms
+ GET /admin 200 in 3777ms
+ GET / 200 in 498ms
+ GET /favicon-16x16.png 404 in 3028ms
+ GET /favicon-16x16.png 404 in 3351ms
+ GET /admin 200 in 1785ms
+ GET / 200 in 1818ms
+ GET /favicon-16x16.png 404 in 284ms
+ GET /favicon-16x16.png 404 in 189ms
+ GET / 200 in 838ms
+ GET /admin 200 in 963ms
+ GET /favicon-16x16.png 404 in 1518ms
+ GET /favicon-16x16.png 404 in 414ms
+ GET / 200 in 932ms
+ GET /admin 200 in 1014ms
+ GET /favicon-16x16.png 404 in 152ms
+ GET /favicon-16x16.png 404 in 170ms
+ GET / 200 in 689ms
+ GET /favicon-16x16.png 404 in 186ms
+ GET /admin 200 in 228ms
+ GET /favicon-16x16.png 404 in 132ms
+ GET / 500 in 9510ms
+ GET /admin 500 in 3504ms
+ GET / 200 in 2696ms
+ GET /admin 500 in 2714ms
+ GET / 200 in 177ms
+ GET / 200 in 297ms
+ GET /admin 200 in 310ms
+ GET /favicon-16x16.png 404 in 343ms
+ GET /favicon-16x16.png 404 in 199ms
+ GET /admin 500 in 65ms
+ GET / 500 in 67ms
+ GET /admin 500 in 1214ms
+ GET /admin 500 in 262ms
+ GET / 500 in 1305ms
+ GET / 500 in 92ms
+ GET / 200 in 628ms
+ GET /api/reviews 200 in 3500ms
+ GET /favicon-16x16.png 500 in 4179ms
+ GET /favicon-16x16.png 500 in 570ms
+ GET /api/leaderboard?timeframe=week 200 in 3613ms
+ GET /api/sidebar 200 in 3621ms
+ GET /api/weather 200 in 3734ms
+ GET /api/weather?source=ip 200 in 242ms
+ GET /api/auth/session 500 in 8497ms
+ GET /api/auth/session 500 in 271ms
+ GET /leaderboards 200 in 4318ms
+ GET /perfume 200 in 4346ms
+ GET /api/auth/session 500 in 648ms
+ GET /api/auth/session 500 in 36ms
+ GET /api/reviews 200 in 32ms
+ GET /api/reviews 200 in 18ms
+ GET /api/reviews 200 in 33ms
+ GET /api/reviews 200 in 29ms
+ GET /api/reviews 200 in 46ms
+ GET /api/reviews 200 in 17ms
+ GET /api/reviews 200 in 18ms
+ GET /api/reviews 200 in 19ms
+ GET /api/reviews 200 in 18ms
+ GET /api/reviews 200 in 268ms
+ GET /api/reviews 200 in 60ms
+ GET /api/reviews 200 in 33ms
+ GET /api/reviews 200 in 3025ms
+ GET /auth/signin 200 in 4890ms
+ GET /auth/signin 307 in 737ms
+ GET /admin 200 in 1936ms
+ GET / 200 in 588ms
+ GET /favicon-16x16.png 404 in 1219ms
+ GET /favicon-16x16.png 404 in 104ms
+ GET / 200 in 415ms
+ GET / 200 in 404ms
+ GET /admin 200 in 280ms
+[?25h

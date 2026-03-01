@@ -72,8 +72,7 @@ export default async function CreatorProfilePage({ params }: Props) {
                         {creator.image ? (
                             <Image src={creator.image} alt={creator.name} fill className="rounded-full object-cover" />
                         ) : (
-                            <div className="w-24 h-24 rounded-full flex items-center justify-center text-2xl font-black text-white shadow-[0_0_32px_rgba(245,158,11,0.3)]"
-                                style={{ background: "linear-gradient(135deg, #F59E0B, #D97706)" }}>
+                            <div className="w-24 h-24 rounded-full flex items-center justify-center text-2xl font-black text-white shadow-[0_0_32px_rgba(245,158,11,0.3)] bg-[linear-gradient(135deg,#F59E0B,#D97706)]">
                                 {initials}
                             </div>
                         )}

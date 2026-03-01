@@ -16,6 +16,18 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+    { media: "(prefers-color-scheme: dark)", color: "#050505" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: {
     default: "Subash | Bangladesh's Fragrance Community",
@@ -74,12 +86,17 @@ export default async function RootLayout({
   return (
     <html lang="bn" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${playfair.variable} antialiased scrollbar-thin overflow-x-hidden`}
+        className={`${inter.variable} ${playfair.variable} bg-ambient-dynamic text-gray-900 dark:text-gray-100 min-h-screen antialiased flex flex-col scrollbar-thin overflow-x-hidden`}
         suppressHydrationWarning
       >
         <Providers>
           <TopNavbar featureToggles={featureToggles} />
-          {children}
+          <div className="flex flex-col flex-1 relative">
+            {/* Global padding to prevent TopNavbar overlap */}
+            <div className="flex-grow pt-[var(--topnav-height,60px)]">
+              {children}
+            </div>
+          </div>
         </Providers>
       </body>
     </html>

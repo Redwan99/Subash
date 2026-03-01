@@ -9,7 +9,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Search, X, Loader2 } from "lucide-react";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
-import { incrementPerfumeSearch } from "@/lib/actions/search";
+import { incrementSearchCount } from "@/lib/actions/search";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "use-debounce";
 
@@ -134,7 +134,7 @@ export function SmartSearch({
     setQuery("");
 
     // Background tracking
-    incrementPerfumeSearch(result.id).catch(console.error);
+    incrementSearchCount(result.id).catch(console.error);
 
     if (onSelectResult) {
       onSelectResult(result);

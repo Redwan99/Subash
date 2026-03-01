@@ -36,6 +36,7 @@ const TIMES: { value: TimeTag; label: string; emoji: string }[] = [
 
 const LONGEVITY_LABELS = ["", "Fades in mins", "Under 2h", "2-3h", "3-4h", "4-5h", "5-6h", "6-8h", "8-12h", "12h+", "Eternal"];
 const SILLAGE_LABELS = ["", "On skin only", "Intimate", "Personal", "Noticeable", "Soft aura", "Moderate", "Filling room", "Heavy", "Enormous", "Nuclear"];
+const MAX_REVIEW_LENGTH = 800;
 
 // ─── Star Rating ──────────────────────────────────────────────────────────────
 
@@ -58,6 +59,7 @@ function StarRating({
           onMouseEnter={() => setHover(star)}
           onMouseLeave={() => setHover(0)}
           aria-label={`Rate ${star} stars`}
+          className="transition-transform duration-150 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
         >
           <Star
             size={24}
@@ -130,7 +132,7 @@ function LiquidSlider({
       {/* Track */}
       <div
         ref={trackRef}
-        className="relative h-4 rounded-full cursor-pointer select-none bg-[var(--border-color)]"
+        className="relative h-4 rounded-full cursor-pointer select-none bg-[var(--border-color)] overflow-hidden"
         onClick={(e) => calcValue(e.clientX)}
       >
         {/* Fill */}
@@ -233,7 +235,13 @@ function SignInCTA() {
 
 // ─── Review Form ──────────────────────────────────────────────────────────────
 
-export function ReviewForm({ perfumeId }: { perfumeId: string }) {
+export function ReviewForm({
+  perfumeId,
+  onSubmitted,
+}: {
+  perfumeId: string;
+  onSubmitted?: () => void;
+}) {
   const { data: session } = useSession();
   const shouldReduceMotion = useReducedMotion();
 
@@ -273,6 +281,7 @@ export function ReviewForm({ perfumeId }: { perfumeId: string }) {
     if (result.success) {
       setText(""); setRating(3); setLongevity(5); setSillage(5);
       setWeatherTags([]); setTimes([]); setTurnstileToken("");
+      onSubmitted?.();
     }
   };
 
@@ -303,6 +312,9 @@ export function ReviewForm({ perfumeId }: { perfumeId: string }) {
           <label className="text-sm font-semibold block mb-2 text-[var(--text-secondary)]">
             Overall Rating
           </label>
+            <p className="text-xs mb-2 text-[var(--text-muted)]">
+              Tap to rate from 1 (dislike) to 5 (love).
+            </p>
           <StarRating value={rating} onChange={setRating} />
         </div>
 
@@ -319,12 +331,18 @@ export function ReviewForm({ perfumeId }: { perfumeId: string }) {
             className="w-full rounded-xl px-4 py-3 text-sm resize-none outline-none bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-primary)] caret-[var(--accent)] transition-colors focus:border-[rgba(139,92,246,0.5)]"
             required
             minLength={10}
+            maxLength={MAX_REVIEW_LENGTH}
           />
-          {state?.fieldErrors?.text && (
-            <p className="text-xs mt-1 text-[#EF4444]">
-              {state.fieldErrors.text[0]}
-            </p>
-          )}
+          <div className="mt-1 flex items-center justify-between text-[11px]">
+            {state?.fieldErrors?.text && (
+              <p className="text-[#EF4444]">
+                {state.fieldErrors.text[0]}
+              </p>
+            )}
+            <span className="ml-auto text-[var(--text-muted)]">
+              {text.length}/{MAX_REVIEW_LENGTH} characters
+            </span>
+          </div>
         </div>
 
         {/* Longevity slider */}
@@ -415,6 +433,13 @@ export function ReviewForm({ perfumeId }: { perfumeId: string }) {
           <Send size={15} />
           {loading ? "Submitting…" : "Submit Review"}
         </motion.button>
+        <p className="mt-2 text-center text-[11px] text-[var(--text-muted)]">
+          {!turnstileToken
+            ? "Complete the bot check above to enable submit."
+            : text.trim().length < 10
+            ? "Write at least 10 characters to share a helpful review."
+            : "Thank you for sharing an honest, helpful review."}
+        </p>
       </form>
     </div>
   );

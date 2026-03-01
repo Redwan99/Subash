@@ -55,6 +55,7 @@ const nextConfig: NextConfig = {
 
   experimental: {
     serverActions: {
+      bodySizeLimit: "10mb",
       // Local dev + production domain + CasaOS allowed
       allowedOrigins: [
         "localhost:3000",
@@ -66,12 +67,12 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // ADDED: Bypass strict linting/type-checking during production builds
   eslint: {
-    ignoreDuringBuilds: true,
+    // Run ESLint during builds so production catches lint issues too
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,  // Fail the build on any type error
   },
 };
 

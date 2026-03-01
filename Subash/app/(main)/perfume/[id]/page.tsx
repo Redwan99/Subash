@@ -3,18 +3,18 @@
 
 import { Metadata } from "next";
 import prisma from "@/lib/prisma";
-import Image from "next/image";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
-import { Star, ShoppingCart, ExternalLink, Tag, Store } from "lucide-react";
+import { ShoppingCart, ExternalLink, Tag, Store } from "lucide-react";
 import NextDynamic from "next/dynamic";
 import { DecantCard, type DecantCardData } from "@/components/marketplace/DecantCard";
 import { auth } from "@/auth";
 import { checkWardrobeStatus } from "@/lib/actions/reviews";
-import { AddToWardrobeButton } from "@/components/perfume/AddToWardrobeButton";
+import { PerfumeHero } from "@/components/perfume/PerfumeHero";
+import ViewTracker from "@/components/perfume/ViewTracker";
 
 // Lazy-load the heavy interactive client bundle (ScentProfile, DupeEngine, ReviewForm)
 const PerfumeInteractive = NextDynamic(
@@ -126,6 +126,14 @@ export default async function PerfumePage({
 
   if (!perfume) return notFound();
 
+  const [shopsToggle, decantsToggle] = await Promise.all([
+    anyPrisma.systemFeature?.findUnique?.({ where: { key: "ENABLE_SHOPS" } }).catch(() => null),
+    anyPrisma.systemFeature?.findUnique?.({ where: { key: "ENABLE_DECANTS" } }).catch(() => null),
+  ]);
+
+  const isShopsEnabled = shopsToggle?.isEnabled ?? true;
+  const isDecantsEnabled = decantsToggle?.isEnabled ?? true;
+
   // Telemetry track view
   trackEvent("view_perfume", { id: perfume.id, slug: perfume.slug });
 
@@ -157,91 +165,30 @@ export default async function PerfumePage({
   return (
     <main className="min-h-screen px-4 md:px-6 pt-20 md:pt-24 pb-20">
       <div className="max-w-6xl mx-auto space-y-10">
-        {/* Hero */}
-        <section className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
-          <div className="rounded-3xl p-6 flex items-center justify-center bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]">
-            {perfume.image_url ? (
-              <Image
-                src={perfume.image_url}
-                alt={perfume.name}
-                width={220}
-                height={260}
-                className="object-contain"
-                priority
-              />
-            ) : (
-              <span className="text-5xl">🧴</span>
-            )}
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <p className="text-xs uppercase tracking-widest text-[var(--text-muted)]">
-                  {perfume.brand}
-                </p>
-                {perfume.gender && (
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 text-[var(--text-secondary)] backdrop-blur-sm">
-                    {perfume.gender.replace("for ", "").replace("women and men", "Unisex").replace("women", "For Women").replace("men", "For Men")}
-                  </span>
-                )}
-              </div>
-              <h1 className="text-3xl md:text-4xl font-display font-semibold text-[var(--text-primary)]">
-                {perfume.name}
-              </h1>
-              {perfume.release_year && (
-                <p className="text-sm text-[var(--text-secondary)]">
-                  Released in {perfume.release_year}
-                </p>
-              )}
-            </div>
-
-            <div className="flex items-center flex-wrap gap-3">
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star
-                    key={i}
-                    size={16}
-                    fill={avgRating >= i - 0.25 ? "currentColor" : "none"}
-                    className={
-                      avgRating >= i - 0.25
-                        ? "text-[var(--accent)]"
-                        : "text-[var(--border-color)]"
-                    }
-                  />
-                ))}
-              </div>
-              <span className="text-sm font-semibold text-[var(--text-primary)]">
-                {avgRating ? avgRating.toFixed(1) : "No ratings yet"}
-              </span>
-              <span className="text-xs text-[var(--text-muted)]">
-                ({reviewCount} review{reviewCount !== 1 ? "s" : ""})
-              </span>
-              {/* Wardrobe button — only if signed in */}
-              {session?.user && (
-                <AddToWardrobeButton
-                  perfumeId={perfume.id}
-                  initialShelf={wardrobeStatus.shelf}
-                />
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {(perfume.top_notes as string[]).slice(0, 3).map((note: string) => (
-                <span
-                  key={note}
-                  className="text-xs px-2 py-1 rounded-full bg-[#8B5CF6]/15 text-[var(--accent)]"
-                >
-                  {note as string}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
+        <ViewTracker perfumeId={perfume.id} />
+        <PerfumeHero
+          perfume={{
+            id: perfume.id,
+            name: perfume.name,
+            brand: perfume.brand,
+            image_url: perfume.image_url,
+            release_year: perfume.release_year,
+            gender: perfume.gender,
+            accords: (perfume.accords ?? []) as string[],
+            top_notes: (perfume.top_notes ?? []) as string[],
+          }}
+          avgRating={avgRating}
+          reviewCount={reviewCount}
+          avgLongevity={avgLongevity}
+          avgSillage={avgSillage}
+          initialShelf={wardrobeStatus.shelf}
+          isSignedIn={!!session?.user}
+        />
 
         {/* Marketplace */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Verified Deals */}
+          {isShopsEnabled && (
           <div className="rounded-3xl p-6 space-y-4 bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]">
             <div className="flex items-center gap-2 mb-1">
               <Store size={15} className="text-[#10B981]" />
@@ -296,7 +243,9 @@ export default async function PerfumePage({
               </div>
             )}
           </div>
+          )}
 
+          {isDecantsEnabled && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-[var(--text-primary)]">
@@ -320,6 +269,7 @@ export default async function PerfumePage({
               </div>
             )}
           </div>
+          )}
         </section>
 
         {/* Interactive Scent Engine */}
