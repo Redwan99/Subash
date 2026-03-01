@@ -1,5 +1,7 @@
 {
     "chat.agent.maxRequests": 50,
     "chat.tools.terminal.ignoreDefaultAutoApproveRules": true,
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+    "idf.currentSetup": "c:\\Users\\redwa\\esp\\esp-idf",
+    "python.terminal.useEnvFile": true
 }

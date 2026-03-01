@@ -70,8 +70,12 @@ const ReviewSchema = z.object({
   overall_rating: z.number().min(1).max(5),
   longevity_score: z.number().int().min(1).max(5),
   sillage_score: z.number().int().min(1).max(5),
-  time_tags: z.array(z.enum(["DAY", "NIGHT", "BOTH"])),
+  time_tags: z.array(z.enum(["MORNING", "DAY", "EVENING", "NIGHT", "ANYTIME", "BOTH"])),
   weather_tags: z.array(z.enum(["HOT", "MILD", "COLD", "HUMID", "DRY", "RAINY"])),
+  genderLeaning: z.number().int().min(1).max(5).optional(),
+  occasion: z.string().trim().max(50).optional().nullable(),
+  valueRating: z.number().int().min(1).max(3).optional(),
+  blindBuySafe: z.boolean().optional(),
   turnstileToken: z.string().min(1, "Please complete the security check"),
 });
 
@@ -98,7 +102,7 @@ export async function submitReview(
     };
   }
 
-  const { perfumeId, text, overall_rating, longevity_score, sillage_score, time_tags, weather_tags, turnstileToken } =
+  const { perfumeId, text, overall_rating, longevity_score, sillage_score, time_tags, weather_tags, genderLeaning, occasion, valueRating, blindBuySafe, turnstileToken } =
     parsed.data;
 
   const isHuman = await verifyTurnstile(turnstileToken);
@@ -116,8 +120,12 @@ export async function submitReview(
           overall_rating,
           longevity_score,
           sillage_score,
-          time_tags: time_tags as ("DAY" | "NIGHT" | "BOTH")[],
+          time_tags: time_tags as ("MORNING" | "DAY" | "EVENING" | "NIGHT" | "ANYTIME" | "BOTH")[],
           weather_tags: weather_tags,
+          genderLeaning,
+          occasion,
+          valueRating,
+          blindBuySafe,
         },
       }),
       // Increment review_count on the User row

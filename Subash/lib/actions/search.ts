@@ -84,6 +84,7 @@ export async function getTrendingPerfumes(take = 5, days = 7) {
         name: true,
         brand: true,
         image_url: true,
+        transparentImageUrl: true,
         searchCount: true,
       },
     });
@@ -94,6 +95,7 @@ export async function getTrendingPerfumes(take = 5, days = 7) {
       name: p.name,
       brand: p.brand,
       image_url: p.image_url,
+      transparentImageUrl: p.transparentImageUrl,
       weeklySearchCount: p.searchCount,
     }));
   }
@@ -107,6 +109,7 @@ export async function getTrendingPerfumes(take = 5, days = 7) {
       name: true,
       brand: true,
       image_url: true,
+      transparentImageUrl: true,
     },
   });
 
@@ -128,6 +131,7 @@ export async function getTrendingPerfumes(take = 5, days = 7) {
       name: string;
       brand: string;
       image_url: string | null;
+      transparentImageUrl?: string | null;
       weeklySearchCount: number;
     } => p !== null);
 }

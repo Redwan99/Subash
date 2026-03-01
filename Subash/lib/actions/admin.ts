@@ -3,6 +3,8 @@
 // Phase 9 — Secure Admin Server Actions
 // All actions enforce SUPER_ADMIN role before executing.
 
+import fs from "fs/promises";
+import path from "path";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
@@ -183,6 +185,38 @@ export async function updateFeatureToggle(key: string, isEnabled: boolean) {
   // Revalidate globally so Navbars and Pages pick up the new toggles
   revalidatePath("/", "layout");
   return { success: true };
+}
+
+// ── Upload Transparent Perfume Image ─────────────────────────────────────────
+export async function uploadTransparentImage(perfumeId: string, formData: FormData) {
+  const adminId = await requireAdmin();
+
+  const file = formData.get("file");
+  if (!file || !(file instanceof File)) {
+    throw new Error("No file provided");
+  }
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const ext = path.extname(file.name) || ".png";
+  const uploadsDir = path.join(process.cwd(), "public", "uploads", "perfumes");
+
+  await fs.mkdir(uploadsDir, { recursive: true });
+
+  const filename = `${perfumeId}-${Date.now()}${ext}`;
+  const filePath = path.join(uploadsDir, filename);
+  await fs.writeFile(filePath, buffer);
+
+  const publicPath = `/uploads/perfumes/${filename}`;
+
+  await prisma.perfume.update({
+    where: { id: perfumeId },
+    data: { transparentImageUrl: publicPath },
+  });
+
+  await logAdminAction(adminId, "UPLOAD_TRANSPARENT_IMAGE", `Perfume ${perfumeId}`);
+
+  revalidatePath(`/perfume/${perfumeId}`);
+  return { success: true, path: publicPath };
 }
 
 // =============================================

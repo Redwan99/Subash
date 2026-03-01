@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Star, Edit, Trophy, Calendar } from "lucide-react";
+import { Star, Edit, Trophy, Calendar, Sunrise, Sun, Sunset, Moon, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WardrobePanel } from "@/components/wardrobe/WardrobePanel";
 import type { WardrobePerfume } from "@/types/wardrobe";
@@ -36,6 +36,30 @@ function getBadge(count: number) {
   if (count >= 11) return { emoji: "🥉", label: "Enthusiast", color: "text-[#A0684A]" };
   return { emoji: "🌱", label: "Novice", color: "text-[#34D399]" };
 }
+
+const timeDisplay = (tag: string | null) => {
+  switch (tag) {
+    case "morning":
+    case "MORNING":
+      return { label: "Morning", icon: <Sunrise className="w-4 h-4" /> };
+    case "day":
+    case "DAY":
+      return { label: "Day", icon: <Sun className="w-4 h-4" /> };
+    case "evening":
+    case "EVENING":
+      return { label: "Evening", icon: <Sunset className="w-4 h-4" /> };
+    case "night":
+    case "NIGHT":
+      return { label: "Night", icon: <Moon className="w-4 h-4" /> };
+    case "anytime":
+    case "ANYTIME":
+    case "all":
+    case "BOTH":
+      return { label: "Anytime", icon: <Clock className="w-4 h-4" /> };
+    default:
+      return null;
+  }
+};
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -140,16 +164,18 @@ export default async function UserProfilePage({
                 <p className="text-sm font-semibold text-[var(--text-primary)] truncate">
                   {status.perfume?.name ?? status.customName ?? "Unknown scent"}
                 </p>
-                <div className="mt-1 flex items-center gap-2 text-[10px] text-emerald-100/90">
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] text-emerald-100/90">
                   {status.perfume?.brand && <span className="truncate">{status.perfume.brand}</span>}
-                  {status.timeTag && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-300/60 text-[10px] font-semibold capitalize">
-                      {status.timeTag === "day" && "☀️"}
-                      {status.timeTag === "night" && "🌙"}
-                      {status.timeTag === "all" && "🕒"}
-                      <span>{status.timeTag}</span>
-                    </span>
-                  )}
+                  {status.timeTag && (() => {
+                    const info = timeDisplay(status.timeTag);
+                    if (!info) return null;
+                    return (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-300/60 text-[10px] font-semibold">
+                        {info.icon}
+                        <span>{info.label}</span>
+                      </span>
+                    );
+                  })()}
                 </div>
                 {status.comment && (
                   <p className="mt-1 text-[11px] leading-relaxed text-emerald-50/90 line-clamp-2">

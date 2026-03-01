@@ -209,7 +209,7 @@ export default function VerifyPhonePage() {
             <button
               onClick={handleSendOtp}
               disabled={pending}
-              className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-white bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)]"
+              className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-black bg-[linear-gradient(135deg,#059669_0%,#10b981_50%,#34d399_100%)] shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
             >
               {pending ? "Sending…" : "Send Verification Code"}
             </button>
@@ -231,7 +231,7 @@ export default function VerifyPhonePage() {
             <button
               onClick={handleVerifyOtp}
               disabled={pending || otp.length !== 6}
-              className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-white bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)]"
+              className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-black bg-[linear-gradient(135deg,#059669_0%,#10b981_50%,#34d399_100%)] shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
             >
               {pending ? "Verifying…" : "Verify Code"}
             </button>

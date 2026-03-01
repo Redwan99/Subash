@@ -44,6 +44,9 @@ enum TimeOfDay {
   DAY
   NIGHT
   BOTH
+  MORNING
+  EVENING
+  ANYTIME
 }
 
 enum ReviewStatus {
@@ -150,6 +153,7 @@ model Perfume {
   top_notes    String[]
   heart_notes  String[]
   base_notes   String[]
+  transparentImageUrl String?
   release_year Int?
   perfumer     String?
   description  String?  @db.Text
@@ -235,6 +239,10 @@ model Review {
   time_tags       TimeOfDay[]
   weather_tags    String[]     // "HOT" | "MILD" | "COLD" | "HUMID" | "DRY" | "RAINY"
   upvote_count    Int          @default(0)
+  genderLeaning   Int?
+  occasion        String?
+  valueRating     Int?
+  blindBuySafe    Boolean?
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 

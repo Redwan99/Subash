@@ -9,9 +9,9 @@ import { getTrendingPerfumes } from "@/lib/actions/search";
 
 // Rank badge colours: gold → silver → bronze → normal → normal
 const RANK_STYLES = [
-    "text-amber-400",   // #1
+    "text-brand-400",   // #1
     "text-slate-300",   // #2
-    "text-orange-400",  // #3
+    "text-brand-300",   // #3
     "text-[var(--text-muted)]",
     "text-[var(--text-muted)]",
 ];
@@ -25,10 +25,10 @@ export async function TrendingPerfumes() {
         <div className="rounded-2xl p-4 glass border border-[var(--bg-glass-border)] bg-black/5 dark:bg-white/5 backdrop-blur-md">
             {/* Header */}
             <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-[rgba(139,92,246,0.18)]">
-                    <TrendingUp size={13} className="text-[var(--accent)]" />
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-[rgba(16,185,129,0.18)]">
+                    <TrendingUp size={13} className="text-brand-500" />
                 </div>
-                <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">
+                <span className="text-[10px] font-bold tracking-widest uppercase text-brand-500">
                     Trending Perfumes
                 </span>
             </div>
@@ -73,7 +73,7 @@ export async function TrendingPerfumes() {
                                 </div>
 
                                 {/* 🔥 Heat indicator (weekly search count) */}
-                                <div className="flex items-center gap-0.5 text-orange-400 shrink-0">
+                                <div className="flex items-center gap-0.5 text-brand-500 shrink-0">
                                     <Flame size={10} className="fill-current opacity-80" />
                                     <span className="text-[9px] font-bold tabular-nums">
                                         {p.weeklySearchCount.toLocaleString()}

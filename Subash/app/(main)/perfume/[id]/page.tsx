@@ -14,6 +14,7 @@ import { DecantCard, type DecantCardData } from "@/components/marketplace/Decant
 import { auth } from "@/auth";
 import { checkWardrobeStatus } from "@/lib/actions/reviews";
 import { PerfumeHero } from "@/components/perfume/PerfumeHero";
+import { CommunityConsensus } from "@/components/perfume/CommunityConsensus";
 import ViewTracker from "@/components/perfume/ViewTracker";
 
 // Lazy-load the heavy interactive client bundle (ScentProfile, DupeEngine, ReviewForm)
@@ -68,6 +69,8 @@ export default async function PerfumePage({
       name: true,
       brand: true,
       image_url: true,
+      transparentImageUrl: true,
+      slug: true,
       release_year: true,
       description: true,
       perfumer: true,
@@ -127,8 +130,8 @@ export default async function PerfumePage({
   if (!perfume) return notFound();
 
   const [shopsToggle, decantsToggle] = await Promise.all([
-    anyPrisma.systemFeature?.findUnique?.({ where: { key: "ENABLE_SHOPS" } }).catch(() => null),
-    anyPrisma.systemFeature?.findUnique?.({ where: { key: "ENABLE_DECANTS" } }).catch(() => null),
+    prisma.featureToggle.findUnique({ where: { key: "ENABLE_SHOPS" } }).catch(() => null),
+    prisma.featureToggle.findUnique({ where: { key: "ENABLE_DECANTS" } }).catch(() => null),
   ]);
 
   const isShopsEnabled = shopsToggle?.isEnabled ?? true;
@@ -172,6 +175,7 @@ export default async function PerfumePage({
             name: perfume.name,
             brand: perfume.brand,
             image_url: perfume.image_url,
+            transparentImageUrl: perfume.transparentImageUrl,
             release_year: perfume.release_year,
             gender: perfume.gender,
             accords: (perfume.accords ?? []) as string[],
@@ -185,7 +189,14 @@ export default async function PerfumePage({
           isSignedIn={!!session?.user}
         />
 
+        {/* Community Consensus */}
+        <CommunityConsensus
+          reviewCount={reviewCount}
+          avgRating={avgRating}
+        />
+
         {/* Marketplace */}
+        {(isShopsEnabled || isDecantsEnabled) && (
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Verified Deals */}
           {isShopsEnabled && (
@@ -271,6 +282,7 @@ export default async function PerfumePage({
           </div>
           )}
         </section>
+        )}
 
         {/* Interactive Scent Engine */}
         <section>

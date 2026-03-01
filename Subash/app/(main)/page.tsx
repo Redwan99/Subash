@@ -19,6 +19,7 @@ type PerfumeCard = {
   name: string;
   brand: string;
   image_url: string | null;
+  transparentImageUrl?: string | null;
 };
 
 /** Convert OWM data into universal climate tags that match Review.weather_tags */
@@ -154,6 +155,11 @@ export default async function HomePage() {
     getLatestReviews(),
   ]);
 
+  // Trending can contain nulls if a perfume was deleted between stats fetch and hydration; guard them out.
+  const trendingPerfumes = trending.filter(
+    (p): p is NonNullable<(typeof trending)[number]> => Boolean(p)
+  );
+
   const climateTags = weather
     ? computeClimateTags(weather.temp, weather.humidity, weather.condition)
     : ["MILD"];
@@ -225,7 +231,7 @@ export default async function HomePage() {
       </section>
 
       {/* Trending + Latest Reviews Feed */}
-      <section className="max-w-6xl mx-auto mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <section className="w-full mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-display font-semibold text-[var(--text-primary)]">
@@ -235,49 +241,46 @@ export default async function HomePage() {
               View Leaderboards →
             </Link>
           </div>
-          {/* auto-fill: columns size themselves to fit, min 140px each */}
-          <div
-            className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]"
-          >
-            {trending.map((p, index) => {
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 w-full">
+            {trendingPerfumes.map((p, index) => {
               const weekly = (p as any).weeklySearchCount ?? 0;
               const hasTraffic = weekly > 0;
+
+              const imageSrc = p.transparentImageUrl || p.image_url || "/placeholder-perfume.jpg";
 
               return (
                 <Link
                   key={p.id}
                   href={`/perfume/${p.slug}`}
-                  className={`rounded-2xl p-3 transition glass-subtle flex flex-col ${
-                    hasTraffic
-                      ? "bg-[rgba(16,185,129,0.06)] border border-[rgba(16,185,129,0.25)]"
-                      : ""
-                  }`}
+                  className="flex flex-col bg-white/5 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 group"
                 >
-                  {/* Image area — fixed height so all cards align */}
-                  <div className="w-full h-[120px] rounded-xl flex items-center justify-center overflow-hidden bg-[rgba(139,92,246,0.06)] dark:bg-[rgba(139,92,246,0.10)]">
-                    {p.image_url ? (
-                      <Image
-                        src={p.image_url}
-                        alt={p.name}
-                        width={100}
-                        height={116}
-                        className="object-contain w-auto max-h-[112px] mix-blend-multiply dark:mix-blend-normal bg-white dark:bg-transparent rounded"
-                        unoptimized
-                      />
-                    ) : (
-                      <span className="text-3xl">🧴</span>
-                    )}
+                  <div className="relative w-full aspect-square sm:aspect-[4/5] bg-gradient-to-b from-gray-50/50 to-transparent dark:from-white/5 dark:to-transparent p-3 sm:p-5 flex items-center justify-center">
+                    <Image
+                      src={imageSrc}
+                      alt={p.name}
+                      fill
+                      className="object-contain p-4 drop-shadow-xl group-hover:scale-110 transition-transform duration-700 ease-out"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
                   </div>
-                  <div className="mt-2 flex-1 min-w-0">
-                    <p className="text-xs font-semibold line-clamp-2 leading-snug text-[var(--text-primary)]">
+
+                  <div className="p-3 sm:p-4 flex flex-col gap-0.5 border-t border-gray-100 dark:border-white/5 bg-white dark:bg-transparent">
+                    <h3 className="font-bold text-gray-900 dark:text-white text-sm sm:text-base line-clamp-1 group-hover:text-brand-500 transition-colors">
                       {p.name}
-                    </p>
-                    <p className="text-[11px] line-clamp-1 mt-0.5 text-[var(--text-secondary)]">
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
                       {p.brand}
                     </p>
-                    <p className="text-[10px] mt-1 text-[var(--text-muted)]">
-                      {weekly > 0 ? `${weekly} searches this week` : "Warming up"} · #{index + 1}
-                    </p>
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <span className="text-[10px] sm:text-xs font-medium text-brand-500 bg-brand-500/10 px-2 py-0.5 rounded-md truncate">
+                        🔥 Trending · #{index + 1}
+                      </span>
+                      {hasTraffic && (
+                        <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
+                          {weekly} searches
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </Link>
               );

@@ -10,18 +10,21 @@ export async function ScentOfTheDay() {
     if (!potd || !potd.perfume) return null;
 
     const perfume = potd.perfume;
+    const displayImage = perfume.transparentImageUrl || perfume.image_url;
 
         return (
 		<Link href={`/perfume/${perfume.slug}`} className="block group transition-transform duration-200 active:scale-[0.97]">
             <div className="rounded-2xl p-4 glass border border-[var(--bg-glass-border)] bg-black/5 dark:bg-white/5 flex flex-col">
                 {/* Poster image with overlaid badge */}
                 <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-black/30">
-                    {perfume.image_url ? (
+                    {displayImage ? (
                         <Image
-                            src={perfume.image_url}
+                            src={displayImage}
                             alt={perfume.name}
                             fill
-                            className="object-contain p-3 transform group-hover:scale-105 transition-transform duration-500"
+                            className={`object-contain p-3 transform group-hover:scale-105 transition-transform duration-500 ${
+                                perfume.transparentImageUrl ? "" : "mix-blend-multiply dark:mix-blend-normal"
+                            }`}
                             sizes="160px"
                             unoptimized
                         />
@@ -30,7 +33,7 @@ export async function ScentOfTheDay() {
                     )}
 
                     <div className="absolute top-2 left-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm text-[10px] font-semibold text-gray-900 dark:text-white">
-                        <Sparkles size={11} className="text-[var(--accent)]" />
+                        <Sparkles size={11} className="text-brand-400" />
                         <span>✨ Scent of the Day</span>
                     </div>
                 </div>

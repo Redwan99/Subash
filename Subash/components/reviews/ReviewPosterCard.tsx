@@ -9,7 +9,12 @@ type ReviewCardProps = {
 };
 
 export default function ReviewPosterCard({ review }: ReviewCardProps) {
-    const imageUrl = review.imageUrl || review.perfume?.image_url || "/placeholder-perfume.jpg";
+    const imageUrl =
+        review.transparentImageUrl ||
+        review.perfume?.transparentImageUrl ||
+        review.imageUrl ||
+        review.perfume?.image_url ||
+        "/placeholder-perfume.jpg";
     const rating = review.overall_rating || 5;
 
     return (

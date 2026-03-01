@@ -10,14 +10,14 @@ import { useState, useRef, useCallback } from "react";
 import { motion, useReducedMotion, PanInfo } from "framer-motion";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Send, Star, LogIn, CheckCircle, AlertCircle } from "lucide-react";
+import { Send, Star, LogIn, CheckCircle, AlertCircle, Briefcase, GlassWater, Heart, Coffee, ShieldCheck, ShieldAlert, Sparkles, Gem, Frown } from "lucide-react";
 import { submitReview, type ReviewFormState } from "@/lib/actions/perfume";
 import { BotShield } from "@/components/ui/BotShield";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type WeatherTag = "HOT" | "MILD" | "COLD" | "HUMID" | "DRY" | "RAINY";
-type TimeTag = "DAY" | "NIGHT" | "BOTH";
+type TimeTag = "morning" | "day" | "evening" | "night" | "anytime" | "both";
 
 const WEATHER_CONDITIONS: { value: WeatherTag; label: string; emoji: string; desc: string }[] = [
   { value: "HOT", label: "Hot", emoji: "☀️", desc: "> 28°C" },
@@ -28,10 +28,12 @@ const WEATHER_CONDITIONS: { value: WeatherTag; label: string; emoji: string; des
   { value: "RAINY", label: "Rainy", emoji: "🌧️", desc: "Rain / Drizzle" },
 ];
 
-const TIMES: { value: TimeTag; label: string; emoji: string }[] = [
-  { value: "DAY", label: "Day", emoji: "🌤️" },
-  { value: "NIGHT", label: "Night", emoji: "🌙" },
-  { value: "BOTH", label: "Anytime", emoji: "⚡" },
+const TIME_OPTIONS: { value: TimeTag; label: string; emoji: string }[] = [
+  { value: "morning", label: "Morning", emoji: "🌅" },
+  { value: "day", label: "Day", emoji: "🌤️" },
+  { value: "evening", label: "Evening", emoji: "🌇" },
+  { value: "night", label: "Night", emoji: "🌙" },
+  { value: "anytime", label: "Anytime", emoji: "⚡" },
 ];
 
 const LONGEVITY_LABELS = ["", "Fades in mins", "Under 2h", "2-3h", "3-4h", "4-5h", "5-6h", "6-8h", "8-12h", "12h+", "Eternal"];
@@ -195,7 +197,7 @@ function ToggleChip({
       whileTap={shouldReduceMotion ? {} : { scale: 0.92 }}
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer select-none border transition-colors duration-150 ${active
-        ? "bg-[#8B5CF6]/20 border-[#8B5CF6]/40 text-[var(--accent)]"
+        ? "bg-brand-500/20 border-brand-500/40 text-brand-400"
         : "bg-[var(--border-color)] border-transparent text-[var(--text-muted)]"
         }`}
       aria-pressed={active}
@@ -223,7 +225,7 @@ function SignInCTA() {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm bg-[linear-gradient(135deg,#059669,#10b981)] text-black shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
         >
           <LogIn size={15} />
           Sign In to Review
@@ -251,6 +253,10 @@ export function ReviewForm({
   const [sillage, setSillage] = useState(5);
   const [weatherTags, setWeatherTags] = useState<WeatherTag[]>([]);
   const [times, setTimes] = useState<TimeTag[]>([]);
+  const [genderLeaning, setGenderLeaning] = useState<number>(3);
+  const [occasion, setOccasion] = useState<string>("");
+  const [valueRating, setValueRating] = useState<number>(2);
+  const [blindBuySafe, setBlindBuySafe] = useState<boolean>(true);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [state, setState] = useState<ReviewFormState | null>(null);
   const [loading, setLoading] = useState(false);
@@ -266,14 +272,22 @@ export function ReviewForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const normalizedTimes = times.map((t) => t.toUpperCase()) as Array<
+      "MORNING" | "DAY" | "EVENING" | "NIGHT" | "ANYTIME" | "BOTH"
+    >;
+
     const result = await submitReview({
       perfumeId,
       text,
       overall_rating: rating,
       longevity_score: longevity,
       sillage_score: sillage,
-      time_tags: times,
+      time_tags: normalizedTimes,
       weather_tags: weatherTags,
+      genderLeaning,
+      occasion: occasion || null,
+      valueRating,
+      blindBuySafe,
       turnstileToken,
     });
     setState(result);
@@ -328,7 +342,7 @@ export function ReviewForm({
             onChange={(e) => setText(e.target.value)}
             placeholder="Describe the fragrance, how it wore on your skin, occasions you'd suggest it for…"
             rows={4}
-            className="w-full rounded-xl px-4 py-3 text-sm resize-none outline-none bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-primary)] caret-[var(--accent)] transition-colors focus:border-[rgba(139,92,246,0.5)]"
+            className="w-full rounded-xl px-4 py-3 text-sm resize-none outline-none bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-primary)] caret-[var(--accent)] transition-colors focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20"
             required
             minLength={10}
             maxLength={MAX_REVIEW_LENGTH}
@@ -352,9 +366,9 @@ export function ReviewForm({
           value={longevity}
           onChange={setLongevity}
           labelMap={LONGEVITY_LABELS}
-          valueClass="text-[#F59E0B]"
-          barClass="bg-[linear-gradient(90deg,rgba(245,158,11,0.5),#F59E0B)] shadow-[0_0_10px_rgba(245,158,11,0.35)]"
-          knobClass="bg-[#F59E0B] shadow-[0_2px_8px_rgba(245,158,11,0.55)]"
+          valueClass="text-brand-500"
+          barClass="bg-[linear-gradient(90deg,rgba(16,185,129,0.5),#10b981)] shadow-[0_0_10px_rgba(16,185,129,0.35)]"
+          knobClass="bg-brand-500 shadow-[0_2px_8px_rgba(16,185,129,0.55)]"
         />
 
         {/* Sillage slider */}
@@ -364,9 +378,9 @@ export function ReviewForm({
           value={sillage}
           onChange={setSillage}
           labelMap={SILLAGE_LABELS}
-          valueClass="text-[#A78BFA]"
-          barClass="bg-[linear-gradient(90deg,rgba(167,139,250,0.5),#A78BFA)] shadow-[0_0_10px_rgba(167,139,250,0.35)]"
-          knobClass="bg-[#A78BFA] shadow-[0_2px_8px_rgba(167,139,250,0.55)]"
+          valueClass="text-brand-400"
+          barClass="bg-[linear-gradient(90deg,rgba(52,211,153,0.5),#34d399)] shadow-[0_0_10px_rgba(52,211,153,0.35)]"
+          knobClass="bg-brand-400 shadow-[0_2px_8px_rgba(52,211,153,0.55)]"
         />
 
         {/* Weather chips */}
@@ -403,7 +417,7 @@ export function ReviewForm({
             Best Time of Day
           </label>
           <div className="flex flex-wrap gap-2">
-            {TIMES.map(({ value, label, emoji }) => (
+            {TIME_OPTIONS.map(({ value, label, emoji }) => (
               <ToggleChip
                 key={value}
                 label={label}
@@ -413,6 +427,101 @@ export function ReviewForm({
                 shouldReduceMotion={shouldReduceMotion}
               />
             ))}
+          </div>
+        </div>
+
+        {/* 1. Gender Leaning */}
+        <div className="mt-6">
+          <label className="text-sm font-semibold text-gray-900 dark:text-white flex justify-between">
+            <span>Gender Leaning</span>
+            <span className="text-brand-500">{["Very Masculine", "Leans Masculine", "True Unisex", "Leans Feminine", "Very Feminine"][genderLeaning - 1]}</span>
+          </label>
+          <p className="text-xs text-gray-500 mb-2">How does it actually smell?</p>
+          <input
+            type="range"
+            min="1"
+            max="5"
+            step="1"
+            value={genderLeaning}
+            onChange={(e) => setGenderLeaning(Number(e.target.value))}
+            className="w-full accent-brand-500 cursor-pointer h-2 bg-gray-200 dark:bg-white/10 rounded-lg appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-brand-500 [&::-webkit-slider-thumb]:rounded-full"
+          />
+        </div>
+
+        {/* 2. Occasion Pills */}
+        <div className="mt-6">
+          <label className="text-sm font-semibold text-gray-900 dark:text-white">Best Occasion</label>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {[
+              { id: "office", label: "Office/Work", icon: Briefcase },
+              { id: "date", label: "Date Night", icon: Heart },
+              { id: "casual", label: "Casual/Daily", icon: Coffee },
+              { id: "formal", label: "Formal/Event", icon: GlassWater },
+            ].map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setOccasion(opt.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-all ${
+                  occasion === opt.id
+                    ? "bg-brand-500/10 border-brand-500 text-brand-500"
+                    : "border-gray-200 dark:border-white/10 text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                }`}
+              >
+                <opt.icon className="w-4 h-4" /> {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. Value & Blind Buy */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+          <div>
+            <label className="text-sm font-semibold text-gray-900 dark:text-white">Value for Money</label>
+            <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-xl mt-2 border border-gray-200 dark:border-white/10">
+              {[
+                { val: 1, label: "Overpriced", icon: Frown },
+                { val: 2, label: "Fair", icon: ShieldCheck },
+                { val: 3, label: "A Steal!", icon: Gem },
+              ].map((opt) => (
+                <button
+                  key={opt.val}
+                  type="button"
+                  onClick={() => setValueRating(opt.val)}
+                  className={`flex-1 flex flex-col items-center py-2 rounded-lg text-xs font-medium transition-all ${
+                    valueRating === opt.val
+                      ? "bg-brand-500 text-white shadow-md"
+                      : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                  }`}
+                >
+                  <opt.icon className="w-4 h-4 mb-1" /> {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-gray-900 dark:text-white">Blind Buy Safe?</label>
+            <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-xl mt-2 border border-gray-200 dark:border-white/10">
+              <button
+                type="button"
+                onClick={() => setBlindBuySafe(true)}
+                className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${
+                  blindBuySafe ? "bg-brand-500 text-white shadow-md" : "text-gray-500"
+                }`}
+              >
+                Yes, safe
+              </button>
+              <button
+                type="button"
+                onClick={() => setBlindBuySafe(false)}
+                className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${
+                  !blindBuySafe ? "bg-red-500 text-white shadow-md" : "text-gray-500"
+                }`}
+              >
+                No, sample first
+              </button>
+            </div>
           </div>
         </div>
 
@@ -427,7 +536,7 @@ export function ReviewForm({
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
           className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors ${loading
             ? "bg-[var(--border-color)] text-[var(--text-muted)] cursor-not-allowed"
-            : "bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white"
+            : "bg-[linear-gradient(135deg,#059669,#10b981)] text-black shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
             }`}
         >
           <Send size={15} />

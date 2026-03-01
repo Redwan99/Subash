@@ -12,6 +12,7 @@ export function ScentOfTheDay({ data }: { data: SOTDData | null }) {
     if (!data) return null;
 
     const { perfume } = data;
+    const displayImage = perfume.transparentImageUrl || perfume.image_url;
 
     return (
         <div className="relative group">
@@ -23,12 +24,14 @@ export function ScentOfTheDay({ data }: { data: SOTDData | null }) {
                 {/* Left: Image & Badge */}
                 <div className="w-full md:w-48 shrink-0 relative">
                     <div className="aspect-[4/5] relative rounded-2xl overflow-hidden bg-white/50 dark:bg-black/20 flex items-center justify-center p-4 border border-white/20">
-                        {perfume.image_url ? (
+                        {displayImage ? (
                             <Image
-                                src={perfume.image_url}
+                                src={displayImage}
                                 alt={perfume.name}
                                 fill
-                                className="object-contain p-2 mix-blend-multiply dark:mix-blend-normal transform group-hover:scale-105 transition-transform duration-500"
+                                className={`object-contain p-2 transform group-hover:scale-105 transition-transform duration-500 ${
+                                    perfume.transparentImageUrl ? "" : "mix-blend-multiply dark:mix-blend-normal"
+                                }`}
                                 unoptimized
                             />
                         ) : (

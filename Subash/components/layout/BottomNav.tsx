@@ -56,7 +56,7 @@ function NavItem({
       >
         {accent ? (
           /* ── Prominent "Add" button ──────────────────── */
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)] [box-shadow:0_4px_16px_rgba(139,92,246,0.45),_0_1px_0_rgba(255,255,255,0.2)_inset]">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-[linear-gradient(135deg,#059669_0%,#10b981_50%,#34d399_100%)] [box-shadow:0_4px_16px_rgba(16,185,129,0.45),_0_1px_0_rgba(255,255,255,0.2)_inset]">
             <Icon size={22} strokeWidth={2.5} className="text-gray-900 dark:text-white" />
           </div>
         ) : (

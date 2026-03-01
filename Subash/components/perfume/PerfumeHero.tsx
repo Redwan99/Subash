@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { useState, useTransition } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, CheckCircle2, Clock, Heart, Droplet } from "lucide-react";
 import { AddToWardrobeButton } from "@/components/perfume/AddToWardrobeButton";
+import { addToWardrobe } from "@/lib/actions/reviews";
 
 interface PerfumeHeroProps {
   perfume: {
@@ -11,6 +13,7 @@ interface PerfumeHeroProps {
     name: string;
     brand: string;
     image_url: string | null;
+    transparentImageUrl: string | null;
     release_year: number | null;
     gender: string | null;
     accords: string[];
@@ -34,6 +37,22 @@ export function PerfumeHero({
   isSignedIn,
 }: PerfumeHeroProps) {
   const shouldReduceMotion = useReducedMotion();
+  const [activeShelf, setActiveShelf] = useState<string | null>(initialShelf ?? null);
+  const [isPending, startTransition] = useTransition();
+
+  const displayImage = perfume.transparentImageUrl || perfume.image_url;
+
+  const handleShelf = (shelf: "HAVE" | "HAD" | "WANT") => {
+    if (!isSignedIn) return;
+    startTransition(async () => {
+      const result = await addToWardrobe(perfume.id, shelf);
+      if (result.success) setActiveShelf(shelf);
+    });
+  };
+
+  const handleWearingToday = () => {
+    window.dispatchEvent(new Event("open-status-modal"));
+  };
 
   const genderLabel = perfume.gender
     ?.replace("for ", "")
@@ -56,7 +75,7 @@ export function PerfumeHero({
       <div className="pointer-events-none absolute -bottom-10 -left-10 h-36 w-36 rounded-full bg-[radial-gradient(circle,rgba(236,72,153,0.18)_0%,transparent_70%)]" />
 
       <div className="relative grid items-center gap-7 lg:grid-cols-[320px_minmax(0,1fr)]">
-        {/* Bottle */}
+        {/* Studio Lightbox Bottle */}
         <motion.div
           className="flex items-center justify-center"
           whileHover={
@@ -65,32 +84,44 @@ export function PerfumeHero({
               : { y: -6, rotate: -1.5, transition: { type: "spring", stiffness: 260, damping: 30 } }
           }
         >
-          <div className="relative w-full max-w-xs rounded-3xl border border-white/10 bg-[radial-gradient(circle_at_top,_rgba(248,250,252,0.14)_0,rgba(15,23,42,0.96)_55%)] px-6 py-7 backdrop-blur-xl shadow-[0_20px_60px_rgba(15,23,42,0.8)]">
-            <div className="pointer-events-none absolute inset-x-8 top-6 h-24 rounded-full bg-[radial-gradient(circle,rgba(248,250,252,0.22)_0,transparent_70%)] opacity-80" />
-            <div className="relative flex h-56 items-center justify-center">
-              {perfume.image_url ? (
-                <Image
-                  src={perfume.image_url}
-                  alt={perfume.name}
-                  width={260}
-                  height={300}
-                  className="h-full w-auto max-h-56 object-contain drop-shadow-[0_18px_45px_rgba(0,0,0,0.65)]"
-                  priority
-                />
-              ) : (
-                <span className="text-6xl">🧴</span>
+          {displayImage ? (
+            <div
+              className={`relative w-full aspect-square md:aspect-[4/5] rounded-[2.5rem] flex items-center justify-center p-8 group ${
+                perfume.transparentImageUrl
+                  ? "bg-gradient-to-b from-brand-900/40 to-black border border-brand-500/20 shadow-[0_0_50px_-15px_rgba(16,185,129,0.3)]"
+                  : "bg-white/5 border border-white/10"
+              }`}
+            >
+              {perfume.transparentImageUrl && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-1/2 h-1/2 bg-brand-500/20 blur-[100px] rounded-full" />
+                </div>
               )}
-            </div>
-            <div className="mt-4 flex items-center justify-between text-[10px] font-semibold text-slate-200/80">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />
-                In rotation
-              </span>
+              <Image
+                src={displayImage}
+                alt={perfume.name}
+                fill
+                className={`object-contain group-hover:scale-105 transition-transform duration-700 ease-out ${
+                  perfume.transparentImageUrl ? "" : "drop-shadow-xl"
+                }`}
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
               {perfume.release_year && (
-                <span className="text-[10px] text-slate-300/70">Est. {perfume.release_year}</span>
+                <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-gradient-to-t from-black/60 to-transparent">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-white/80">
+                    <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
+                    In rotation
+                  </span>
+                  <span className="text-[10px] text-white/60">Est. {perfume.release_year}</span>
+                </div>
               )}
             </div>
-          </div>
+          ) : (
+            <div className="relative w-full max-w-xs aspect-[4/5] rounded-[2.5rem] bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] border border-white/20">
+              <span className="text-7xl">🧴</span>
+            </div>
+          )}
         </motion.div>
 
         {/* Meta + stats */}
@@ -191,6 +222,65 @@ export function PerfumeHero({
             </div>
           )}
         </div>
+      </div>
+
+      {/* ── Wardrobe Action Bar ───────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-2 p-2 mt-6 bg-white/5 dark:bg-black/40 backdrop-blur-2xl border border-[var(--bg-glass-border)] rounded-2xl shadow-xl">
+        <div className="flex flex-1 items-center gap-1">
+          {/* I have it */}
+          <button
+            onClick={() => handleShelf("HAVE")}
+            disabled={isPending || !isSignedIn}
+            className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-colors group disabled:opacity-50 ${
+              activeShelf === "HAVE"
+                ? "bg-brand-500/15 text-brand-500"
+                : "hover:bg-brand-500/10 text-gray-400 hover:text-brand-500"
+            }`}
+          >
+            <CheckCircle2 className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">I have it</span>
+          </button>
+
+          {/* I had it */}
+          <button
+            onClick={() => handleShelf("HAD")}
+            disabled={isPending || !isSignedIn}
+            className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-colors group disabled:opacity-50 ${
+              activeShelf === "HAD"
+                ? "bg-sky-500/15 text-sky-400"
+                : "hover:bg-white/5 text-gray-400 hover:text-white"
+            }`}
+          >
+            <Clock className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">I had it</span>
+          </button>
+
+          {/* I want it */}
+          <button
+            onClick={() => handleShelf("WANT")}
+            disabled={isPending || !isSignedIn}
+            className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-colors group disabled:opacity-50 ${
+              activeShelf === "WANT"
+                ? "bg-pink-500/15 text-pink-400"
+                : "hover:bg-pink-500/10 text-gray-400 hover:text-pink-500"
+            }`}
+          >
+            <Heart className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">I want it</span>
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-10 bg-white/10 hidden sm:block mx-1" />
+
+        {/* Wearing Today CTA */}
+        <button
+          onClick={handleWearingToday}
+          className="flex-shrink-0 flex items-center gap-2 py-2.5 px-5 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-semibold text-sm shadow-lg shadow-brand-500/20 transition-all active:scale-95 w-full sm:w-auto justify-center mt-2 sm:mt-0"
+        >
+          <Droplet className="w-4 h-4" />
+          Wearing Today
+        </button>
       </div>
     </motion.section>
   );

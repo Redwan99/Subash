@@ -16,7 +16,7 @@ export default function MainLayout({
                     <LeftSidebar />
                 </div>
 
-                <div className="flex-1 max-w-3xl w-full py-6 min-h-screen animate-fade-in-up">{children}</div>
+                <div className="flex-1 max-w-5xl w-full py-6 min-h-screen animate-fade-in-up">{children}</div>
 
                 {/* Hide on mobile/tablet/small desktop, show ONLY on xl Mac/PC */}
                 <div className="hidden xl:block w-80 shrink-0 py-6 pl-6">

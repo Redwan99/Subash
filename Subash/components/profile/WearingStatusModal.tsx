@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Droplet, Search, X, SunMedium, MoonStar, Clock3, Loader2 } from "lucide-react";
+import { Droplet, Search, X, Sun, Moon, Sunrise, Sunset, Clock, Loader2 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
 import { setWearingStatus, clearWearingStatus } from "@/lib/actions/status";
 
-type TimeTag = "day" | "night" | "all";
+type TimeTag = "morning" | "day" | "evening" | "night" | "anytime" | "all";
+
+const timeOptions: { id: TimeTag; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: "morning", label: "Morning", icon: Sunrise },
+  { id: "day", label: "Day", icon: Sun },
+  { id: "evening", label: "Evening", icon: Sunset },
+  { id: "night", label: "Night", icon: Moon },
+  { id: "anytime", label: "Anytime", icon: Clock },
+];
 
 export function WearingStatusModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +23,7 @@ export function WearingStatusModal() {
   const [searchResults, setSearchResults] = useState<PerfumeSearchResult[]>([]);
   const [selectedPerfume, setSelectedPerfume] = useState<PerfumeSearchResult | null>(null);
   const [customName, setCustomName] = useState("");
-  const [timeTag, setTimeTag] = useState<TimeTag>("all");
+  const [timeTag, setTimeTag] = useState<TimeTag>("anytime");
   const [comment, setComment] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, startSaving] = useTransition();
@@ -77,7 +85,7 @@ export function WearingStatusModal() {
       setSelectedPerfume(null);
       setCustomName("");
       setComment("");
-      setTimeTag("all");
+      setTimeTag("anytime");
       setIsOpen(false);
     });
   }
@@ -213,25 +221,25 @@ export function WearingStatusModal() {
                       Time of day
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {[
-                        { key: "day" as TimeTag, label: "Day", icon: <SunMedium size={14} /> },
-                        { key: "night" as TimeTag, label: "Night", icon: <MoonStar size={14} /> },
-                        { key: "all" as TimeTag, label: "All day", icon: <Clock3 size={14} /> },
-                      ].map(({ key, label, icon }) => (
-                        <button
-                          key={key}
-                          type="button"
-                          onClick={() => setTimeTag(key)}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-colors ${
-                            timeTag === key
-                              ? "bg-emerald-500/15 border-emerald-400/60 text-emerald-300 shadow-[0_0_10px_rgba(16,185,129,0.35)]"
-                              : "bg-black/20 border-[var(--bg-glass-border)] text-[var(--text-muted)] hover:border-emerald-500/40"
-                          }`}
-                        >
-                          {icon}
-                          <span>{label}</span>
-                        </button>
-                      ))}
+                      {timeOptions.map((option) => {
+                        const Icon = option.icon;
+                        const isActive = timeTag === option.id;
+                        return (
+                          <button
+                            key={option.id}
+                            type="button"
+                            onClick={() => setTimeTag(option.id)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-all ${
+                              isActive
+                                ? "bg-brand-500/10 border-brand-500 text-brand-500"
+                                : "border-white/10 text-gray-400 hover:text-gray-200 hover:border-white/20"
+                            }`}
+                          >
+                            <Icon className="w-4 h-4" />
+                            {option.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -303,10 +311,12 @@ export function WearingStatusModal() {
                       <p className="text-[10px] text-[var(--text-muted)] truncate">
                         {selectedPerfume?.brand || (!selectedPerfume && !customName ? "This will show on your profile" : "Custom entry")}
                       </p>
-                      <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-200 border border-emerald-400/40">
-                        {timeTag === "day" && <SunMedium size={11} />}
-                        {timeTag === "night" && <MoonStar size={11} />}
-                        {timeTag === "all" && <Clock3 size={11} />}
+                      <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-500/15 text-brand-200 border border-brand-400/40">
+                        {(() => {
+                          const found = timeOptions.find((t) => t.id === timeTag);
+                          const Icon = found?.icon ?? Clock;
+                          return <Icon className="w-3.5 h-3.5" />;
+                        })()}
                         <span className="capitalize">{timeTag}</span>
                       </div>
                     </div>

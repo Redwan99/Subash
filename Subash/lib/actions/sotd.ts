@@ -22,6 +22,7 @@ export type SOTDData = {
         name: string;
         brand: string;
         image_url: string | null;
+        transparentImageUrl?: string | null;
         description: string | null;
     };
 };
@@ -58,7 +59,7 @@ export async function getScentOfTheDay(): Promise<SOTDData | null> {
                     perfume: {
                         select: {
                             id: true, slug: true, name: true, brand: true,
-                            image_url: true, description: true,
+                            image_url: true, transparentImageUrl: true, description: true,
                         },
                     },
                 },
@@ -78,7 +79,7 @@ export async function getScentOfTheDay(): Promise<SOTDData | null> {
                 take: 1,
                 select: {
                     id: true, slug: true, name: true, brand: true,
-                    image_url: true, description: true,
+                    image_url: true, transparentImageUrl: true, description: true,
                 },
                 orderBy: { id: "asc" }, // stable ordering required for skip to be deterministic
             });
@@ -93,7 +94,7 @@ export async function getScentOfTheDay(): Promise<SOTDData | null> {
                         perfume: {
                             select: {
                                 id: true, slug: true, name: true, brand: true,
-                                image_url: true, description: true,
+                                image_url: true, transparentImageUrl: true, description: true,
                             },
                         },
                     },
@@ -107,7 +108,7 @@ export async function getScentOfTheDay(): Promise<SOTDData | null> {
                         perfume: {
                             select: {
                                 id: true, slug: true, name: true, brand: true,
-                                image_url: true, description: true,
+                                image_url: true, transparentImageUrl: true, description: true,
                             },
                         },
                     },
