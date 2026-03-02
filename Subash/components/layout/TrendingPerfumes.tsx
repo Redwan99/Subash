@@ -19,7 +19,11 @@ const RANK_STYLES = [
 export async function TrendingPerfumes() {
     const trending = await getTrendingPerfumes(5);
 
-    if (!trending || trending.length === 0) return null;
+    const trendingPerfumes = trending.filter(
+        (p): p is NonNullable<(typeof trending)[number]> => Boolean(p)
+    );
+
+    if (!trendingPerfumes || trendingPerfumes.length === 0) return null;
 
     return (
         <div className="rounded-2xl p-4 glass border border-[var(--bg-glass-border)] bg-black/5 dark:bg-white/5 backdrop-blur-md">
@@ -35,7 +39,7 @@ export async function TrendingPerfumes() {
 
             {/* Ranked list */}
             <ul className="space-y-2">
-                {trending.map((p, i) => (
+                {trendingPerfumes.map((p, i) => (
                     <li key={p.id}>
                         <Link href={`/perfume/${p.slug}`} prefetch={false}>
                             <div className="group flex items-center gap-2.5 p-1.5 rounded-xl transition-colors hover:bg-black/10 dark:hover:bg-white/10">

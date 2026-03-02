@@ -85,17 +85,24 @@ const getTrending = unstable_cache(
 
 const getLatestReviews = unstable_cache(
   async () =>
-    (prisma as any).review.findMany({
-      where: { status: "APPROVED" },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      select: {
-        id: true, text: true, title: true, imageUrl: true, overall_rating: true,
-        createdAt: true,
-        user: { select: { name: true, image: true } },
-        perfume: { select: { name: true, brand: true, image_url: true } },
-      },
-    }),
+    {
+      try {
+        return await (prisma as any).review.findMany({
+          where: { status: "APPROVED" },
+          orderBy: { createdAt: "desc" },
+          take: 6,
+          select: {
+            id: true, text: true, title: true, imageUrl: true, overall_rating: true,
+            createdAt: true,
+            user: { select: { name: true, image: true } },
+            perfume: { select: { name: true, brand: true, image_url: true } },
+          },
+        });
+      } catch (error) {
+        console.warn("[homepage] latest reviews fallback to empty (DB unavailable)", error);
+        return [] as any[];
+      }
+    },
   ["homepage-reviews-grid"],
   { revalidate: 300, tags: ["reviews"] }
 );
@@ -104,43 +111,48 @@ const getLatestReviews = unstable_cache(
 async function getClimatePicks(climateTags: string[]) {
   // Parallel: run groupBy and a fallback prefetch together — if groupBy
   // returns results we discard the fallback; if not, it's already ready.
-  const [grouped, fallback] = await Promise.all([
-    prisma.review.groupBy({
-      by: ["perfumeId"],
-      where: { weather_tags: { hasSome: climateTags } },
-      _avg: { overall_rating: true },
-      _count: { id: true },
-      orderBy: [{ _avg: { overall_rating: "desc" } }, { _count: { id: "desc" } }],
-      take: 12,
-    }),
-    prisma.perfume.findMany({
+  try {
+    const [grouped, fallback] = await Promise.all([
+      prisma.review.groupBy({
+        by: ["perfumeId"],
+        where: { weather_tags: { hasSome: climateTags } },
+        _avg: { overall_rating: true },
+        _count: { id: true },
+        orderBy: [{ _avg: { overall_rating: "desc" } }, { _count: { id: "desc" } }],
+        take: 12,
+      }),
+      prisma.perfume.findMany({
+        select: { id: true, slug: true, name: true, brand: true, image_url: true },
+        orderBy: [{ release_year: "desc" }, { name: "asc" }],
+        take: 12,
+      }),
+    ]);
+
+    if (!grouped.length) {
+      return (fallback as PerfumeCard[]).map((p) => ({ ...p, rating: 0, reviewCount: 0 }));
+    }
+
+    const ids = grouped.map((g) => g.perfumeId);
+    const perfumes = (await prisma.perfume.findMany({
+      where: { id: { in: ids } },
       select: { id: true, slug: true, name: true, brand: true, image_url: true },
-      orderBy: [{ release_year: "desc" }, { name: "asc" }],
-      take: 12,
-    }),
-  ]);
+    })) as PerfumeCard[];
 
-  if (!grouped.length) {
-    return (fallback as PerfumeCard[]).map((p) => ({ ...p, rating: 0, reviewCount: 0 }));
+    const byId = new Map(perfumes.map((p) => [p.id, p]));
+    return grouped
+      .map((g) => {
+        const perfume = byId.get(g.perfumeId);
+        if (!perfume) return null;
+        return { ...perfume, rating: g._avg?.overall_rating ?? 0, reviewCount: g._count?.id ?? 0 };
+      })
+      .filter(Boolean) as Array<{
+        id: string; slug: string; name: string; brand: string;
+        image_url: string | null; rating: number; reviewCount: number;
+      }>;
+  } catch (error) {
+    console.warn("[homepage] climate picks fallback to empty (DB unavailable)", error);
+    return [];
   }
-
-  const ids = grouped.map((g) => g.perfumeId);
-  const perfumes = (await prisma.perfume.findMany({
-    where: { id: { in: ids } },
-    select: { id: true, slug: true, name: true, brand: true, image_url: true },
-  })) as PerfumeCard[];
-
-  const byId = new Map(perfumes.map((p) => [p.id, p]));
-  return grouped
-    .map((g) => {
-      const perfume = byId.get(g.perfumeId);
-      if (!perfume) return null;
-      return { ...perfume, rating: g._avg?.overall_rating ?? 0, reviewCount: g._count?.id ?? 0 };
-    })
-    .filter(Boolean) as Array<{
-      id: string; slug: string; name: string; brand: string;
-      image_url: string | null; rating: number; reviewCount: number;
-    }>;
 }
 
 export default async function HomePage() {

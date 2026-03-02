@@ -54,30 +54,56 @@ export async function incrementSearchCount(perfumeId: string) {
  * Used by the TrendingPerfumes sidebar widget and homepage grid.
  */
 export async function getTrendingPerfumes(take = 5, days = 7) {
-  const now = new Date();
-  const windowStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  // include today + previous (days - 1) days
-  windowStart.setUTCDate(windowStart.getUTCDate() - (days - 1));
-  const delegate = (prisma as any).perfumeSearchStat as
-    | { groupBy?: (args: any) => Promise<any[]> }
-    | undefined;
+  try {
+    const now = new Date();
+    const windowStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    // include today + previous (days - 1) days
+    windowStart.setUTCDate(windowStart.getUTCDate() - (days - 1));
+    const delegate = (prisma as any).perfumeSearchStat as
+      | { groupBy?: (args: any) => Promise<any[]> }
+      | undefined;
 
-  let stats: Array<{ perfumeId: string; _sum: { count: number | null } }> = [];
+    let stats: Array<{ perfumeId: string; _sum: { count: number | null } }> = [];
 
-  if (delegate?.groupBy) {
-    stats = await delegate.groupBy({
-      by: ["perfumeId"],
-      where: { date: { gte: windowStart } },
-      _sum: { count: true },
-      orderBy: { _sum: { count: "desc" } },
-      take,
-    });
-  }
+    if (delegate?.groupBy) {
+      stats = await delegate.groupBy({
+        by: ["perfumeId"],
+        where: { date: { gte: windowStart } },
+        _sum: { count: true },
+        orderBy: { _sum: { count: "desc" } },
+        take,
+      });
+    }
 
-  if (stats.length === 0) {
-    const fallback = await prisma.perfume.findMany({
-      orderBy: { searchCount: "desc" },
-      take,
+    if (stats.length === 0) {
+      const fallback = await prisma.perfume.findMany({
+        orderBy: { searchCount: "desc" },
+        take,
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          brand: true,
+          image_url: true,
+          transparentImageUrl: true,
+          searchCount: true,
+        },
+      });
+
+      return fallback.map((p) => ({
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        brand: p.brand,
+        image_url: p.image_url,
+        transparentImageUrl: p.transparentImageUrl,
+        weeklySearchCount: p.searchCount,
+      }));
+    }
+
+    const ids = stats.map((s) => s.perfumeId);
+    const perfumes = await prisma.perfume.findMany({
+      where: { id: { in: ids } },
       select: {
         id: true,
         slug: true,
@@ -85,53 +111,32 @@ export async function getTrendingPerfumes(take = 5, days = 7) {
         brand: true,
         image_url: true,
         transparentImageUrl: true,
-        searchCount: true,
       },
     });
 
-    return fallback.map((p) => ({
-      id: p.id,
-      slug: p.slug,
-      name: p.name,
-      brand: p.brand,
-      image_url: p.image_url,
-      transparentImageUrl: p.transparentImageUrl,
-      weeklySearchCount: p.searchCount,
-    }));
+    const byId = new Map(perfumes.map((p) => [p.id, p]));
+
+    return stats
+      .map((s) => {
+        const perfume = byId.get(s.perfumeId);
+        if (!perfume) return null;
+        const heat = s._sum.count ?? 0;
+        return {
+          ...perfume,
+          weeklySearchCount: heat,
+        };
+      })
+      .filter((p): p is {
+        id: string;
+        slug: string;
+        name: string;
+        brand: string;
+        image_url: string | null;
+        transparentImageUrl: string | null;
+        weeklySearchCount: number;
+      } => p !== null);
+  } catch (error) {
+    console.warn("[search] getTrendingPerfumes fallback to empty (DB unavailable)", error);
+    return [];
   }
-
-  const ids = stats.map((s) => s.perfumeId);
-  const perfumes = await prisma.perfume.findMany({
-    where: { id: { in: ids } },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      brand: true,
-      image_url: true,
-      transparentImageUrl: true,
-    },
-  });
-
-  const byId = new Map(perfumes.map((p) => [p.id, p]));
-
-  return stats
-    .map((s) => {
-      const perfume = byId.get(s.perfumeId);
-      if (!perfume) return null;
-      const heat = s._sum.count ?? 0;
-      return {
-        ...perfume,
-        weeklySearchCount: heat,
-      };
-    })
-    .filter((p): p is {
-      id: string;
-      slug: string;
-      name: string;
-      brand: string;
-      image_url: string | null;
-      transparentImageUrl?: string | null;
-      weeklySearchCount: number;
-    } => p !== null);
 }
