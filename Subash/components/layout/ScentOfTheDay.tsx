@@ -13,7 +13,7 @@ export async function ScentOfTheDay() {
     const displayImage = perfume.transparentImageUrl || perfume.image_url;
 
         return (
-		<Link href={`/perfume/${perfume.slug}`} className="block group transition-transform duration-200 active:scale-[0.97]">
+        <Link href={`/perfume/${perfume.slug}`} className="block group gpu-accelerate transition-transform duration-200 active:scale-[0.97]">
             <div className="rounded-2xl p-4 glass border border-[var(--bg-glass-border)] bg-black/5 dark:bg-white/5 flex flex-col">
                 {/* Poster image with overlaid badge */}
                 <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-black/30">
@@ -22,6 +22,7 @@ export async function ScentOfTheDay() {
                             src={displayImage}
                             alt={perfume.name}
                             fill
+                            priority
                             className={`object-contain p-3 transform group-hover:scale-105 transition-transform duration-500 ${
                                 perfume.transparentImageUrl ? "" : "mix-blend-multiply dark:mix-blend-normal"
                             }`}

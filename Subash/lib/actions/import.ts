@@ -49,31 +49,30 @@ export async function importPerfumesCsv(formData: FormData) {
                                 .replace(/[^a-z0-9]+/g, "-")
                                 .replace(/(^-|-$)+/g, "");
 
+                            const topNotes = parseNotes(row.top_notes);
+                            const heartNotes = parseNotes(row.heart_notes);
+                            const baseNotes = parseNotes(row.base_notes);
+                            const accords = parseNotes(row.accords);
+
                             return {
                                 slug,
                                 name,
                                 brand,
                                 image_url: row.image_url || null,
                                 description: row.description || "A wonderful fragrance.",
-                                top_notes: parseNotes(row.top_notes),
-                                heart_notes: parseNotes(row.heart_notes),
-                                base_notes: parseNotes(row.base_notes),
-                                accords: parseNotes(row.accords),
+                                top_notes: JSON.stringify(topNotes),
+                                heart_notes: JSON.stringify(heartNotes),
+                                base_notes: JSON.stringify(baseNotes),
+                                accords: JSON.stringify(accords),
                                 gender: row.gender || "Unisex",
-                                longevity: row.longevity || "Moderate",
-                                sillage: row.sillage || "Moderate",
-                                volume_ml: row.volume_ml ? parseInt(row.volume_ml, 10) : 100,
                                 release_year: row.release_year ? parseInt(row.release_year, 10) : new Date().getFullYear(),
-                                rating: 0,
                                 searchCount: 0,
                             };
                         });
 
-                        // Using createMany or individual creates with ignore duplicates (slug uniqueness)
-                        // Prisma's createMany supports skipDuplicates
+                        // Bulk insert perfumes from CSV
                         const result = await prisma.perfume.createMany({
                             data: perfumesData,
-                            skipDuplicates: true,
                         });
 
                         await logAdminAction(
@@ -86,19 +85,21 @@ export async function importPerfumesCsv(formData: FormData) {
                         revalidatePath("/perfume");
 
                         resolve({ success: true, count: result.count });
-                    } catch (err: any) {
+                    } catch (err: unknown) {
                         console.error("CSV Import DB Error:", err);
-                        reject(new Error(err.message || "Failed to save to database."));
+                        const message = err instanceof Error ? err.message : "Failed to save to database.";
+                        reject(new Error(message));
                     }
                 },
-                error: (error: any) => {
+                error: (error: unknown) => {
                     console.error("PapaParse Error:", error);
                     reject(new Error("Failed to parse CSV file."));
                 }
             });
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("CSV Import Action Error:", error);
-        return { success: false, error: error.message || "Upload failed." };
+        const message = error instanceof Error ? error.message : "Upload failed.";
+        return { success: false, error: message };
     }
 }

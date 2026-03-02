@@ -46,10 +46,12 @@ function todayUTC(): string {
  * independent cache entry that naturally expires after 24 hours.
  */
 export async function getScentOfTheDay(): Promise<SOTDData | null> {
+    try {
     const dateStr = todayUTC();
 
     return unstable_cache(
         async (): Promise<SOTDData | null> => {
+            try {
             // ── 1. Use existing DB record if already picked today ──────────
             const today = new Date(`${dateStr}T00:00:00.000Z`);
 
@@ -115,10 +117,18 @@ export async function getScentOfTheDay(): Promise<SOTDData | null> {
                 });
                 return race as unknown as SOTDData;
             }
+            } catch (error) {
+                console.warn("⚠️ Build Phase: DB unreachable for SOTD. Using fallback.", error);
+                return null;
+            }
         },
         // Date-keyed cache → auto-invalidates each new day
         ["scent-of-the-day", dateStr],
         { revalidate: 86400, tags: ["sotd"] }
     )();
+    } catch (error) {
+        console.warn("⚠️ Build Phase: SOTD cache wrapper failed. Using fallback.", error);
+        return null;
+    }
 }
 

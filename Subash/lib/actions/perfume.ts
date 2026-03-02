@@ -16,7 +16,7 @@ export async function getPerfumesPage(page: number, filters: { brand?: string; g
   const where: Record<string, unknown> = {};
   if (filters.brand) where.brand = filters.brand;
   if (filters.gender) where.gender = filters.gender;
-  if (filters.accord) where.accords = { has: filters.accord };
+  if (filters.accord) where.accords = { contains: `"${filters.accord}"` };
 
   const perfumes = await prisma.perfume.findMany({
     where,
@@ -49,11 +49,11 @@ export async function searchPerfumes(query: string): Promise<PerfumeSearchResult
   return prisma.perfume.findMany({
     where: {
       OR: [
-        { name: { contains: q, mode: "insensitive" } },
-        { brand: { contains: q, mode: "insensitive" } },
-        { top_notes: { hasSome: [q] } },
-        { heart_notes: { hasSome: [q] } },
-        { base_notes: { hasSome: [q] } },
+        { name: { contains: q } },
+        { brand: { contains: q } },
+        { top_notes: { contains: q } },
+        { heart_notes: { contains: q } },
+        { base_notes: { contains: q } },
       ],
     },
     select: { id: true, name: true, brand: true, image_url: true, slug: true },
@@ -120,8 +120,8 @@ export async function submitReview(
           overall_rating,
           longevity_score,
           sillage_score,
-          time_tags: time_tags as ("MORNING" | "DAY" | "EVENING" | "NIGHT" | "ANYTIME" | "BOTH")[],
-          weather_tags: weather_tags,
+          time_tags: JSON.stringify(time_tags),
+          weather_tags: JSON.stringify(weather_tags),
           genderLeaning,
           occasion,
           valueRating,

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Star, MessageCircle, Calendar, User, ArrowLeft } from "lucide-react";
+import { Star, MessageCircle, Calendar, ArrowLeft } from "lucide-react";
 import { CommentSection } from "@/components/reviews/CommentSection";
 
 // Force dynamic since we have comments and user sessions
@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 async function getFullReview(id: string) {
     try {
-        const review = await (prisma as any).review.findUnique({
+        const review = await prisma.review.findUnique({
             where: { id },
             include: {
                 user: { select: { name: true, image: true, bio: true } },

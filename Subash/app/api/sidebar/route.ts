@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getTrendingPerfumes } from "@/lib/actions/search";
+import { parsePrismaArray } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 // Revalidate isn't needed here explicitly if we rely on unstable_cache interval, 
@@ -139,7 +140,26 @@ const getCachedSidebarData = unstable_cache(
       })),
     ];
 
-    return { potd, trendingBrands, trendingPerfumes, activity };
+    const hydratedPotd = potd
+      ? {
+          ...potd,
+          accords: parsePrismaArray(potd.accords),
+          top_notes: parsePrismaArray(potd.top_notes),
+          heart_notes: parsePrismaArray(potd.heart_notes),
+          base_notes: parsePrismaArray(potd.base_notes),
+        }
+      : null;
+
+    const hydratedTrending = trendingPerfumes.map((perfume) =>
+      perfume
+        ? {
+            ...perfume,
+            accords: parsePrismaArray((perfume as { accords?: unknown }).accords),
+          }
+        : perfume
+    );
+
+    return { potd: hydratedPotd, trendingBrands, trendingPerfumes: hydratedTrending, activity };
   },
   ['sidebar-cache'],
   { revalidate: 120 }

@@ -14,7 +14,7 @@ export async function addReviewComment(reviewId: string, text: string) {
     }
 
     try {
-        await (prisma as any).comment.create({
+        await prisma.comment.create({
             data: {
                 text: text.trim(),
                 reviewId,

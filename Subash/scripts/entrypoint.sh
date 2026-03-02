@@ -2,7 +2,7 @@
 # scripts/entrypoint.sh
 # Docker entrypoint for Subash on CasaOS.
 # Runs on every container start:
-#   1. Waits for Postgres
+#   1. Ensures SQLite database file exists
 #   2. Applies schema (prisma db push — idempotent)
 #   3. Seeds all perfumes from CSV only on the very first boot
 #   4. Starts the Next.js server
@@ -13,20 +13,15 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "  Subash — starting up"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# ── 1. Wait for Postgres ─────────────────────────────────────────────────────
-echo "⏳  Waiting for Postgres..."
-until node -e "
-  const { PrismaClient } = require('@prisma/client');
-  const p = new PrismaClient();
-  p.\$connect()
-    .then(() => p.\$disconnect())
-    .then(() => process.exit(0))
-    .catch(() => process.exit(1));
-" 2>/dev/null; do
-  echo "    DB not ready yet, retrying in 3s..."
-  sleep 3
-done
-echo "✅  Postgres is up."
+# ── 1. Ensure SQLite file exists ─────────────────────────────────────────────
+DB_PATH="$(echo "${DATABASE_URL:-file:./subash.db}" | sed 's|^file:||')"
+mkdir -p "$(dirname "$DB_PATH")"
+if [ ! -f "$DB_PATH" ]; then
+  echo "📄  Creating SQLite database at $DB_PATH"
+  touch "$DB_PATH"
+else
+  echo "📄  Using existing SQLite database at $DB_PATH"
+fi
 
 # ── 2. Apply schema ──────────────────────────────────────────────────────────
 echo "🔄  Syncing database schema (prisma db push)..."

@@ -7,11 +7,11 @@
 import { useState, useRef, useEffect, useTransition } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
-  MessageCircle, X, Send, ExternalLink, ChevronDown,
+  X, Send, ExternalLink, ChevronDown,
   Sparkles, Loader2,
 } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, parsePrismaArray } from "@/lib/utils";
 import { type BotPerfume } from "@/lib/actions/bot";
 
 // ─── Shared types ─────────────────────────────────────────────────────────────
@@ -52,6 +52,8 @@ const MODERATOR_WHATSAPP =
   "https://wa.me/8801700000000?text=Hi%20Subash%20team%2C%20I%20need%20help%20with";
 
 function PerfumeCard({ p }: { p: BotPerfume }) {
+  const accords = parsePrismaArray(p.accords);
+
   return (
     <Link
       href={`/perfume/${p.id}`}
@@ -71,9 +73,9 @@ function PerfumeCard({ p }: { p: BotPerfume }) {
       <div className="min-w-0 flex-1">
         <p className="text-[11px] font-semibold leading-tight truncate text-[var(--text-primary)]">{p.name}</p>
         <p className="text-[10px] truncate text-[var(--accent)]">{p.brand}</p>
-        {p.accords.length > 0 && (
+        {accords.length > 0 && (
           <p className="text-[9px] truncate text-[var(--text-muted)] mt-0.5">
-            {p.accords.slice(0, 3).join(" · ")}
+            {accords.slice(0, 3).join(" · ")}
           </p>
         )}
       </div>
@@ -86,7 +88,7 @@ function PerfumeCard({ p }: { p: BotPerfume }) {
   );
 }
 
-function SubashAIPanel({ featureToggles }: { featureToggles?: Record<string, boolean> }) {
+function SubashAIPanel() {
   const [messages, setMessages] = useState<Message[]>([AI_WELCOME]);
   const [input, setInput] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -245,7 +247,7 @@ export function ChatWidget({ featureToggles }: { featureToggles?: Record<string,
                     <Sparkles size={16} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-[var(--text-primary)] leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6]">Subash AI</p>
+                    <p className="text-sm font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6]">Subash AI</p>
                     <p className="text-[9px] text-[#34D399] leading-none mt-1 flex items-center gap-1">
                       <span className="w-1 h-1 rounded-full bg-[#34D399] animate-pulse" />
                       Online • Fragrance Expert
@@ -260,7 +262,7 @@ export function ChatWidget({ featureToggles }: { featureToggles?: Record<string,
             </div>
 
             {/* Content Area */}
-            <SubashAIPanel featureToggles={featureToggles} />
+            <SubashAIPanel />
           </motion.div>
         )}
       </AnimatePresence>

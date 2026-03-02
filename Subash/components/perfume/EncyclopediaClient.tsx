@@ -10,6 +10,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useInView } from "react-intersection-observer";
 import { Search, SlidersHorizontal, X, BookOpen, Filter } from "lucide-react";
 import { getPerfumesPage } from "@/lib/actions/perfume";
+import { parsePrismaArray } from "@/lib/utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -219,14 +220,19 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                 accord: activeFilters.accord || undefined,
             });
 
-            if (newItems.length > 0) {
+            const hydratedItems = newItems.map((item) => ({
+                ...item,
+                accords: parsePrismaArray(item.accords),
+            }));
+
+            if (hydratedItems.length > 0) {
                 setLoadedPerfumes(prev => {
                     const existing = new Set(prev.map(p => p.id));
-                    return [...prev, ...newItems.filter(n => !existing.has(n.id))];
+                    return [...prev, ...hydratedItems.filter(n => !existing.has(n.id))];
                 });
                 setPage(nextPage);
             }
-            if (newItems.length === 0 || newItems.length < 60) {
+            if (hydratedItems.length === 0 || hydratedItems.length < 60) {
                 setHasMore(false);
             }
         } catch (e) {

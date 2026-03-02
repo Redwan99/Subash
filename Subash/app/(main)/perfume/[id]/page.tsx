@@ -5,7 +5,8 @@ import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
+// ISR: refresh perfume pages every 60s
+export const revalidate = 60;
 import { notFound } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
 import { ShoppingCart, ExternalLink, Tag, Store } from "lucide-react";
@@ -16,6 +17,7 @@ import { checkWardrobeStatus } from "@/lib/actions/reviews";
 import { PerfumeHero } from "@/components/perfume/PerfumeHero";
 import { CommunityConsensus } from "@/components/perfume/CommunityConsensus";
 import ViewTracker from "@/components/perfume/ViewTracker";
+import { parsePrismaArray } from "@/lib/utils";
 
 // Lazy-load the heavy interactive client bundle (ScentProfile, DupeEngine, ReviewForm)
 const PerfumeInteractive = NextDynamic(
@@ -165,6 +167,11 @@ export default async function PerfumePage({
     clone: { id: d.clone.id, name: d.clone.name, brand: d.clone.brand, image_url: d.clone.image_url, slug: d.clone.slug },
   }));
 
+  const accords = parsePrismaArray(perfume.accords);
+  const topNotes = parsePrismaArray(perfume.top_notes);
+  const heartNotes = parsePrismaArray(perfume.heart_notes);
+  const baseNotes = parsePrismaArray(perfume.base_notes);
+
   return (
     <main className="min-h-screen px-4 md:px-6 pt-20 md:pt-24 pb-20">
       <div className="max-w-6xl mx-auto space-y-10">
@@ -178,8 +185,8 @@ export default async function PerfumePage({
             transparentImageUrl: perfume.transparentImageUrl,
             release_year: perfume.release_year,
             gender: perfume.gender,
-            accords: (perfume.accords ?? []) as string[],
-            top_notes: (perfume.top_notes ?? []) as string[],
+            accords,
+            top_notes: topNotes,
           }}
           avgRating={avgRating}
           reviewCount={reviewCount}
@@ -289,9 +296,9 @@ export default async function PerfumePage({
           <PerfumeInteractive
             perfumeId={perfume.id} description={perfume.description ?? null}
             perfumer={perfume.perfumer ?? null}
-            accords={perfume.accords} top_notes={perfume.top_notes}
-            heart_notes={perfume.heart_notes}
-            base_notes={perfume.base_notes}
+            accords={accords} top_notes={topNotes}
+            heart_notes={heartNotes}
+            base_notes={baseNotes}
             avgLongevity={Math.max(1, avgLongevity)}
             avgSillage={Math.max(1, avgSillage)}
             reviewCount={reviewCount}

@@ -28,7 +28,7 @@ RUN npx prisma generate
 # connections to a DB that doesn't exist during the build stage.
 # These are overridden by real values in docker-compose.yml at runtime.
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL=postgresql://build:build@localhost:5432/build?schema=public
+ENV DATABASE_URL="file:./subash.db"
 ENV AUTH_SECRET=build-time-dummy-secret-not-used-at-runtime
 ENV AUTH_URL=http://localhost:3000
 ENV GOOGLE_CLIENT_ID=build-dummy
@@ -48,6 +48,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV DATABASE_URL="file:./subash.db"
 
 # Create a non-root user for security
 RUN addgroup --system --gid 1001 nodejs

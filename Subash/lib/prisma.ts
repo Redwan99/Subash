@@ -14,7 +14,8 @@ const shouldMock = process.env.SKIP_DB === "true" || !process.env.DATABASE_URL;
 
 const prismaClient: PrismaClient = shouldMock
   ? (() => {
-      const handler: ProxyHandler<any> = {
+      type MockFn = (...args: unknown[]) => Promise<unknown[]>;
+      const handler: ProxyHandler<MockFn> = {
         get() {
           return proxyFn;
         },
@@ -22,8 +23,8 @@ const prismaClient: PrismaClient = shouldMock
           return Promise.resolve([]);
         },
       };
-      const proxyFn: any = new Proxy(async () => [], handler);
-      return proxyFn as PrismaClient;
+      const proxyFn: MockFn = new Proxy(async () => [], handler);
+      return proxyFn as unknown as PrismaClient;
     })()
   : (globalForPrisma.prisma ??
       new PrismaClient({

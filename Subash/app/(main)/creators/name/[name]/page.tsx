@@ -7,6 +7,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { BookOpen, ChevronLeft } from "lucide-react";
+import { parsePrismaArray } from "@/lib/utils";
 
 type Props = { params: Promise<{ name: string }> };
 
@@ -24,7 +25,7 @@ export default async function CreatorByNamePage({ params }: Props) {
     const decoded = decodeURIComponent(name);
 
     const perfumes = await prisma.perfume.findMany({
-        where: { perfumer: { equals: decoded, mode: "insensitive" } },
+        where: { perfumer: { contains: decoded } },
         select: { id: true, slug: true, name: true, brand: true, image_url: true, accords: true, gender: true },
         orderBy: [{ brand: "asc" }, { name: "asc" }],
     });
@@ -78,7 +79,7 @@ export default async function CreatorByNamePage({ params }: Props) {
                                 <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--accent)] truncate mb-0.5">{p.brand}</p>
                                 <h3 className="text-sm font-bold text-[var(--text-primary)] line-clamp-2 leading-snug mb-1.5">{p.name}</h3>
                                 <div className="flex flex-wrap gap-1">
-                                    {p.accords.slice(0, 2).map((a) => (
+                                    {parsePrismaArray(p.accords).slice(0, 2).map((a) => (
                                         <span key={a} className="text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(139,92,246,0.1)] text-[var(--text-muted)] capitalize">{a}</span>
                                     ))}
                                 </div>

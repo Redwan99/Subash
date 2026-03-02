@@ -4,9 +4,20 @@ import { Sparkles, MessageSquare } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+type ReviewCardItem = {
+    id: string;
+    title: string | null;
+    text: string;
+    imageUrl: string | null;
+    overall_rating: number;
+    createdAt: Date;
+    user: { name: string | null; image: string | null };
+    perfume: { name: string; brand: string; image_url: string | null };
+};
+
 async function getAllReviews() {
     try {
-        return await (prisma as any).review.findMany({
+        return await prisma.review.findMany({
             where: { status: "APPROVED" },
             orderBy: { createdAt: "desc" },
             take: 50,
@@ -23,7 +34,7 @@ async function getAllReviews() {
         });
     } catch (error) {
         console.error("Error fetching global reviews:", error);
-        return [];
+        return [] as ReviewCardItem[];
     }
 }
 
@@ -54,8 +65,8 @@ export default async function ReviewsPage() {
             {/* Masonry Grid */}
             <section className="max-w-[1400px] mx-auto">
                 {reviews.length > 0 ? (
-                    <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-3 gap-6 space-y-6">
-                        {reviews.map((review: any) => (
+                    <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-3 gap-6 space-y-6 contain-paint">
+                        {reviews.map((review) => (
                             <ReviewPosterCard key={review.id} review={review} />
                         ))}
                     </div>

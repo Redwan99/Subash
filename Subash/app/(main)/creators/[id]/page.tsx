@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Globe, BookOpen, ChevronLeft } from "lucide-react";
+import { parsePrismaArray } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +58,11 @@ export default async function CreatorProfilePage({ params }: Props) {
 
     if (!creator) notFound();
 
+    const hydratedPerfumes = creator.perfumes.map((perfume) => ({
+        ...perfume,
+        accords: parsePrismaArray(perfume.accords),
+    }));
+
     const initials = creator.name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase();
 
     return (
@@ -80,7 +86,7 @@ export default async function CreatorProfilePage({ params }: Props) {
                     <div className="flex-1 text-center md:text-left">
                         <h1 className="text-3xl font-black text-[var(--text-primary)] mb-1">{creator.name}</h1>
                         <p className="text-sm text-[var(--accent)] font-semibold mb-3">
-                            {creator.perfumes.length} {creator.perfumes.length === 1 ? "fragrance" : "fragrances"} in the portfolio
+                            {hydratedPerfumes.length} {hydratedPerfumes.length === 1 ? "fragrance" : "fragrances"} in the portfolio
                         </p>
                         {creator.bio && (
                             <p className="text-sm leading-relaxed text-[var(--text-secondary)] max-w-2xl">{creator.bio}</p>
@@ -101,14 +107,14 @@ export default async function CreatorProfilePage({ params }: Props) {
                 <h2 className="text-lg font-bold text-[var(--text-primary)]">Portfolio</h2>
             </div>
 
-            {creator.perfumes.length === 0 ? (
+            {hydratedPerfumes.length === 0 ? (
                 <div className="text-center py-16 text-[var(--text-muted)]">
                     <span className="text-3xl block mb-2">🧴</span>
                     No perfumes linked to this creator yet.
                 </div>
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {creator.perfumes.map((p: Perfume) => (
+                    {hydratedPerfumes.map((p: Perfume) => (
                         <Link key={p.id} href={`/perfume/${p.slug}`} prefetch={false}>
                             <div className="group rounded-2xl overflow-hidden border border-[var(--bg-glass-border)] hover:border-[rgba(139,92,246,0.35)] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(139,92,246,0.15)] transition-all duration-300 glass">
                                 <div className="relative h-36 bg-gradient-to-b from-[rgba(139,92,246,0.06)] to-transparent flex items-center justify-center">

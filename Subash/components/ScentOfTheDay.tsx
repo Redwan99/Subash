@@ -6,7 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Sparkles, ArrowRight, Quote } from "lucide-react";
 import { type SOTDData } from "@/lib/actions/sotd";
-import { cn } from "@/lib/utils";
 
 export function ScentOfTheDay({ data }: { data: SOTDData | null }) {
     if (!data) return null;

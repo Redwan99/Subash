@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Star, Clock, Wind, Thermometer, Zap } from "lucide-react";
 import { fetcher } from "@/lib/fetcher";
 import { VerifiedNoseBadge } from "@/components/ui/VerifiedNoseBadge";
+import { parsePrismaArray } from "@/lib/utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type ReviewUser = { id: string; name: string | null; image: string | null; reputationScore?: number };
@@ -21,8 +22,8 @@ export type LiveReview = {
     overall_rating: number;
     longevity_score: number;
     sillage_score: number;
-    time_tags: string[];
-    weather_tags: string[];
+    time_tags: string[] | string;
+    weather_tags: string[] | string;
     upvote_count: number;
     createdAt: string;
     user: ReviewUser;
@@ -49,6 +50,9 @@ function StarRow({ rating, max = 10 }: { rating: number; max?: number }) {
 
 // ── Review Card ───────────────────────────────────────────────────────────────
 function ReviewCard({ review, isNew }: { review: LiveReview; isNew: boolean }) {
+    const weatherTags = parsePrismaArray(review.weather_tags);
+    const timeTags = parsePrismaArray(review.time_tags);
+
     const initials = (review.user.name ?? "?")
         .split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
@@ -145,13 +149,13 @@ function ReviewCard({ review, isNew }: { review: LiveReview; isNew: boolean }) {
                 </div>
 
                 {/* Weather tags */}
-                {review.weather_tags.slice(0, 2).map((tag) => (
+                {weatherTags.slice(0, 2).map((tag) => (
                     <span key={tag} className="flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(139,92,246,0.08)] text-[var(--text-muted)] capitalize">
                         <Thermometer size={8} /> {tag.toLowerCase()}
                     </span>
                 ))}
                 {/* Time tags */}
-                {review.time_tags.slice(0, 1).map((tag) => (
+                {timeTags.slice(0, 1).map((tag) => (
                     <span key={tag} className="flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(245,158,11,0.08)] text-[#F59E0B] capitalize">
                         <Zap size={8} /> {tag.replace("_", " ").toLowerCase()}
                     </span>

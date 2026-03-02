@@ -5,7 +5,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Flame, TrendingUp } from "lucide-react";
-import { getTrendingPerfumes } from "@/lib/actions/search";
+import { getCachedTrendingPerfumes } from "@/lib/actions/search";
 
 // Rank badge colours: gold → silver → bronze → normal → normal
 const RANK_STYLES = [
@@ -17,7 +17,7 @@ const RANK_STYLES = [
 ];
 
 export async function TrendingPerfumes() {
-    const trending = await getTrendingPerfumes(5);
+    const trending = await getCachedTrendingPerfumes(5);
 
     const trendingPerfumes = trending.filter(
         (p): p is NonNullable<(typeof trending)[number]> => Boolean(p)
@@ -42,7 +42,7 @@ export async function TrendingPerfumes() {
                 {trendingPerfumes.map((p, i) => (
                     <li key={p.id}>
                         <Link href={`/perfume/${p.slug}`} prefetch={false}>
-                            <div className="group flex items-center gap-2.5 p-1.5 rounded-xl transition-colors hover:bg-black/10 dark:hover:bg-white/10">
+                            <div className="group gpu-accelerate flex items-center gap-2.5 p-1.5 rounded-xl transition-colors hover:bg-black/10 dark:hover:bg-white/10">
                                 {/* Rank number — gold / silver / bronze tiers */}
                                 <span className={`w-4 text-center text-[11px] font-extrabold shrink-0 ${RANK_STYLES[i] ?? RANK_STYLES[4]}`}>
                                     {i + 1}

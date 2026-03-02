@@ -1,6 +1,6 @@
 // =============================================
 //  Subash — Prisma Schema
-//  Database: PostgreSQL
+//  Database: SQLite
 //  Run: npx prisma generate && npx prisma db push
 // =============================================
 
@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -69,10 +69,10 @@ model User {
   image         String?  // renamed from avatarUrl — required by @auth/prisma-adapter
   bio           String?
   password      String?  // nullable — OAuth users have no password; bcryptjs hash for manual auth
-  role            Role         @default(STANDARD)
+  role            String       @default("STANDARD")
   review_count    Int          @default(0)
   reputationScore Int          @default(0)   // Reputation Engine: +2 per review, +1 per HAVE item
-  authProvider    AuthProvider @default(CREDENTIALS)
+  authProvider    String       @default("CREDENTIALS")
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
@@ -107,12 +107,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -150,15 +150,15 @@ model Perfume {
   name         String
   brand        String
   image_url    String?
-  top_notes    String[]
-  heart_notes  String[]
-  base_notes   String[]
+  top_notes    String   @default("[]")
+  heart_notes  String   @default("[]")
+  base_notes   String   @default("[]")
   transparentImageUrl String?
   release_year Int?
   perfumer     String?
-  description  String?  @db.Text
+  description  String?
   gender       String?
-  accords      String[]
+  accords      String   @default("[]")
   slug         String   @unique
   scraped      Boolean  @default(false)
   searchCount  Int      @default(0)
@@ -181,10 +181,11 @@ model Perfume {
 
   @@index([name, brand])
   @@index([name])
+  @@index([slug])
   @@index([brand])           // groupBy brand in sidebar trending-brands query
   @@index([release_year])    // fallback climate-picks orderBy
   @@index([creatorId])       // creator portfolio lookups
-  @@index([searchCount])     // fast sort for Trending Perfumes sidebar widget
+  @@index([searchCount(sort: Desc)]) // Crucial for the Trending feed
   @@map("perfumes")
 }
 
@@ -231,13 +232,13 @@ model Review {
   id              String     @id @default(cuid())
   userId          String
   perfumeId       String
-  text            String       @db.Text
+  text            String
   overall_rating  Float        // 1.0 – 10.0
   longevity_score Int          // 1 – 10
   sillage_score   Int          // 1 – 10
-  status          ReviewStatus @default(APPROVED)
-  time_tags       TimeOfDay[]
-  weather_tags    String[]     // "HOT" | "MILD" | "COLD" | "HUMID" | "DRY" | "RAINY"
+  status          String        @default("APPROVED")
+  time_tags       String        @default("[]")
+  weather_tags    String        @default("[]")    // stringified array of weather tags
   upvote_count    Int          @default(0)
   genderLeaning   Int?
   occasion        String?
@@ -256,8 +257,8 @@ model Review {
   @@unique([userId, perfumeId])
   @@index([userId])
   @@index([perfumeId])
-  @@index([createdAt])       // homepage latest-reviews orderBy
-  @@index([weather_tags])    // hasSome climate-picks filter (converted to GIN by Postgres)
+  @@index([createdAt(sort: Desc)])
+  // Weather tag index removed for SQLite
   @@map("reviews")
 }
 
@@ -295,7 +296,7 @@ model Shop {
   latitude           Float?
   longitude          Float?
   isVerified         Boolean  @default(false)
-  description        String?  @db.Text
+  description        String?
   imageUrl           String?
   createdAt          DateTime @default(now())
 
@@ -434,7 +435,7 @@ model Notification {
 model PerfumeOfTheDay {
   id        String   @id @default(cuid())
   perfumeId String
-  date      DateTime @unique @db.Date // one entry per calendar day
+  date      DateTime @unique // one entry per calendar day
   note      String?  // editorial note from admin
   createdAt DateTime @default(now())
 
@@ -475,7 +476,7 @@ model DecantListing {
 model Creator {
   id       String    @id @default(cuid())
   name     String    @unique
-  bio      String?   @db.Text
+  bio      String?
   image    String?   // optional avatar / portrait URL
   website  String?   // optional personal site
   perfumes Perfume[]
@@ -507,7 +508,7 @@ model AuditLog {
   id        String   @id @default(cuid())
   userId    String   // Store as string to avoid strict cascading issues, but links to User
   action    String
-  details   String?  @db.Text
+  details   String?
   createdAt DateTime @default(now())
 
   @@index([userId])
@@ -525,7 +526,7 @@ model BrandClaim {
   brandName     String
   officialEmail String
   status        String   @default("PENDING") // PENDING | APPROVED | REJECTED
-  message       String?  @db.Text
+  message       String?
   createdAt     DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

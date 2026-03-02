@@ -4,6 +4,7 @@
 
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { parsePrismaArray } from "@/lib/utils";
 
 // Cache for 5 seconds (matches SWR refreshInterval)
 export const revalidate = 5;
@@ -37,7 +38,13 @@ export async function GET() {
             },
         });
 
-        return NextResponse.json(reviews, {
+        const hydratedReviews = reviews.map((review: { time_tags: unknown; weather_tags: unknown }) => ({
+            ...review,
+            time_tags: parsePrismaArray(review.time_tags),
+            weather_tags: parsePrismaArray(review.weather_tags),
+        }));
+
+        return NextResponse.json(hydratedReviews, {
             headers: { "Cache-Control": "s-maxage=5, stale-while-revalidate=10" },
         });
     } catch (error) {

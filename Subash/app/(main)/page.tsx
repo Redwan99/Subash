@@ -2,16 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
-import { truncate } from "@/lib/utils";
-import { getTrendingPerfumes } from "@/lib/actions/search";
+import { getCachedTrendingPerfumes } from "@/lib/actions/search";
 import { ClimateSection } from "@/components/ClimateSection";
-import { LiveReviewFeed } from "@/components/feed/LiveReviewFeed";
+import { LiveReviewFeed, type LiveReview } from "@/components/feed/LiveReviewFeed";
 import { SmartSearch } from "@/components/ui/SmartSearch";
 import ReviewPosterCard from "@/components/reviews/ReviewPosterCard";
 import { Sparkles } from "lucide-react";
 
-// Data is cached via unstable_cache; page rendered dynamically (no DB at build time)
-export const dynamic = 'force-dynamic';
+// ISR: revalidate cached payloads every 60 seconds for homepage freshness
+export const revalidate = 60;
 
 type PerfumeCard = {
   id: string;
@@ -21,6 +20,24 @@ type PerfumeCard = {
   image_url: string | null;
   transparentImageUrl?: string | null;
 };
+
+type LatestReview = {
+  id: string;
+  text: string;
+  title: string | null;
+  imageUrl: string | null;
+  overall_rating: number;
+  longevity_score: number;
+  sillage_score: number;
+  time_tags: string;
+  weather_tags: string;
+  upvote_count: number;
+  createdAt: Date;
+  user: { id: string; name: string | null; image: string | null; reputationScore: number };
+  perfume: { id: string; slug: string; name: string; brand: string; image_url: string | null };
+};
+
+type TrendingPerfumeCard = PerfumeCard & { weeklySearchCount?: number };
 
 /** Convert OWM data into universal climate tags that match Review.weather_tags */
 function computeClimateTags(
@@ -77,30 +94,29 @@ async function getWeather(city: string) {
 // unstable_cache deduplicates across simultaneous renders and survives
 // across ISR re-validation cycles without blocking the initial response.
 
-const getTrending = unstable_cache(
-  async () => getTrendingPerfumes(12, 7),
-  ["homepage-trending"],
-  { revalidate: 120, tags: ["trending"] }
-);
-
 const getLatestReviews = unstable_cache(
   async () =>
     {
       try {
-        return await (prisma as any).review.findMany({
+        return await prisma.review.findMany({
           where: { status: "APPROVED" },
           orderBy: { createdAt: "desc" },
           take: 6,
           select: {
             id: true, text: true, title: true, imageUrl: true, overall_rating: true,
+            longevity_score: true,
+            sillage_score: true,
+            time_tags: true,
+            weather_tags: true,
+            upvote_count: true,
             createdAt: true,
-            user: { select: { name: true, image: true } },
-            perfume: { select: { name: true, brand: true, image_url: true } },
+            user: { select: { id: true, name: true, image: true, reputationScore: true } },
+            perfume: { select: { id: true, slug: true, name: true, brand: true, image_url: true } },
           },
         });
       } catch (error) {
         console.warn("[homepage] latest reviews fallback to empty (DB unavailable)", error);
-        return [] as any[];
+        return [] as LatestReview[];
       }
     },
   ["homepage-reviews-grid"],
@@ -109,13 +125,19 @@ const getLatestReviews = unstable_cache(
 
 
 async function getClimatePicks(climateTags: string[]) {
+  const climateWhere = climateTags.length
+    ? {
+        OR: climateTags.map((tag) => ({ weather_tags: { contains: `"${tag}"` } })),
+      }
+    : undefined;
+
   // Parallel: run groupBy and a fallback prefetch together — if groupBy
   // returns results we discard the fallback; if not, it's already ready.
   try {
     const [grouped, fallback] = await Promise.all([
       prisma.review.groupBy({
         by: ["perfumeId"],
-        where: { weather_tags: { hasSome: climateTags } },
+        where: climateWhere,
         _avg: { overall_rating: true },
         _count: { id: true },
         orderBy: [{ _avg: { overall_rating: "desc" } }, { _count: { id: "desc" } }],
@@ -163,20 +185,22 @@ export default async function HomePage() {
   // but by then trending and reviews are already in flight.
   const [weather, trending, latestReviews] = await Promise.all([
     getWeather(city),
-    getTrending(),
+    getCachedTrendingPerfumes(12, 7),
     getLatestReviews(),
   ]);
 
   // Trending can contain nulls if a perfume was deleted between stats fetch and hydration; guard them out.
-  const trendingPerfumes = trending.filter(
-    (p): p is NonNullable<(typeof trending)[number]> => Boolean(p)
-  );
+  const trendingPerfumes = trending.filter(Boolean) as TrendingPerfumeCard[];
 
   const climateTags = weather
     ? computeClimateTags(weather.temp, weather.humidity, weather.condition)
     : ["MILD"];
   const initialTheme = pickWeatherTheme(climateTags);
   const climatePicks = await getClimatePicks(climateTags);
+  const feedInitialReviews: LiveReview[] = latestReviews.map((review) => ({
+    ...review,
+    createdAt: review.createdAt.toISOString(),
+  }));
 
   return (
     <main className="min-h-screen px-4 md:px-6 pt-20 md:pt-24 pb-20">
@@ -235,8 +259,8 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-3 gap-6 space-y-6">
-          {latestReviews.map((review: any) => (
+        <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-3 gap-6 space-y-6 contain-paint">
+          {latestReviews.map((review) => (
             <ReviewPosterCard key={review.id} review={review} />
           ))}
         </div>
@@ -255,7 +279,7 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 w-full">
             {trendingPerfumes.map((p, index) => {
-              const weekly = (p as any).weeklySearchCount ?? 0;
+              const weekly = p.weeklySearchCount ?? 0;
               const hasTraffic = weekly > 0;
 
               const imageSrc = p.transparentImageUrl || p.image_url || "/placeholder-perfume.jpg";
@@ -264,7 +288,7 @@ export default async function HomePage() {
                 <Link
                   key={p.id}
                   href={`/perfume/${p.slug}`}
-                  className="flex flex-col bg-white/5 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 group"
+                  className="flex flex-col gpu-accelerate bg-white/5 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 group"
                 >
                   <div className="relative w-full aspect-square sm:aspect-[4/5] bg-gradient-to-b from-gray-50/50 to-transparent dark:from-white/5 dark:to-transparent p-3 sm:p-5 flex items-center justify-center">
                     <Image
@@ -302,7 +326,7 @@ export default async function HomePage() {
 
         <div className="space-y-4">
           {/* Live Feed — SWR polls /api/reviews every 5 s */}
-          <LiveReviewFeed initialReviews={latestReviews} />
+          <LiveReviewFeed initialReviews={feedInitialReviews} />
         </div>
       </section>
     </main>

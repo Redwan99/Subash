@@ -32,11 +32,17 @@ function pickWeatherTheme(tags: string[], hour: number): string {
 }
 
 async function _getClimatePicks(climateTags: string[]) {
+  const climateWhere = climateTags.length
+    ? {
+        OR: climateTags.map((tag) => ({ weather_tags: { contains: `"${tag}"` } })),
+      }
+    : undefined;
+
   // Parallel: groupBy + fallback prefetch run together
   const [grouped, fallback] = await Promise.all([
     prisma.review.groupBy({
       by: ["perfumeId"],
-      where: { weather_tags: { hasSome: climateTags } },
+      where: climateWhere,
       _avg: { overall_rating: true },
       _count: { id: true },
       orderBy: [{ _avg: { overall_rating: "desc" } }, { _count: { id: "desc" } }],

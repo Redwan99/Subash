@@ -5,6 +5,7 @@
 // dropdown, powering the Trending Perfumes sidebar widget.
 
 import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
 /**
  * Increment the searchCount of a perfume.
@@ -53,17 +54,26 @@ export async function incrementSearchCount(perfumeId: string) {
  * stats table is empty (e.g. right after deploy).
  * Used by the TrendingPerfumes sidebar widget and homepage grid.
  */
-export async function getTrendingPerfumes(take = 5, days = 7) {
+async function fetchTrendingPerfumes(take: number, days: number) {
   try {
     const now = new Date();
     const windowStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     // include today + previous (days - 1) days
     windowStart.setUTCDate(windowStart.getUTCDate() - (days - 1));
-    const delegate = (prisma as any).perfumeSearchStat as
-      | { groupBy?: (args: any) => Promise<any[]> }
-      | undefined;
+    type TrendingStat = { perfumeId: string; _sum: { count: number | null } };
+    type GroupByArgs = {
+      by: ["perfumeId"];
+      where: { date: { gte: Date } };
+      _sum: { count: true };
+      orderBy: { _sum: { count: "desc" } };
+      take: number;
+    };
 
-    let stats: Array<{ perfumeId: string; _sum: { count: number | null } }> = [];
+    const delegate = prisma.perfumeSearchStat as unknown as {
+      groupBy?: (args: GroupByArgs) => Promise<TrendingStat[]>;
+    };
+
+    let stats: TrendingStat[] = [];
 
     if (delegate?.groupBy) {
       stats = await delegate.groupBy({
@@ -139,4 +149,16 @@ export async function getTrendingPerfumes(take = 5, days = 7) {
     console.warn("[search] getTrendingPerfumes fallback to empty (DB unavailable)", error);
     return [];
   }
+}
+
+export async function getCachedTrendingPerfumes(take = 5, days = 7) {
+  return unstable_cache(
+    async () => fetchTrendingPerfumes(take, days),
+    [`trending-perfumes-${take}-${days}`],
+    { revalidate: 3600, tags: ["trending"] }
+  )();
+}
+
+export async function getTrendingPerfumes(take = 5, days = 7) {
+  return getCachedTrendingPerfumes(take, days);
 }

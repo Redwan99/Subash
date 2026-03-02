@@ -30,6 +30,36 @@ export function parseNotes(raw: string): string[] {
 }
 
 /**
+ * Safely parse Prisma scalar-list values stored as SQLite strings.
+ * Accepts JSON strings, comma-separated strings, arrays, null/undefined.
+ */
+export function parsePrismaArray(val: unknown): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) {
+    return val.map((item) => String(item).trim()).filter(Boolean);
+  }
+
+  if (typeof val === "string") {
+    const trimmed = val.trim();
+    if (!trimmed) return [];
+
+    try {
+      if (!trimmed.startsWith("[")) {
+        return trimmed.split(",").map((s) => s.trim()).filter(Boolean);
+      }
+
+      const parsed = JSON.parse(trimmed);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map((item) => String(item).trim()).filter(Boolean);
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+/**
  * Calculate the "Community Match %" for a DupeVote record.
  * match(450, 50) → "90%"
  */

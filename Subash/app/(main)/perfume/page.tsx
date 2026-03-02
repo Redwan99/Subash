@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { EncyclopediaClient } from "@/components/perfume/EncyclopediaClient";
 import { getFeatureMap } from "@/lib/features";
 import { notFound } from "next/navigation";
+import { parsePrismaArray } from "@/lib/utils";
 
 export const metadata: Metadata = {
     title: "Perfume Encyclopedia | Subash",
@@ -38,7 +39,7 @@ export default async function PerfumeEncyclopediaPage({
     const where: Record<string, unknown> = {};
     if (params.brand) where.brand = params.brand;
     if (params.gender) where.gender = params.gender;
-    if (params.accord) where.accords = { has: params.accord };
+    if (params.accord) where.accords = { contains: `"${params.accord}"` };
 
     const [perfumes, totalCount, topBrands] = await Promise.all([
         prisma.perfume.findMany({
@@ -63,10 +64,14 @@ export default async function PerfumeEncyclopediaPage({
 
     const totalPages = Math.ceil(totalCount / PAGE_SIZE);
     const brands = topBrands.map((b) => b.brand).sort();
+    const hydratedPerfumes = perfumes.map((perfume) => ({
+        ...perfume,
+        accords: parsePrismaArray(perfume.accords),
+    }));
 
     return (
         <EncyclopediaClient
-            perfumes={perfumes}
+            perfumes={hydratedPerfumes}
             brands={brands}
             accords={FEATURED_ACCORDS}
             totalCount={totalCount}

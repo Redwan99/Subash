@@ -295,6 +295,16 @@ body::-webkit-scrollbar { display: none; }
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
+
+  .gpu-accelerate {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
+  .contain-paint {
+    contain: paint layout;
+  }
 }
 
 /* =============================================

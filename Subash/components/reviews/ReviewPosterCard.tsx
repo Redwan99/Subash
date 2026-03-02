@@ -20,7 +20,7 @@ export default function ReviewPosterCard({ review }: ReviewCardProps) {
     return (
         <Link 
             href={`/review/${review.id}`}
-            className="block break-inside-avoid mb-6 rounded-[2rem] overflow-hidden bg.white dark:bg-[#0f0f0f] border border-gray-200 dark:border-white/10 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500 active:scale-[0.97] group"
+            className="block break-inside-avoid gpu-accelerate mb-6 rounded-[2rem] overflow-hidden bg.white dark:bg-[#0f0f0f] border border-gray-200 dark:border-white/10 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500 active:scale-[0.97] group"
         >
             {/* Top Image Header - Fixed Aspect Ratio for Verticality */}
             <div className="relative w-full aspect-square sm:aspect-[4/5] bg-gray-100 dark:bg-black/50 overflow-hidden">

@@ -40,11 +40,14 @@ const NotificationBellDynamic = dynamic(
   () => import("./NotificationBellClient").then((m) => ({ default: m.NotificationBellClient })),
   { ssr: false }
 );
+const WearingStatusModal = dynamic(
+  () => import("@/components/profile/WearingStatusModal").then((m) => ({ default: m.WearingStatusModal })),
+  { ssr: false }
+);
 import {
   markNotificationRead,
   markAllNotificationsRead,
 } from "@/lib/actions/notifications";
-import { WearingStatusModal } from "@/components/profile/WearingStatusModal";
 
 // ─── Top Nav Links ────────────────────────────────────────────────────────────
 
@@ -74,7 +77,7 @@ function NavLink({
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <Link href={href} prefetch={false}>
+    <Link href={href}>
       <motion.div
         whileHover={shouldReduceMotion ? {} : { y: -1 }}
         whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}

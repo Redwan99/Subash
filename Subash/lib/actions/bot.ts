@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { parsePrismaArray } from "@/lib/utils";
 
 export type BotPerfume = {
   id: string;
@@ -96,9 +97,12 @@ async function searchPerfumes(msg: string): Promise<BotPerfume[]> {
   const genderFilter = getGenderFilter(msg);
   const extractedAccords = getExtractedAccords(msg);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const whereClause: any = {};
-  if (genderFilter) whereClause.gender = { contains: genderFilter, mode: "insensitive" };
-  if (extractedAccords.length > 0) whereClause.accords = { hasSome: extractedAccords };
+  if (genderFilter) whereClause.gender = { contains: genderFilter };
+  if (extractedAccords.length > 0) {
+    whereClause.OR = extractedAccords.map((accord) => ({ accords: { contains: `"${accord}"` } }));
+  }
 
   // Fallback to keyword search if no structured filters found
   if (!genderFilter && extractedAccords.length === 0) {
@@ -106,8 +110,8 @@ async function searchPerfumes(msg: string): Promise<BotPerfume[]> {
     if (tokens.length > 0) {
       whereClause.OR = tokens.map(t => ({
         OR: [
-          { name: { contains: t, mode: "insensitive" } },
-          { brand: { contains: t, mode: "insensitive" } }
+          { name: { contains: t } },
+          { brand: { contains: t } }
         ]
       }));
     } else {
@@ -115,7 +119,7 @@ async function searchPerfumes(msg: string): Promise<BotPerfume[]> {
     }
   }
 
-  return await prisma.perfume.findMany({
+  const perfumes = await prisma.perfume.findMany({
     where: whereClause,
     take: 3,
     orderBy: { id: "desc" },
@@ -129,6 +133,11 @@ async function searchPerfumes(msg: string): Promise<BotPerfume[]> {
       gender: true,
     }
   });
+
+  return perfumes.map((perfume) => ({
+    ...perfume,
+    accords: parsePrismaArray(perfume.accords),
+  }));
 }
 
 function getGenderFilter(msg: string): string | undefined {

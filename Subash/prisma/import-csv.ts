@@ -53,14 +53,14 @@ interface PerfumeRow {
   name: string;
   brand: string;
   image_url: string;
-  top_notes: string[];
-  heart_notes: string[];
-  base_notes: string[];
+  top_notes: string;
+  heart_notes: string;
+  base_notes: string;
   release_year: number | null;
   perfumer: string | null;
   description: string | null;
   gender: string | null;
-  accords: string[];
+  accords: string;
   slug: string;
   scraped: boolean;
 }
@@ -189,7 +189,6 @@ async function importCleaned(
     const toInsert = batch.splice(0); // clear in-place and take copy
     const result = await prisma.perfume.createMany({
       data: toInsert,
-      skipDuplicates: true,
     });
     totalInserted += result.count;
     console.log(
@@ -249,14 +248,14 @@ async function importCleaned(
       name: capitalize(nameRaw) || "Unknown",
       brand: capitalize(brandRaw) || "Unknown",
       image_url: buildImageUrl(url),
-      top_notes: splitNotes(row["Top"] ?? ""),
-      heart_notes: splitNotes(row["Middle"] ?? ""),
-      base_notes: splitNotes(row["Base"] ?? ""),
+      top_notes: JSON.stringify(splitNotes(row["Top"] ?? "")),
+      heart_notes: JSON.stringify(splitNotes(row["Middle"] ?? "")),
+      base_notes: JSON.stringify(splitNotes(row["Base"] ?? "")),
       release_year: yearRaw ? parseInt(yearRaw, 10) || null : null,
       perfumer: perfumer || null,
       description,
       gender: mapGender(genderRaw),
-      accords,
+      accords: JSON.stringify(accords),
       slug: makeSlug(nameRaw, brandRaw, extractFragranticaId(url)),
       scraped: true,
     };

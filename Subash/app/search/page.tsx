@@ -43,12 +43,12 @@ async function search(q: string): Promise<PerfumeResult[]> {
   const results = await prisma.perfume.findMany({
     where: {
       OR: [
-        { name: { contains: q, mode: "insensitive" } },
-        { brand: { contains: q, mode: "insensitive" } },
-        { top_notes: { hasSome: [q] } },
-        { heart_notes: { hasSome: [q] } },
-        { base_notes: { hasSome: [q] } },
-        { perfumer: { contains: q, mode: "insensitive" } },
+        { name: { contains: q } },
+        { brand: { contains: q } },
+        { top_notes: { contains: q } },
+        { heart_notes: { contains: q } },
+        { base_notes: { contains: q } },
+        { perfumer: { contains: q } },
       ],
     },
     select: {
