@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useTransition } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Droplet, Search, X, Sun, Moon, Sunrise, Sunset, Clock, Loader2 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
@@ -27,7 +27,6 @@ export function WearingStatusModal() {
   const [comment, setComment] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, startSaving] = useTransition();
-  const shouldReduceMotion = useReducedMotion();
 
   const [mounted, setMounted] = useState(false);
 

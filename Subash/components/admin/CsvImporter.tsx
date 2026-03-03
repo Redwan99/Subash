@@ -58,7 +58,7 @@ export function CsvImporter() {
         formData.append("file", file);
 
         try {
-            const response = await importPerfumesCsv(formData) as any;
+            const response = await importPerfumesCsv(formData) as { success?: boolean; error?: string; count?: number };
             if (response?.error) {
                 setResult({ success: false, message: response.error });
             } else if (response?.success) {
@@ -68,8 +68,8 @@ export function CsvImporter() {
             } else {
                 throw new Error("Unknown error occurred");
             }
-        } catch (err: any) {
-            setResult({ success: false, message: err.message || "Failed to process the uploaded file." });
+        } catch (err: unknown) {
+            setResult({ success: false, message: err instanceof Error ? err.message : "Failed to process the uploaded file." });
         } finally {
             setLoading(false);
         }

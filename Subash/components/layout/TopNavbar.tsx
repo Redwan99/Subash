@@ -1,13 +1,13 @@
-﻿"use client";
+"use client";
 // components/layout/TopNavbar.tsx
-// Phase 3 (Pivot) — Sticky Top Navigation Bar
+// Phase 3 (Pivot) � Sticky Top Navigation Bar
 // Pro Max: glassmorphism, spring-animated search bar, avatar dropdown.
-// Contains: Logo · Search (center) · Nav links + ThemeToggle + Bell + Avatar (right)
+// Contains: Logo � Search (center) � Nav links + ThemeToggle + Bell + Avatar (right)
 
-import { useState, useRef, useEffect, useTransition } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
   Trophy,
@@ -18,21 +18,20 @@ import {
   LogOut,
   User,
   Settings,
-  Bell,
-  CheckCheck,
   Shield,
   BookOpen,
   Users2,
   Store,
+  Droplet,
   type LucideIcon,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import dynamic from "next/dynamic";
 
-// SmartSearch and NotificationBell use useRouter(); render them client-only to
+// GlobalSearch and NotificationBell use useRouter(); render them client-only to
 // avoid "expected app router to be mounted" invariants during the HTML pass.
-const SmartSearch = dynamic(
-  () => import("@/components/ui/SmartSearch").then((m) => ({ default: m.SmartSearch })),
+const GlobalSearch = dynamic(
+  () => import("@/components/layout/GlobalSearch"),
   { ssr: false, loading: () => <div className="h-9 w-full rounded-full bg-[var(--surface-2)] animate-pulse" /> }
 );
 
@@ -44,24 +43,21 @@ const WearingStatusModal = dynamic(
   () => import("@/components/profile/WearingStatusModal").then((m) => ({ default: m.WearingStatusModal })),
   { ssr: false }
 );
-import {
-  markNotificationRead,
-  markAllNotificationsRead,
-} from "@/lib/actions/notifications";
 
-// ─── Top Nav Links ────────────────────────────────────────────────────────────
+
+// --- Top Nav Links ------------------------------------------------------------
 
 const NAV_LINKS: { href: string; icon: LucideIcon; label: string }[] = [
   { href: "/leaderboards", icon: Trophy, label: "Leaderboards" },
   { href: "/fragram", icon: Camera, label: "Fragram" },
-  { href: "/perfume", icon: BookOpen, label: "Encyclopedia" },
+  { href: "/encyclopedia", icon: BookOpen, label: "Encyclopedia" },
   { href: "/creators", icon: Users2, label: "Creators" },
   { href: "/shops", icon: Store, label: "Boutiques" },
   { href: "/decants", icon: ShoppingBag, label: "Decants" },
   { href: "/wardrobe", icon: Briefcase, label: "Wardrobe" },
 ];
 
-// ─── Nav Link Item ────────────────────────────────────────────────────────────
+// --- Nav Link Item ------------------------------------------------------------
 
 function NavLink({
   href,
@@ -112,197 +108,7 @@ function NavLink({
   );
 }
 
-// ─── Notification Bell ────────────────────────────────────────────────
-
-type NotificationItem = {
-  id: string;
-  type: string;
-  message: string;
-  link: string | null;
-  read: boolean;
-  createdAt: string;
-};
-
-function NotificationBell() {
-  const { data: session } = useSession();
-  const router = useRouter();
-  const shouldReduceMotion = useReducedMotion();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const [, startTransition] = useTransition();
-
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Close on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  // Fetch notifications on mount + poll every 45 s
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    const fetchNotes = async () => {
-      try {
-        const res = await fetch("/api/notifications", { cache: "no-store" });
-        const data = await res.json() as { notifications: NotificationItem[]; unreadCount: number };
-        setNotifications(data.notifications);
-        setUnreadCount(data.unreadCount);
-      } catch { /* silent */ }
-    };
-
-    fetchNotes();
-    const id = setInterval(fetchNotes, 45_000);
-    return () => clearInterval(id);
-  }, [session?.user?.id]);
-
-  if (!session?.user?.id) return null;
-
-  function handleNotificationClick(n: NotificationItem) {
-    startTransition(async () => {
-      if (!n.read) {
-        await markNotificationRead(n.id);
-        setNotifications((prev) =>
-          prev.map((x) => (x.id === n.id ? { ...x, read: true } : x))
-        );
-        setUnreadCount((c) => Math.max(0, c - 1));
-      }
-      setOpen(false);
-      if (n.link) router.push(n.link);
-    });
-  }
-
-  function handleMarkAll() {
-    startTransition(async () => {
-      await markAllNotificationsRead();
-      setNotifications((prev) => prev.map((x) => ({ ...x, read: true })));
-      setUnreadCount(0);
-    });
-  }
-
-  const ICON_FOR_TYPE: Record<string, string> = {
-    REVIEW_UPVOTE: "⭐",
-    DUPE_VOTE: "👍",
-    FRAGRAM_LIKE: "❤️",
-    REVIEW_REPLY: "💬",
-  };
-
-  return (
-    <div ref={ref} className="relative">
-      {/* Bell button */}
-      <motion.button
-        onClick={() => setOpen((o) => !o)}
-        whileHover={shouldReduceMotion ? {} : { scale: 1.1 }}
-        whileTap={shouldReduceMotion ? {} : { scale: 0.9 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        aria-label="Notifications"
-        aria-expanded={open}
-        className="relative p-2 rounded-full text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-      >
-        <Bell size={18} strokeWidth={1.75} />
-
-        {/* Unread dot */}
-        {unreadCount > 0 && (
-          <motion.span
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="absolute top-1 right-1 flex items-center justify-center min-w-[14px] h-[14px] px-0.5 rounded-full text-[9px] font-bold leading-none bg-[#EF4444] text-gray-900 dark:text-white shadow-[0_0_6px_rgba(239,68,68,0.6)]"
-          >
-            {unreadCount > 9 ? "9+" : unreadCount}
-          </motion.span>
-        )}
-      </motion.button>
-
-      {/* Dropdown */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={
-              shouldReduceMotion
-                ? { duration: 0 }
-                : { type: "spring", stiffness: 380, damping: 26 }
-            }
-            className="absolute right-0 top-10 w-80 rounded-2xl overflow-hidden z-[100]
-              bg-black/40 dark:bg-black/60 backdrop-blur-2xl
-              border border-black/10 dark:border-white/10
-              shadow-[0_8px_40px_rgba(0,0,0,0.22)]"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/20 dark:border-white/10">
-              <p className="text-sm font-semibold text-[var(--text-primary)]">
-                Notifications
-              </p>
-              {unreadCount > 0 && (
-                <button
-                  onClick={handleMarkAll}
-                  className="flex items-center gap-1 text-[10px] font-semibold text-[var(--accent)] hover:underline"
-                >
-                  <CheckCheck size={11} />
-                  Mark all read
-                </button>
-              )}
-            </div>
-
-            {/* List */}
-            <div className="max-h-[340px] overflow-y-auto divide-y divide-white/10 dark:divide-white/5">
-              {notifications.length === 0 ? (
-                <div className="py-8 text-center text-xs text-[var(--text-muted)]">
-                  🔔 No notifications yet
-                </div>
-              ) : (
-                notifications.slice(0, 10).map((n) => (
-                  <button
-                    key={n.id}
-                    onClick={() => handleNotificationClick(n)}
-                    className={`w-full text-left flex items-start gap-3 px-4 py-3 transition-colors duration-150 ${n.read
-                      ? "bg-transparent hover:bg-white/10 dark:hover:bg-white/5"
-                      : "bg-[var(--accent)]/8 hover:bg-[var(--accent)]/12"
-                      }`}
-                  >
-                    {/* Type emoji */}
-                    <span className="mt-0.5 text-base leading-none shrink-0">
-                      {ICON_FOR_TYPE[n.type] ?? "🔔"}
-                    </span>
-
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-xs leading-relaxed break-words ${n.read ? "text-[var(--text-secondary)]" : "font-semibold text-[var(--text-primary)]"
-                        }`}>
-                        {n.message}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                        {new Date(n.createdAt).toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-
-                    {/* Unread dot */}
-                    {!n.read && (
-                      <span className="mt-1.5 w-2 h-2 rounded-full bg-[var(--accent)] shadow-[0_0_4px_var(--accent-glow)] shrink-0" />
-                    )}
-                  </button>
-                ))
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ─── Avatar / Profile Dropdown ────────────────────────────────────────────────
+// --- Avatar / Profile Dropdown ------------------------------------------------
 
 function AvatarMenu() {
   const { data: session, status } = useSession();
@@ -327,7 +133,7 @@ function AvatarMenu() {
 
   if (!session) {
     return (
-      <Link href="/auth/signin" prefetch={false}>
+      <Link href="/login" prefetch={false}>
         <motion.div
           whileHover={shouldReduceMotion ? {} : { scale: 1.04 }}
           whileTap={shouldReduceMotion ? {} : { scale: 0.96 }}
@@ -428,7 +234,7 @@ function AvatarMenu() {
   );
 }
 
-// ─── Top Navbar ───────────────────────────────────────────────────────────────
+// --- Top Navbar ---------------------------------------------------------------
 
 export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, boolean> }) {
   const rawPathname = usePathname();
@@ -456,6 +262,12 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [pathname]);
 
+  // Hide navbar on auth and legal pages
+  const authPaths = ["/login", "/register", "/verify-phone", "/forgot-password"];
+  if (authPaths.some((p) => pathname.startsWith(p)) || pathname.startsWith("/legal")) {
+    return null;
+  }
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -16 }}
@@ -468,30 +280,30 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
       className="fixed top-0 left-0 right-0 z-50 flex items-center gap-3 px-4 md:px-6 h-[var(--topnav-height,60px)] glass border-b border-[var(--bg-glass-border)]"
       aria-label="Top navigation"
     >
-      {/* ── Left: Logo ───────────────────────────────────────── */}
-      <Link href="/" className="shrink-0 group" prefetch={false}>
+      {/* -- Left: Logo ----------------------------------------- */}
+      <Link href="/" className="shrink-0 group flex items-center gap-2" prefetch={false}>
         <motion.div
           whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="flex flex-col leading-none"
+          className="flex items-center gap-2"
         >
-          <span className="font-display text-xl font-bold bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)] bg-clip-text text-transparent">
-            সুবাশ
-          </span>
-          <span className="text-[9px] font-semibold tracking-[0.2em] uppercase -mt-0.5 text-[var(--text-muted)]">
-            Subash
+          <div className="bg-brand-500/10 p-1.5 rounded-lg group-hover:bg-brand-500/20 transition-colors">
+            <Droplet className="w-5 h-5 text-brand-500" />
+          </div>
+          <span className="font-serif font-bold text-xl tracking-wider text-gray-900 dark:text-white">
+            SUBASH
           </span>
         </motion.div>
       </Link>
 
-      {/* ── Center: Search (scroll-aware on homepage) ────────── */}
+      {/* -- Center: Search (scroll-aware on homepage) ---------- */}
       <div className="flex-1 max-w-md mx-auto">
-        {showSearch && <SmartSearch id="top-nav-search" />}
+        {showSearch && <GlobalSearch />}
       </div>
 
-      {/* ── Right: Nav Links + Theme + Avatar ────────────────── */}
+      {/* -- Right: Nav Links + Theme + Avatar ------------------ */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* Nav links — hidden on very small screens */}
+        {/* Nav links � hidden on very small screens */}
         <nav className="hidden sm:flex items-center gap-0.5">
           {NAV_LINKS.filter(l => {
             if (l.label === "Encyclopedia" && featureToggles?.ENABLE_ENCYCLOPEDIA === false) return false;
@@ -531,3 +343,5 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
     </motion.header>
   );
 }
+
+

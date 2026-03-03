@@ -63,7 +63,7 @@ services:
       # subsequent restarts don’t re-check the DB on every boot.
       SEED_DB: ${SEED_DB:-false}
     ports:
-      - "9864:3000"
+      - "9864:9864"
 
 volumes:
   postgres_data:

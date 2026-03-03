@@ -1,4 +1,4 @@
-﻿// app/auth/signin/page.tsx
+// app/login/page.tsx
 // Custom Sign-In page — Phase 2.1 + Manual Auth
 // Glassmorphism design · Google + Facebook + Email/Password
 
@@ -6,6 +6,7 @@ import { signIn } from "@/auth";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { CredentialsForm } from "./CredentialsForm";
+import Link from "next/link";
 
 export const metadata = {
   title: "Sign In",
@@ -59,7 +60,7 @@ export default async function SignInPage({
         {/* Logo / Title */}
         <div className="text-center space-y-2">
           <h1
-            className="font-display text-4xl font-bold bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
+            className="font-display text-4xl font-bold bg-[linear-gradient(135deg,#059669_0%,#10b981_50%,#34d399_100%)] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
           >
             সুবাশ
           </h1>
@@ -170,7 +171,7 @@ export default async function SignInPage({
         <p
           className="text-xs text-center leading-relaxed text-[var(--text-muted)]"
         >
-          By signing in, you agree to our Terms of Service and Privacy Policy.
+          By signing in, you agree to our <Link href="/legal/terms" className="text-brand-500 hover:underline">Terms of Service</Link> and <Link href="/legal/privacy" className="text-brand-500 hover:underline">Privacy Policy</Link>.
         </p>
       </div>
     </main>

@@ -198,8 +198,8 @@ export function ChatWidget({ featureToggles }: { featureToggles?: Record<string,
         className={cn(
           "fixed z-50 bottom-20 right-4 md:bottom-6 md:right-6",
           "w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-white",
-          "bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)]",
-          "shadow-[0_8px_28px_rgba(139,92,246,0.55),0_0_0_1px_rgba(139,92,246,0.25)]"
+          "bg-brand-500",
+          "shadow-[0_8px_28px_rgba(16,185,129,0.55),0_0_0_1px_rgba(16,185,129,0.25)]"
         )}
       >
         <AnimatePresence mode="wait">

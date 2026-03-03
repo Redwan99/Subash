@@ -1,46 +1,46 @@
-﻿"use client";
+"use client";
 // components/perfume/ReviewForm.tsx
-// Phase 4.4 — Review Submission Form
-//   · Session-gated (shows CTA if not signed in)
-//   · Framer Motion sliders for Longevity + Sillage
-//   · Toggle chips for Season + Time
-//   · Calls submitReview server action
+// Phase 4.4 � Review Submission Form
+//   � Session-gated (shows CTA if not signed in)
+//   � Framer Motion sliders for Longevity + Sillage
+//   � Toggle chips for Season + Time
+//   � Calls submitReview server action
 
 import { useState, useRef, useCallback } from "react";
 import { motion, useReducedMotion, PanInfo } from "framer-motion";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Send, Star, LogIn, CheckCircle, AlertCircle, Briefcase, GlassWater, Heart, Coffee, ShieldCheck, ShieldAlert, Sparkles, Gem, Frown } from "lucide-react";
+import { Send, Star, LogIn, CheckCircle, AlertCircle, Briefcase, GlassWater, Heart, Coffee, ShieldCheck, Gem, Frown } from "lucide-react";
 import { submitReview, type ReviewFormState } from "@/lib/actions/perfume";
 import { BotShield } from "@/components/ui/BotShield";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 type WeatherTag = "HOT" | "MILD" | "COLD" | "HUMID" | "DRY" | "RAINY";
 type TimeTag = "morning" | "day" | "evening" | "night" | "anytime" | "both";
 
 const WEATHER_CONDITIONS: { value: WeatherTag; label: string; emoji: string; desc: string }[] = [
-  { value: "HOT", label: "Hot", emoji: "☀️", desc: "> 28°C" },
-  { value: "MILD", label: "Mild", emoji: "⛅", desc: "15–28°C" },
-  { value: "COLD", label: "Cold", emoji: "❄️", desc: "< 15°C" },
-  { value: "HUMID", label: "Humid", emoji: "💧", desc: "Humidity > 70%" },
-  { value: "DRY", label: "Dry", emoji: "🏜️", desc: "Humidity < 40%" },
-  { value: "RAINY", label: "Rainy", emoji: "🌧️", desc: "Rain / Drizzle" },
+  { value: "HOT", label: "Hot", emoji: "??", desc: "> 28�C" },
+  { value: "MILD", label: "Mild", emoji: "?", desc: "15�28�C" },
+  { value: "COLD", label: "Cold", emoji: "??", desc: "< 15�C" },
+  { value: "HUMID", label: "Humid", emoji: "??", desc: "Humidity > 70%" },
+  { value: "DRY", label: "Dry", emoji: "???", desc: "Humidity < 40%" },
+  { value: "RAINY", label: "Rainy", emoji: "???", desc: "Rain / Drizzle" },
 ];
 
 const TIME_OPTIONS: { value: TimeTag; label: string; emoji: string }[] = [
-  { value: "morning", label: "Morning", emoji: "🌅" },
-  { value: "day", label: "Day", emoji: "🌤️" },
-  { value: "evening", label: "Evening", emoji: "🌇" },
-  { value: "night", label: "Night", emoji: "🌙" },
-  { value: "anytime", label: "Anytime", emoji: "⚡" },
+  { value: "morning", label: "Morning", emoji: "??" },
+  { value: "day", label: "Day", emoji: "???" },
+  { value: "evening", label: "Evening", emoji: "??" },
+  { value: "night", label: "Night", emoji: "??" },
+  { value: "anytime", label: "Anytime", emoji: "?" },
 ];
 
 const LONGEVITY_LABELS = ["", "Fades in mins", "Under 2h", "2-3h", "3-4h", "4-5h", "5-6h", "6-8h", "8-12h", "12h+", "Eternal"];
 const SILLAGE_LABELS = ["", "On skin only", "Intimate", "Personal", "Noticeable", "Soft aura", "Moderate", "Filling room", "Heavy", "Enormous", "Nuclear"];
 const MAX_REVIEW_LENGTH = 800;
 
-// ─── Star Rating ──────────────────────────────────────────────────────────────
+// --- Star Rating --------------------------------------------------------------
 
 function StarRating({
   value,
@@ -77,7 +77,7 @@ function StarRating({
   );
 }
 
-// ─── Liquid Slider ────────────────────────────────────────────────────────────
+// --- Liquid Slider ------------------------------------------------------------
 
 function LiquidSlider({
   label,
@@ -91,7 +91,7 @@ function LiquidSlider({
 }: {
   label: string;
   sublabel: string;
-  value: number; // 1–10
+  value: number; // 1�10
   onChange: (v: number) => void;
   labelMap: string[];
   valueClass: string;
@@ -105,7 +105,7 @@ function LiquidSlider({
     if (!trackRef.current) return;
     const rect = trackRef.current.getBoundingClientRect();
     const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const newVal = Math.round(pct * 9) + 1; // maps 0..1 → 1..10
+    const newVal = Math.round(pct * 9) + 1; // maps 0..1 ? 1..10
     onChange(newVal);
   }, [onChange]);
 
@@ -127,7 +127,7 @@ function LiquidSlider({
           </span>
         </div>
         <span className={`text-sm font-bold ${valueClass}`}>
-          {value}/10 — {labelMap[value]}
+          {value}/10 � {labelMap[value]}
         </span>
       </div>
 
@@ -175,7 +175,7 @@ function LiquidSlider({
   );
 }
 
-// ─── Toggle Chip ──────────────────────────────────────────────────────────────
+// --- Toggle Chip --------------------------------------------------------------
 
 function ToggleChip({
   label,
@@ -208,7 +208,7 @@ function ToggleChip({
   );
 }
 
-// ─── Sign-in CTA ──────────────────────────────────────────────────────────────
+// --- Sign-in CTA --------------------------------------------------------------
 
 function SignInCTA() {
   return (
@@ -220,7 +220,7 @@ function SignInCTA() {
       <p className="text-sm mb-4 text-[var(--text-muted)]">
         Sign in to leave a review for this fragrance.
       </p>
-      <Link href="/auth/signin">
+      <Link href="/login">
         <motion.div
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -235,7 +235,7 @@ function SignInCTA() {
   );
 }
 
-// ─── Review Form ──────────────────────────────────────────────────────────────
+// --- Review Form --------------------------------------------------------------
 
 export function ReviewForm({
   perfumeId,
@@ -340,7 +340,7 @@ export function ReviewForm({
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Describe the fragrance, how it wore on your skin, occasions you'd suggest it for…"
+            placeholder="Describe the fragrance, how it wore on your skin, occasions you'd suggest it for�"
             rows={4}
             className="w-full rounded-xl px-4 py-3 text-sm resize-none outline-none bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-primary)] caret-[var(--accent)] transition-colors focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20"
             required
@@ -540,7 +540,7 @@ export function ReviewForm({
             }`}
         >
           <Send size={15} />
-          {loading ? "Submitting…" : "Submit Review"}
+          {loading ? "Submitting�" : "Submit Review"}
         </motion.button>
         <p className="mt-2 text-center text-[11px] text-[var(--text-muted)]">
           {!turnstileToken
@@ -553,3 +553,4 @@ export function ReviewForm({
     </div>
   );
 }
+

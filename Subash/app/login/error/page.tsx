@@ -1,4 +1,4 @@
-﻿// app/auth/error/page.tsx
+// app/login/error/page.tsx
 // Auth error page — displayed when NextAuth encounters an OAuth error.
 
 import Link from "next/link";
@@ -40,7 +40,7 @@ export default async function AuthErrorPage({
           </p>
         )}
         <Link
-          href="/auth/signin"
+          href="/login"
           className="inline-block px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] text-white bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)]"
         >
           Try Again

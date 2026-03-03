@@ -179,7 +179,7 @@ async function importCleaned(
   const rawRows = await loadCsv(filePath, ";", LIMIT);
   console.log(`  📄 ${rawRows.length} rows collected from fra_cleaned.csv\n`);
 
-  let batch: PerfumeRow[] = [];
+  const batch: PerfumeRow[] = [];
   let totalInserted = 0;
   let mergeHits = 0;
   let mergeMisses = 0;

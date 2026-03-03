@@ -1,4 +1,4 @@
-﻿// middleware.ts
+// middleware.ts
 // Phase 2.3 — Auth.js v5 middleware with full RBAC guards.
 // Uses authConfig (edge-safe: no Prisma / bcryptjs) for the middleware runtime.
 
@@ -56,7 +56,7 @@ export default auth((req: any) => {
   // Helper: redirect to sign-in preserving callbackUrl
   function toSignIn() {
     const url = req.nextUrl.clone();
-    url.pathname = "/auth/signin";
+    url.pathname = "/login";
     url.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(url);
   }
@@ -81,7 +81,7 @@ export default auth((req: any) => {
     pathname.startsWith("/decants/create")
   ) {
     if (!isSignedIn) return toSignIn();
-    if (!phoneVerified) return NextResponse.redirect(new URL("/auth/verify-phone", req.url));
+    if (!phoneVerified) return NextResponse.redirect(new URL("/verify-phone", req.url));
     if (reviewCount < 50 && role !== "SUPER_ADMIN") {
       return NextResponse.redirect(new URL("/", req.url));
     }

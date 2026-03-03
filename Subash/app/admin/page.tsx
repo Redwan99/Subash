@@ -9,7 +9,7 @@ import prisma from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 import { Role } from "@prisma/client";
 import AdminDashboardClient from "./AdminDashboardClient";
-import type { AdminReview as Review, AdminUser, AuditLog } from "./types";
+import type { AdminReview as Review, AdminUser, AuditLog, BrandClaim } from "./types";
 
 async function getAdminData() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,13 +71,13 @@ async function getAdminData() {
     users: users as AdminUser[],
     featureToggles: featureToggles,
     auditLogs: auditLogs as AuditLog[],
-    brandClaims: brandClaims as any[],
+    brandClaims: brandClaims as BrandClaim[],
   };
 }
 
 export default async function AdminPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/auth/signin");
+  if (!session?.user?.id) redirect("/login");
 
   const me = await prisma.user.findUnique({
     where: { id: session.user.id },

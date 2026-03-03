@@ -13,8 +13,8 @@ import { ShoppingCart, ExternalLink, Tag, Store } from "lucide-react";
 import NextDynamic from "next/dynamic";
 import { DecantCard, type DecantCardData } from "@/components/marketplace/DecantCard";
 import { auth } from "@/auth";
-import { checkWardrobeStatus } from "@/lib/actions/reviews";
 import { PerfumeHero } from "@/components/perfume/PerfumeHero";
+import { WardrobeActionBar } from "@/components/perfume/WardrobeActionBar";
 import { CommunityConsensus } from "@/components/perfume/CommunityConsensus";
 import ViewTracker from "@/components/perfume/ViewTracker";
 import { parsePrismaArray } from "@/lib/utils";
@@ -103,13 +103,12 @@ export default async function PerfumePage({
           sillage_score: true,
         },
       },
-      dupeOriginal: {
-        orderBy: { upvotes: "desc" },
+      dupesForThis: {
+        orderBy: { votes: "desc" },
         select: {
           id: true,
-          upvotes: true,
-          downvotes: true,
-          clone: { select: { id: true, name: true, brand: true, image_url: true, slug: true } },
+          votes: true,
+          dupePerfume: { select: { id: true, name: true, brand: true, image_url: true, slug: true } },
         },
       },
       deals: {
@@ -144,9 +143,17 @@ export default async function PerfumePage({
 
   // Wardrobe status (null when not signed in)
   const session = await auth();
-  const wardrobeStatus = session?.user?.id
-    ? await checkWardrobeStatus(perfume.id)
-    : { shelf: null };
+  const currentWardrobeStatus = session?.user?.id
+    ? await prisma.wardrobeItem.findUnique({
+        where: {
+          userId_perfumeId: {
+            userId: session.user.id,
+            perfumeId: perfume.id,
+          },
+        },
+        select: { shelf: true },
+      })
+    : null;
 
   const reviewCount = perfume.reviews.length;
   const avgRating = reviewCount
@@ -159,12 +166,12 @@ export default async function PerfumePage({
     ? perfume.reviews.reduce((sum: number, r: { sillage_score: number }) => sum + r.sillage_score, 0) / reviewCount
     : 1;
 
-  const dupes = perfume.dupeOriginal.map((d: {
-    id: string; upvotes: number; downvotes: number;
-    clone: { id: string; name: string; brand: string; image_url: string | null; slug: string };
+  const dupes = perfume.dupesForThis.map((d: {
+    id: string; votes: number;
+    dupePerfume: { id: string; name: string; brand: string; image_url: string | null; slug: string };
   }) => ({
-    id: d.id, upvotes: d.upvotes, downvotes: d.downvotes,
-    clone: { id: d.clone.id, name: d.clone.name, brand: d.clone.brand, image_url: d.clone.image_url, slug: d.clone.slug },
+    id: d.id, votes: d.votes,
+    dupePerfume: { id: d.dupePerfume.id, name: d.dupePerfume.name, brand: d.dupePerfume.brand, image_url: d.dupePerfume.image_url, slug: d.dupePerfume.slug },
   }));
 
   const accords = parsePrismaArray(perfume.accords);
@@ -192,9 +199,14 @@ export default async function PerfumePage({
           reviewCount={reviewCount}
           avgLongevity={avgLongevity}
           avgSillage={avgSillage}
-          initialShelf={wardrobeStatus.shelf}
-          isSignedIn={!!session?.user}
         />
+
+        {!!session?.user?.id && (
+          <WardrobeActionBar
+            perfumeId={perfume.id}
+            initialStatus={currentWardrobeStatus?.shelf}
+          />
+        )}
 
         {/* Community Consensus */}
         <CommunityConsensus

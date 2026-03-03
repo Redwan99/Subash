@@ -185,7 +185,7 @@ function FilterPanel({
 }
 
 // ── Main client ───────────────────────────────────────────────────────────────
-export function EncyclopediaClient({ perfumes, brands, accords, totalCount, totalPages, currentPage, activeFilters }: Props) {
+export function EncyclopediaClient({ perfumes, brands, accords, totalCount, totalPages, currentPage: _currentPage, activeFilters }: Props) {
     const router = useRouter();
     const pathname = usePathname();
     const [query, setQuery] = useState("");
@@ -296,7 +296,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                         className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] text-[var(--text-primary)] outline-none focus:border-[rgba(139,92,246,0.5)] placeholder:text-[var(--text-muted)]"
                     />
                     {query && (
-                        <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <button aria-label="Clear Search" onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2">
                             <X size={14} className="text-[var(--text-muted)]" />
                         </button>
                     )}
@@ -322,7 +322,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                             className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-[rgba(139,92,246,0.15)] border border-[rgba(139,92,246,0.3)] text-[var(--accent)]"
                         >
                             <span className="capitalize">{v}</span>
-                            <button onClick={() => setFilter(k as keyof ActiveFilters, null)}>
+                            <button aria-label="Remove Filter" onClick={() => setFilter(k as keyof ActiveFilters, null)}>
                                 <X size={11} />
                             </button>
                         </span>
@@ -353,7 +353,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <span className="font-bold text-[var(--text-primary)]">Filters</span>
-                                <button onClick={() => setSidebar(false)}><X size={18} className="text-[var(--text-muted)]" /></button>
+                                <button aria-label="Close Filter" onClick={() => setSidebar(false)}><X size={18} className="text-[var(--text-muted)]" /></button>
                             </div>
                             <FilterPanel brands={brands} accords={accords} activeFilters={activeFilters}
                                 onSetFilter={(k, v) => { setFilter(k, v); setSidebar(false); }} onClearAll={() => { clearAll(); setSidebar(false); }} />

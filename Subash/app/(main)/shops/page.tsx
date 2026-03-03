@@ -2,7 +2,6 @@
 // Phase 11 — Verified Boutiques Directory with Map View placeholder
 
 import { Metadata } from "next";
-import Link from "next/link";
 import { ShopsClient } from "@/components/shops/ShopsClient";
 import { getFeatureMap } from "@/lib/features";
 import { notFound } from "next/navigation";

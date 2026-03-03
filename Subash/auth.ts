@@ -1,4 +1,4 @@
-﻿// =============================================
+// =============================================
 //  Subash — Auth.js v5 Configuration
 //  Providers: Google, Facebook, Credentials
 //  Adapter:   Prisma (OAuth user/account creation)
@@ -105,23 +105,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        try {
+          const email = (credentials?.email as string | undefined)?.trim().toLowerCase();
+          const password = credentials?.password as string | undefined;
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
+          if (!email || !password) return null;
 
-        // No account found, or account belongs to an OAuth provider (no password)
-        if (!user || !user.password) return null;
+          const user = await prisma.user.findUnique({
+            where: { email },
+          });
 
-        const passwordMatch = await bcrypt.compare(
-          credentials.password as string,
-          user.password
-        );
+          // No account found, or account belongs to an OAuth provider (no password)
+          if (!user || !user.password) return null;
 
-        if (!passwordMatch) return null;
+          const passwordMatch = await bcrypt.compare(password, user.password);
+          if (!passwordMatch) return null;
 
-        return { id: user.id, name: user.name, email: user.email, image: user.image };
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+          };
+        } catch (err) {
+          console.error("[Subash Auth] authorize() error:", err);
+          return null;
+        }
       },
     }),
   ],
@@ -164,8 +173,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
+    signIn: "/login",
+    error: "/login/error",
   },
 
   session: {

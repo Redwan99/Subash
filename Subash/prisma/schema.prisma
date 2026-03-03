@@ -84,10 +84,12 @@ model User {
   dupeVotes       DupeVote[]
   wardrobeItems   WardrobeItem[]
   fragramPosts    FragramPost[]
-  fragramLikes    FragramLike[]
   reviewUpvotes   ReviewUpvote[]
   decantListings  DecantListing[] @relation("UserDecants")
   notifications   Notification[]
+  followers       Follows[]       @relation("UserFollowing")
+  following       Follows[]       @relation("UserFollowers")
+  suggestedDupes  PerfumeDupe[]
   brandClaims     BrandClaim[]
   comments        Comment[]
   wearingStatus   WearingStatus?
@@ -171,6 +173,8 @@ model Perfume {
   dupeOriginal   DupeVote[]      @relation("OriginalPerfume")
   dupeClone      DupeVote[]      @relation("ClonePerfume")
   wardrobeItems  WardrobeItem[]
+  dupesForThis   PerfumeDupe[]   @relation("TargetDupes")
+  isDupeOf       PerfumeDupe[]   @relation("IsDupeOf")
   fragramPosts   FragramPost[]
   potdEntries    PerfumeOfTheDay[]
   decantListings DecantListing[]
@@ -381,33 +385,26 @@ model WardrobeItem {
 
 model FragramPost {
   id        String   @id @default(cuid())
+  imageUrl  String   // Path to the uploaded image
+  caption   String?  // Optional text
+  
   userId    String
-  perfumeId String?
-  imageUrl  String
-  caption   String?
-  likeCount Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  perfumeId String?  // Optional: Tag the perfume they are wearing
+  perfume   Perfume? @relation(fields: [perfumeId], references: [id])
+  
+  likes     Int      @default(0)
+  
   createdAt DateTime @default(now())
-
-  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  perfume Perfume?      @relation(fields: [perfumeId], references: [id], onDelete: SetNull)
-  likes   FragramLike[]
+  updatedAt DateTime @updatedAt
 
   @@index([createdAt(sort: Desc)])
-  @@map("fragram_posts")
+  @@index([userId])
+  @@index([perfumeId])
 }
 
-model FragramLike {
-  id     String @id @default(cuid())
-  userId String
-  postId String
-
-  user User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post FragramPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, postId])
-  @@index([postId])
-  @@map("fragram_likes")
-}
+  // Removed FragramLike
 
 // =============================================
 //  Notification
@@ -415,16 +412,17 @@ model FragramLike {
 
 model Notification {
   id        String   @id @default(cuid())
-  userId    String
-  type      String   // "REVIEW_UPVOTE" | "DUPE_VOTE" | "FRAGRAM_LIKE" | "REVIEW_REPLY"
+  userId    String   // The user receiving the notification
+  type      String   // e.g., "LIKE", "FOLLOW", "DUPE_UPVOTE"
   message   String
-  link      String?
-  read      Boolean  @default(false)
+  link      String?  // Where to send them when they click it
+  isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId, read])
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
   @@map("notifications")
 }
 
@@ -535,3 +533,36 @@ model BrandClaim {
   @@index([status])
   @@map("brand_claims")
 }
+
+model PerfumeDupe {
+  id              String   @id @default(cuid())
+  targetPerfumeId String   // The perfume being viewed
+  dupePerfumeId   String   // The suggested alternative
+
+  // Relations back to Perfume
+  targetPerfume   Perfume  @relation("TargetDupes", fields: [targetPerfumeId], references: [id], onDelete: Cascade)
+  dupePerfume     Perfume  @relation("IsDupeOf", fields: [dupePerfumeId], references: [id], onDelete: Cascade)
+  
+  votes           Int      @default(1) // Net score (upvotes - downvotes)
+  userId          String   // The user who first suggested it
+  user            User     @relation(fields: [userId], references: [id])
+
+  createdAt       DateTime @default(now())
+
+  @@unique([targetPerfumeId, dupePerfumeId]) // Prevent duplicate links
+  @@index([targetPerfumeId])
+}
+
+
+model Follows {
+  followerId  String
+  followingId String
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@id([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+}
+

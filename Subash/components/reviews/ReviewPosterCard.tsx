@@ -5,7 +5,28 @@ import { formatDistanceToNow } from "date-fns";
 
 // Adjust types based on your exact Prisma schema
 type ReviewCardProps = {
-    review: any; 
+    review: {
+        id?: string;
+        title?: string | null;
+        text?: string;
+        overall_rating?: number;
+        createdAt?: string | Date;
+        transparentImageUrl?: string | null;
+        imageUrl?: string | null;
+        perfume?: {
+            id?: string;
+            slug?: string;
+            name?: string;
+            brand?: string;
+            image_url?: string | null;
+            transparentImageUrl?: string | null;
+        } | null;
+        user?: {
+            id?: string;
+            name?: string | null;
+            image?: string | null;
+        } | null;
+    };
 };
 
 export default function ReviewPosterCard({ review }: ReviewCardProps) {

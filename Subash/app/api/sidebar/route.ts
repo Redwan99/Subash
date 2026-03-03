@@ -99,7 +99,7 @@ const getCachedSidebarData = unstable_cache(
         take: 2,
         orderBy: { createdAt: "desc" },
         select: {
-          id: true, likeCount: true, caption: true, createdAt: true,
+          id: true, likes: true, caption: true, createdAt: true,
           user: { select: { name: true } },
           perfume: { select: { id: true, name: true } },
         },
@@ -134,7 +134,7 @@ const getCachedSidebarData = unstable_cache(
         user: p.user.name ?? "Anon",
         action: "posted to Fragram",
         subject: p.perfume?.name ?? "a scent",
-        detail: p.caption ? p.caption.slice(0, 50) : `❤️ ${p.likeCount} likes`,
+        detail: p.caption ? p.caption.slice(0, 50) : `❤️ ${p.likes} likes`,
         time: timeAgo(p.createdAt),
         href: "/fragram",
       })),

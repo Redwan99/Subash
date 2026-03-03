@@ -75,7 +75,7 @@ export function CommentSection({
             ) : (
                 <div className="p-8 rounded-2xl border-2 border-dashed border-white/10 text-center">
                     <p className="text-sm text-[var(--text-muted)] mb-4">You must be signed in to join the conversation.</p>
-                    <a href="/auth/signin" className="text-xs font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">
+                    <a href="/login" className="text-xs font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">
                         Sign In Now
                     </a>
                 </div>

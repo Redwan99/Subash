@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 // lib/actions/admin.ts
 // Phase 9 — Secure Admin Server Actions
 // All actions enforce SUPER_ADMIN role before executing.
@@ -263,4 +263,50 @@ export async function updateBrandClaimStatus(id: string, newStatus: "APPROVED" |
   await logAdminAction(adminId, `brand_claim_${newStatus.toLowerCase()}`, `Claim ID: ${id}, Brand: ${claim.brandName}`);
   revalidatePath("/admin");
   return updatedClaim;
+}
+
+// ── Bulk Import Perfumes (JSON) ───────────────────────────────────────────────
+export async function importBulkPerfumes(jsonData: string) {
+  try {
+    const perfumes = JSON.parse(jsonData);
+    if (!Array.isArray(perfumes)) throw new Error("Data must be a JSON array.");
+
+    let successCount = 0;
+
+    // Process sequentially to avoid SQLite lockups on massive arrays
+    for (const p of perfumes) {
+      if (!p.name || !p.brand) continue;
+
+      // Basic slugification fallback if slug is missing
+      const slug =
+        p.slug ||
+        `${p.brand}-${p.name}`
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)+/g, "");
+
+      await prisma.perfume.upsert({
+        where: { slug },
+        update: {}, // Don't overwrite existing records
+        create: {
+          slug,
+          name: p.name,
+          brand: p.brand,
+          image_url: p.image_url || "/placeholder-bottle.png",
+          description: p.description || "",
+          release_year: p.release_year ? Number(p.release_year) : null,
+          // Stringify arrays for SQLite TEXT columns
+          accords: p.main_accords ? JSON.stringify(p.main_accords) : p.accords ? JSON.stringify(p.accords) : undefined,
+          top_notes: p.top_notes ? JSON.stringify(p.top_notes) : undefined,
+        },
+      });
+      successCount++;
+    }
+
+    return { success: true, count: successCount };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Bulk Import Error:", error);
+    return { success: false, error: message };
+  }
 }

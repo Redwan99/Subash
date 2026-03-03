@@ -1,11 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Star, CheckCircle2, Clock, Heart, Droplet } from "lucide-react";
-import { AddToWardrobeButton } from "@/components/perfume/AddToWardrobeButton";
-import { addToWardrobe } from "@/lib/actions/reviews";
+import { Star } from "lucide-react";
 
 interface PerfumeHeroProps {
   perfume: {
@@ -23,8 +20,6 @@ interface PerfumeHeroProps {
   reviewCount: number;
   avgLongevity: number;
   avgSillage: number;
-  initialShelf: string | null;
-  isSignedIn: boolean;
 }
 
 export function PerfumeHero({
@@ -33,26 +28,10 @@ export function PerfumeHero({
   reviewCount,
   avgLongevity,
   avgSillage,
-  initialShelf,
-  isSignedIn,
 }: PerfumeHeroProps) {
   const shouldReduceMotion = useReducedMotion();
-  const [activeShelf, setActiveShelf] = useState<string | null>(initialShelf ?? null);
-  const [isPending, startTransition] = useTransition();
 
   const displayImage = perfume.transparentImageUrl || perfume.image_url;
-
-  const handleShelf = (shelf: "HAVE" | "HAD" | "WANT") => {
-    if (!isSignedIn) return;
-    startTransition(async () => {
-      const result = await addToWardrobe(perfume.id, shelf);
-      if (result.success) setActiveShelf(shelf);
-    });
-  };
-
-  const handleWearingToday = () => {
-    window.dispatchEvent(new Event("open-status-modal"));
-  };
 
   const genderLabel = perfume.gender
     ?.replace("for ", "")
@@ -168,13 +147,6 @@ export function PerfumeHero({
                 {avgRating ? avgRating.toFixed(1) : "No ratings yet"}
               </span>
             </div>
-
-            {isSignedIn && (
-              <div className="ml-1">
-                <AddToWardrobeButton perfumeId={perfume.id} initialShelf={initialShelf} />
-              </div>
-            )}
-
             <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-300/80">
               <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2 py-0.5">
                 <span className="h-1 w-1 rounded-full bg-sky-400" />
@@ -224,64 +196,6 @@ export function PerfumeHero({
         </div>
       </div>
 
-      {/* ── Wardrobe Action Bar ───────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-2 p-2 mt-6 bg-white/5 dark:bg-black/40 backdrop-blur-2xl border border-[var(--bg-glass-border)] rounded-2xl shadow-xl">
-        <div className="flex flex-1 items-center gap-1">
-          {/* I have it */}
-          <button
-            onClick={() => handleShelf("HAVE")}
-            disabled={isPending || !isSignedIn}
-            className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-colors group disabled:opacity-50 ${
-              activeShelf === "HAVE"
-                ? "bg-brand-500/15 text-brand-500"
-                : "hover:bg-brand-500/10 text-gray-400 hover:text-brand-500"
-            }`}
-          >
-            <CheckCircle2 className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">I have it</span>
-          </button>
-
-          {/* I had it */}
-          <button
-            onClick={() => handleShelf("HAD")}
-            disabled={isPending || !isSignedIn}
-            className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-colors group disabled:opacity-50 ${
-              activeShelf === "HAD"
-                ? "bg-sky-500/15 text-sky-400"
-                : "hover:bg-white/5 text-gray-400 hover:text-white"
-            }`}
-          >
-            <Clock className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">I had it</span>
-          </button>
-
-          {/* I want it */}
-          <button
-            onClick={() => handleShelf("WANT")}
-            disabled={isPending || !isSignedIn}
-            className={`flex-1 flex flex-col items-center justify-center py-2 px-3 rounded-xl transition-colors group disabled:opacity-50 ${
-              activeShelf === "WANT"
-                ? "bg-pink-500/15 text-pink-400"
-                : "hover:bg-pink-500/10 text-gray-400 hover:text-pink-500"
-            }`}
-          >
-            <Heart className="w-5 h-5 mb-1 group-hover:scale-110 transition-transform" />
-            <span className="text-[10px] font-bold uppercase tracking-wider">I want it</span>
-          </button>
-        </div>
-
-        {/* Divider */}
-        <div className="w-px h-10 bg-white/10 hidden sm:block mx-1" />
-
-        {/* Wearing Today CTA */}
-        <button
-          onClick={handleWearingToday}
-          className="flex-shrink-0 flex items-center gap-2 py-2.5 px-5 rounded-xl bg-brand-500 hover:bg-brand-400 text-black font-semibold text-sm shadow-lg shadow-brand-500/20 transition-all active:scale-95 w-full sm:w-auto justify-center mt-2 sm:mt-0"
-        >
-          <Droplet className="w-4 h-4" />
-          Wearing Today
-        </button>
-      </div>
     </motion.section>
   );
 }

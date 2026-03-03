@@ -98,6 +98,12 @@ function NavItem({
 export function BottomNav() {
   const pathname = usePathname();
 
+  // Hide on auth and legal pages
+  const authPaths = ["/login", "/register", "/verify-phone", "/forgot-password"];
+  if (authPaths.some((p) => pathname?.startsWith(p)) || pathname?.startsWith("/legal")) {
+    return null;
+  }
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 flex md:hidden z-50 h-[var(--bottom-nav-height)] bg-white/40 dark:bg-black/40 backdrop-blur-xl border-t border-white/20 dark:border-white/5 shadow-[0_-8px_40px_rgba(0,0,0,0.20)]"

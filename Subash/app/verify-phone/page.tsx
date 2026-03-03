@@ -1,5 +1,5 @@
-﻿"use client";
-// app/auth/verify-phone/page.tsx
+"use client";
+// app/verify-phone/page.tsx
 // Step 2.2 — Firebase Phone OTP Verification
 // Client Component: uses Firebase client SDK for reCAPTCHA + OTP flow.
 // On success, calls the saveVerifiedPhone Server Action to update the DB.
@@ -36,7 +36,7 @@ export default function VerifyPhonePage() {
 
   // Redirect unauthenticated users
   useEffect(() => {
-    if (status === "unauthenticated") router.replace("/auth/signin");
+    if (status === "unauthenticated") router.replace("/login");
   }, [status, router]);
 
   // Redirect if already verified
@@ -209,7 +209,7 @@ export default function VerifyPhonePage() {
             <button
               onClick={handleSendOtp}
               disabled={pending}
-              className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-black bg-[linear-gradient(135deg,#059669_0%,#10b981_50%,#34d399_100%)] shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
+              className="w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-white dark:text-black font-semibold shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {pending ? "Sending…" : "Send Verification Code"}
             </button>
@@ -231,7 +231,7 @@ export default function VerifyPhonePage() {
             <button
               onClick={handleVerifyOtp}
               disabled={pending || otp.length !== 6}
-              className="w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-black bg-[linear-gradient(135deg,#059669_0%,#10b981_50%,#34d399_100%)] shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
+              className="w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-white dark:text-black font-semibold shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40 transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {pending ? "Verifying…" : "Verify Code"}
             </button>

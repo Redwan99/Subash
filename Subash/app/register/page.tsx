@@ -1,4 +1,4 @@
-﻿// app/auth/register/page.tsx
+// app/register/page.tsx
 // Registration page — Server Component shell + Client Component form
 
 import { auth } from "@/auth";
@@ -66,7 +66,7 @@ export default async function RegisterPage() {
         {/* Social sign-in link */}
         <div className="text-center">
           <Link
-            href="/auth/signin"
+            href="/login"
             className="text-xs hover:underline text-[var(--text-muted)]"
           >
             Prefer Google or Facebook?{" "}

@@ -162,3 +162,45 @@ export async function getCachedTrendingPerfumes(take = 5, days = 7) {
 export async function getTrendingPerfumes(take = 5, days = 7) {
   return getCachedTrendingPerfumes(take, days);
 }
+
+// ── Omnibar (Global Command-Palette Search) ───────────────────────────────────
+export async function getOmnibarResults(query: string) {
+  if (!query || query.length < 2) return { perfumes: [], users: [] };
+
+  try {
+    const [perfumes, users] = await Promise.all([
+      prisma.perfume.findMany({
+        where: {
+          OR: [
+            { name: { contains: query } },
+            { brand: { contains: query } },
+          ],
+        },
+        take: 5,
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          brand: true,
+          image_url: true,
+          transparentImageUrl: true,
+        },
+      }),
+      prisma.user.findMany({
+        where: {
+          OR: [
+            { name: { contains: query } },
+            { email: { contains: query } },
+          ],
+        },
+        take: 3,
+        select: { id: true, name: true, image: true },
+      }),
+    ]);
+
+    return { perfumes, users };
+  } catch (error) {
+    console.error("Omnibar search error:", error);
+    return { perfumes: [], users: [] };
+  }
+}

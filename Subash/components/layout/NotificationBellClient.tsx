@@ -13,7 +13,7 @@ type NotificationItem = {
   title: string;
   body: string;
   link: string | null;
-  read: boolean;
+  isRead: boolean;
   createdAt: string;
 };
 
@@ -61,9 +61,9 @@ export function NotificationBellClient() {
 
   function handleNotificationClick(n: NotificationItem) {
     startTransition(async () => {
-      if (!n.read) {
+      if (!n.isRead) {
         await markNotificationRead(n.id);
-        setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+        setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, isRead: true } : x)));
         setUnreadCount((c) => Math.max(0, c - 1));
       }
       setOpen(false);
@@ -74,7 +74,7 @@ export function NotificationBellClient() {
   function handleMarkAll() {
     startTransition(async () => {
       await markAllNotificationsRead();
-      setNotifications((prev) => prev.map((x) => ({ ...x, read: true })));
+      setNotifications((prev) => prev.map((x) => ({ ...x, isRead: true })));
       setUnreadCount(0);
     });
   }
@@ -146,7 +146,7 @@ export function NotificationBellClient() {
                   <button
                     key={n.id}
                     onClick={() => handleNotificationClick(n)}
-                    className={`w-full flex items-start gap-2 px-3 py-2.5 text-left text-xs transition-colors hover:bg-[var(--surface-2)] ${n.read ? "opacity-70" : "bg-[var(--surface-2)]/60"}`}
+                    className={`w-full flex items-start gap-2 px-3 py-2.5 text-left text-xs transition-colors hover:bg-[var(--surface-2)] ${n.isRead ? "opacity-70" : "bg-[var(--surface-2)]/60"}`}
                   >
                     <div className="mt-0.5 text-base">
                       {ICON_FOR_TYPE[n.type] ?? "🔔"}
@@ -172,3 +172,4 @@ export function NotificationBellClient() {
     </div>
   );
 }
+

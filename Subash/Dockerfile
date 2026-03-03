@@ -30,7 +30,7 @@ RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="file:./subash.db"
 ENV AUTH_SECRET=build-time-dummy-secret-not-used-at-runtime
-ENV AUTH_URL=http://localhost:3000
+ENV AUTH_URL=http://localhost:9864
 ENV GOOGLE_CLIENT_ID=build-dummy
 ENV GOOGLE_CLIENT_SECRET=build-dummy
 ENV FACEBOOK_CLIENT_ID=build-dummy
@@ -87,8 +87,8 @@ RUN chown -R nextjs:nodejs /app/scripts /app/prisma
 
 USER nextjs
 
-EXPOSE 3000
-ENV PORT=3000
+EXPOSE 9864
+ENV PORT=9864
 ENV HOSTNAME="0.0.0.0"
 # CSV_DIR tells seed.js where to find the CSV files inside the image
 ENV CSV_DIR=/app/prisma

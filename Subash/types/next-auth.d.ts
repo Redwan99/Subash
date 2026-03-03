@@ -3,8 +3,6 @@
 // to include Subash-specific fields (role, review_count, etc.)
 
 import type { DefaultSession } from "next-auth";
-import type { JWT } from "next-auth/jwt";
-
 declare module "next-auth" {
   /**
    * Extend Session.user with Subash-specific fields

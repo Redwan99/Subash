@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 // app/admin/AdminDashboardClient.tsx
 // Phase 9 — Pro Max Glassmorphism Admin Dashboard Client Component
 
@@ -13,6 +13,7 @@ import {
 import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus } from "@/lib/actions/admin";
 import type { Role, FeatureToggle } from "@prisma/client";
 import { CsvImporter } from "@/components/admin/CsvImporter";
+import BulkImporter from "@/components/admin/BulkImporter";
 import type { ReviewStatus, AdminReview as Review, AdminUser, BrandClaim, AuditLog } from "./types";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -284,6 +285,7 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                                         <select
                                             value={user.role}
                                             disabled={pending}
+                                            aria-label={`Change role for ${user.name ?? user.email}`}
                                             onChange={(e) => handleRoleChange(user.id, e.target.value as Role)}
                                             className="appearance-none text-xs font-semibold px-3 py-1.5 pr-7 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] text-white outline-none cursor-pointer hover:border-[rgba(139,92,246,0.4)] disabled:opacity-40 transition-all"
                                         >
@@ -417,23 +419,21 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
     };
 
     return (
-        <div className="min-h-screen text-white"
-            style={{ background: "linear-gradient(135deg, #08051A 0%, #0D0A26 40%, #100C30 100%)" }}>
+        <div className="min-h-screen bg-gray-50 dark:bg-[#050505] text-gray-900 dark:text-white">
 
             {/* Ambient orbs */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-20%] left-[-10%] w-[55vw] h-[55vw] rounded-full opacity-20"
-                    style={{ background: "radial-gradient(circle, #7C3AED 0%, transparent 70%)", filter: "blur(100px)" }} />
+                    style={{ background: "radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)", filter: "blur(100px)" }} />
                 <div className="absolute bottom-[-20%] right-[-10%] w-[45vw] h-[45vw] rounded-full opacity-15"
-                    style={{ background: "radial-gradient(circle, #2563EB 0%, transparent 70%)", filter: "blur(80px)" }} />
+                    style={{ background: "radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%)", filter: "blur(80px)" }} />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                            style={{ background: "linear-gradient(135deg, #7C3AED, #A78BFA)" }}>
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-brand-500 shadow-md shadow-brand-500/20">
                             <Crown size={18} className="text-white" />
                         </div>
                         <div>
@@ -453,7 +453,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     {tabs.map(({ id, label, icon }) => (
                         <button key={id} onClick={() => setTab(id)}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${tab === id
-                                ? "bg-[rgba(139,92,246,0.25)] text-[#C4B5FD] border border-[rgba(139,92,246,0.35)] shadow-[0_0_16px_rgba(139,92,246,0.2)]"
+                                ? "bg-brand-500/20 text-brand-500 border border-brand-500/30 shadow-[0_0_16px_rgba(16,185,129,0.2)]"
                                 : "text-[rgba(255,255,255,0.4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
                                 }`}>
                             {icon} {label}
@@ -583,7 +583,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                                     <button
                                         onClick={() => handleToggle(feature.key)}
                                         disabled={isUpdating}
-                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${toggles[feature.key] ? 'bg-[#34D399]' : 'bg-[rgba(255,255,255,0.15)]'}`}
+                                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50 ${toggles[feature.key] ? 'bg-brand-500' : 'bg-gray-600'}`}
                                     >
                                         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${toggles[feature.key] ? 'translate-x-6' : 'translate-x-1'}`} />
                                     </button>
@@ -635,8 +635,9 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
 
                 {/* ── Import Data Tab ── */}
                 {tab === "import" && (
-                    <div className="max-w-3xl mx-auto">
+                    <div className="max-w-3xl mx-auto space-y-8">
                         <CsvImporter />
+                        <BulkImporter />
                     </div>
                 )}
             </div>

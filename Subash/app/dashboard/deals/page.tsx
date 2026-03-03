@@ -30,7 +30,7 @@ type DealRow = {
 
 export default async function DealsPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/auth/signin?callbackUrl=/dashboard/deals");
+  if (!session?.user?.id) redirect("/login?callbackUrl=/dashboard/deals");
 
   const role = session.user.role;
   if (role !== "SELLER" && role !== "SUPER_ADMIN") redirect("/");

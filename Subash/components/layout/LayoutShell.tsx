@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 // components/layout/LayoutShell.tsx
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -8,7 +8,7 @@ import { BottomNav } from "./BottomNav";
 import { WeatherThemeProvider } from "./WeatherThemeProvider";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 
-const AUTH_ROUTES = ["/auth/signin", "/auth/register", "/auth/verify-phone", "/auth/error"];
+const AUTH_ROUTES = ["/login", "/register", "/verify-phone", "/forgot-password", "/login/error"];
 
 function isAuthRoute(pathname: string) {
   return AUTH_ROUTES.some((route) => pathname.startsWith(route));

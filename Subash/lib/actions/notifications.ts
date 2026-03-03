@@ -15,7 +15,7 @@ export async function markNotificationRead(
 
   await prisma.notification.updateMany({
     where: { id: notificationId, userId: session.user.id },
-    data:  { read: true },
+    data:  { isRead: true },
   });
 
   revalidatePath("/"); // Let LayoutShell refresh
@@ -28,8 +28,8 @@ export async function markAllNotificationsRead(): Promise<{ success: boolean }> 
   if (!session?.user?.id) return { success: false };
 
   await prisma.notification.updateMany({
-    where: { userId: session.user.id, read: false },
-    data:  { read: true },
+    where: { userId: session.user.id, isRead: false },
+    data:  { isRead: true },
   });
 
   revalidatePath("/");

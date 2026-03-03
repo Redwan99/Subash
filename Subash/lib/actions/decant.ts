@@ -86,15 +86,15 @@ export type WardrobeActionState = {
 
 export async function upsertWardrobeItem(
   perfumeId: string,
-  shelf: WardrobeShelf
+  listType: WardrobeShelf
 ): Promise<WardrobeActionState> {
   const session = await auth();
   if (!session?.user?.id) return { success: false, error: "Sign in required." };
 
   await prisma.wardrobeItem.upsert({
     where: { userId_perfumeId: { userId: session.user.id, perfumeId } },
-    update: { shelf },
-    create: { userId: session.user.id, perfumeId, shelf },
+    update: { shelf: listType },
+    create: { userId: session.user.id, perfumeId, shelf: listType },
   });
 
   revalidatePath(`/user/${session.user.id}`);

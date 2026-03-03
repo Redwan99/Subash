@@ -1,8 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
 import { getCachedTrendingPerfumes } from "@/lib/actions/search";
+import { getFollowingFeed } from "@/lib/actions/feed";
+import { auth } from "@/auth";
+import { HomeFeedSection } from "@/components/home/HomeFeedSection";
 import { ClimateSection } from "@/components/ClimateSection";
 import { LiveReviewFeed, type LiveReview } from "@/components/feed/LiveReviewFeed";
 import { SmartSearch } from "@/components/ui/SmartSearch";
@@ -183,10 +185,13 @@ export default async function HomePage() {
   // ⚡ Fan out: weather + trending + reviews all start at the same time.
   // climatePicks depends on weather tags — it starts after weather resolves,
   // but by then trending and reviews are already in flight.
-  const [weather, trending, latestReviews] = await Promise.all([
-    getWeather(city),
-    getCachedTrendingPerfumes(12, 7),
-    getLatestReviews(),
+
+  const [weather, trending, latestReviews, session, followingFeed] = await Promise.all([
+      getWeather(city),
+      getCachedTrendingPerfumes(12, 7),
+      getLatestReviews(),
+      auth(),
+      getFollowingFeed(),
   ]);
 
   // Trending can contain nulls if a perfume was deleted between stats fetch and hydration; guard them out.
@@ -268,61 +273,7 @@ export default async function HomePage() {
 
       {/* Trending + Latest Reviews Feed */}
       <section className="w-full mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-display font-semibold text-[var(--text-primary)]">
-              Trending This Week
-            </h2>
-            <Link href="/leaderboards" className="text-xs text-[var(--accent)]">
-              View Leaderboards →
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 w-full">
-            {trendingPerfumes.map((p, index) => {
-              const weekly = p.weeklySearchCount ?? 0;
-              const hasTraffic = weekly > 0;
-
-              const imageSrc = p.transparentImageUrl || p.image_url || "/placeholder-perfume.jpg";
-
-              return (
-                <Link
-                  key={p.id}
-                  href={`/perfume/${p.slug}`}
-                  className="flex flex-col gpu-accelerate bg-white/5 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 group"
-                >
-                  <div className="relative w-full aspect-square sm:aspect-[4/5] bg-gradient-to-b from-gray-50/50 to-transparent dark:from-white/5 dark:to-transparent p-3 sm:p-5 flex items-center justify-center">
-                    <Image
-                      src={imageSrc}
-                      alt={p.name}
-                      fill
-                      className="object-contain p-4 drop-shadow-xl group-hover:scale-110 transition-transform duration-700 ease-out"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                  </div>
-
-                  <div className="p-3 sm:p-4 flex flex-col gap-0.5 border-t border-gray-100 dark:border-white/5 bg-white dark:bg-transparent">
-                    <h3 className="font-bold text-gray-900 dark:text-white text-sm sm:text-base line-clamp-1 group-hover:text-brand-500 transition-colors">
-                      {p.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
-                      {p.brand}
-                    </p>
-                    <div className="mt-1.5 flex items-center gap-1.5">
-                      <span className="text-[10px] sm:text-xs font-medium text-brand-500 bg-brand-500/10 px-2 py-0.5 rounded-md truncate">
-                        🔥 Trending · #{index + 1}
-                      </span>
-                      {hasTraffic && (
-                        <span className="text-[10px] text-gray-500 dark:text-gray-400 truncate">
-                          {weekly} searches
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
+        <HomeFeedSection trendingPerfumes={trendingPerfumes} followingFeed={followingFeed} hasUser={!!session?.user?.id} />
 
         <div className="space-y-4">
           {/* Live Feed — SWR polls /api/reviews every 5 s */}
@@ -332,3 +283,4 @@ export default async function HomePage() {
     </main>
   );
 }
+

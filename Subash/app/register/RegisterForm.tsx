@@ -1,5 +1,5 @@
-﻿"use client";
-// app/auth/register/RegisterForm.tsx
+"use client";
+// app/register/RegisterForm.tsx
 // Client Component — handles the registration form state, validation feedback,
 // and the useFormState / useFormStatus hooks for progressive enhancement.
 
@@ -96,7 +96,7 @@ export function RegisterForm() {
   // Redirect to sign-in on success
   useEffect(() => {
     if (state?.success) {
-      const t = setTimeout(() => router.push("/auth/signin?registered=1"), 1500);
+      const t = setTimeout(() => router.push("/login?registered=1"), 1500);
       return () => clearTimeout(t);
     }
   }, [state, router]);
@@ -144,7 +144,7 @@ export function RegisterForm() {
       <p className="text-center text-xs text-[var(--text-muted)]">
         Already have an account?{" "}
         <Link
-          href="/auth/signin"
+          href="/login"
           className="font-semibold hover:underline text-[var(--accent)]"
         >
           Sign in

@@ -7,9 +7,10 @@ import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Star, Edit, Trophy, Calendar, Sunrise, Sun, Sunset, Moon, Clock } from "lucide-react";
+import { Star, Edit, Trophy, Calendar, Sunrise, Sun, Sunset, Moon, Clock, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WardrobePanel } from "@/components/wardrobe/WardrobePanel";
+import { FollowButton } from "@/components/ui/FollowButton";
 import type { WardrobePerfume } from "@/types/wardrobe";
 import type { Metadata } from "next";
 
@@ -84,6 +85,8 @@ export default async function UserProfilePage({
         review_count: true,
         phoneVerified: true,
         createdAt: true,
+        followers: { select: { followerId: true } },
+        following: { select: { followingId: true } },
         wearingStatus: {
           include: { perfume: { select: { id: true, name: true, brand: true, image_url: true, slug: true } } },
         },
@@ -109,7 +112,7 @@ export default async function UserProfilePage({
       where: { userId: id },
       orderBy: { createdAt: "desc" },
       include: {
-        perfume: { select: { id: true, name: true, brand: true, image_url: true, slug: true } },
+        perfume: true,
       },
     }),
   ]);
@@ -120,21 +123,31 @@ export default async function UserProfilePage({
     HAVE: [], HAD: [], WANT: [], SIGNATURE: [],
   };
   for (const item of wardrobeItems) {
-    const shelf = item.shelf as string;
-    if (!grouped[shelf]) grouped[shelf] = [];
-    grouped[shelf].push({
+    const listType = item.shelf as string;
+    if (!grouped[listType]) grouped[listType] = [];
+    grouped[listType].push({
       id: item.perfume.id,
       name: item.perfume.name,
       brand: item.perfume.brand,
       image_url: item.perfume.image_url,
       slug: item.perfume.slug,
-      shelf,
+      shelf: listType,
     });
   }
+
+  const wardrobeByType: Record<"HAVE" | "WANT" | "HAD", typeof wardrobeItems> = {
+    HAVE: wardrobeItems.filter((item) => item.shelf === "HAVE"),
+    WANT: wardrobeItems.filter((item) => item.shelf === "WANT"),
+    HAD: wardrobeItems.filter((item) => item.shelf === "HAD"),
+  };
 
   const badge = getBadge(user.review_count);
   const totalWardrobe = Object.values(grouped).reduce((s, a) => s + a.length, 0);
   const status = user.wearingStatus;
+  
+  const isFollowing = session?.user?.id 
+    ? user.followers.some(f => f.followerId === session.user?.id)
+    : false;
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
@@ -223,11 +236,24 @@ export default async function UserProfilePage({
                     <Edit size={12} /> Edit Profile
                   </Link>
                 )}
+                {!isOwner && session?.user?.id && (
+                  <div className="shrink-0">
+                    <FollowButton targetUserId={user.id} initialFollowing={isFollowing} />
+                  </div>
+                )}
               </div>
               {user.bio && (
                 <p className="text-sm mt-2 text-[var(--text-secondary)]">{user.bio}</p>
               )}
-              <div className="flex items-center gap-5 mt-3">
+              <div className="flex items-center flex-wrap gap-x-5 gap-y-2 mt-3">
+                <div className="flex items-center gap-1.5">
+                  <Users size={13} className="text-[#3B82F6]" />
+                  <span className="text-sm font-bold text-[var(--text-primary)]">{user.followers.length}</span>
+                  <span className="text-xs text-[var(--text-muted)]">followers</span>
+                  <span className="text-xs text-[var(--border-color)] mx-1">•</span>
+                  <span className="text-sm font-bold text-[var(--text-primary)]">{user.following.length}</span>
+                  <span className="text-xs text-[var(--text-muted)]">following</span>
+                </div>
                 <div className="flex items-center gap-1.5">
                   <Star size={13} className="text-[#F59E0B]" />
                   <span className="text-sm font-bold text-[var(--text-primary)]">{user.review_count}</span>
@@ -249,6 +275,53 @@ export default async function UserProfilePage({
         </div>
 
         {/* ─── Wardrobe ──────────────────────────────────────── */}
+        <section className="rounded-2xl p-5 bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] space-y-4">
+          <div>
+            <h2 className="text-base font-bold text-[var(--text-primary)]">Fragrance Wardrobe</h2>
+            <p className="text-xs text-[var(--text-muted)]">Your scent shelves at a glance.</p>
+          </div>
+
+          {([
+            ["HAVE", "I Have It"],
+            ["WANT", "I Want It"],
+            ["HAD", "I Had It"],
+          ] as const).map(([listType, title]) => (
+            <div key={listType} className="space-y-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+                {title} ({wardrobeByType[listType].length})
+              </h3>
+
+              {wardrobeByType[listType].length === 0 ? (
+                <div className="text-xs text-[var(--text-muted)]">No perfumes yet.</div>
+              ) : (
+                <div className="flex gap-3 overflow-x-auto pb-1">
+                  {wardrobeByType[listType].map((item) => {
+                    const imageUrl = item.perfume.transparentImageUrl || item.perfume.image_url;
+                    return (
+                      <Link
+                        key={item.id}
+                        href={`/perfume/${item.perfume.slug}`}
+                        className="w-20 h-20 shrink-0 bg-white/5 rounded-xl p-2 hover:scale-110 transition-transform border border-white/10 backdrop-blur-lg flex items-center justify-center"
+                      >
+                        {imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={imageUrl}
+                            alt={item.perfume.name}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-2xl">🧴</span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </section>
+
         <section>
           <WardrobePanel grouped={grouped} isOwner={isOwner} userId={id} />
         </section>

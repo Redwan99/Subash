@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 9864",
     "build": "prisma db push --accept-data-loss && prisma generate && next build",
-    "start": "next start",
+    "start": "next start -p 9864",
     "start:prod": "node .next/standalone/server.js",
     "lint": "next lint",
     "db:generate": "prisma generate",
@@ -13,6 +13,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "import-csv": "ts-node --project tsconfig.scripts.json prisma/import-csv.ts",
+    "import-perfumes": "ts-node --project tsconfig.scripts.json prisma/import-perfumes.ts",
     "fix-images": "ts-node --project tsconfig.scripts.json prisma/fix-images.ts",
     "clean": "ts-node --project tsconfig.scripts.json prisma/clean.ts"
   },

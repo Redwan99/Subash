@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import sharp from "sharp";
 import { join } from "path";
-import { writeFile, mkdir } from "fs/promises";
+import { mkdir } from "fs/promises";
 import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {

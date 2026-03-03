@@ -5,7 +5,6 @@
 
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
-import type { DupeVoteData } from "@/components/perfume/DupeEngine";
 
 const Skeleton = ({ h }: { h: string }) => (
   <div className={`${h} rounded-2xl animate-pulse bg-[var(--bg-glass)]`} />
@@ -43,7 +42,8 @@ export function PerfumeInteractive({
   avgLongevity: number;
   avgSillage: number;
   reviewCount: number;
-  initialDupes: DupeVoteData[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialDupes: any[];
 }) {
   const shouldReduceMotion = useReducedMotion();
 
@@ -85,7 +85,7 @@ export function PerfumeInteractive({
         />
       </motion.div>
       <motion.div variants={item}>
-        <DupeEngine perfumeId={perfumeId} initialDupes={initialDupes} />
+        <DupeEngine targetPerfumeId={perfumeId} existingDupes={initialDupes} />
       </motion.div>
     </motion.div>
   );

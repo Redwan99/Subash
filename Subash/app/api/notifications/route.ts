@@ -21,12 +21,12 @@ export async function GET() {
       type:      true,
       message:   true,
       link:      true,
-      read:      true,
+      isRead:    true,
       createdAt: true,
     },
   });
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return NextResponse.json(
     { notifications, unreadCount },

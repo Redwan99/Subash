@@ -1,5 +1,5 @@
-﻿"use client";
-// app/auth/signin/CredentialsForm.tsx
+"use client";
+// app/login/CredentialsForm.tsx
 // Client Component — email/password sign-in form
 // Uses signIn("credentials") from next-auth/react (client-side call)
 
@@ -73,8 +73,8 @@ export function CredentialsForm({ callbackUrl = "/" }: Props) {
         disabled={pending}
         className={
           pending
-            ? "w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-color)]"
-            : "w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)] text-white border border-[var(--border-color)]"
+            ? "w-full py-3 px-4 rounded-xl text-sm transition-all duration-200 opacity-60 cursor-not-allowed bg-[var(--bg-surface)] text-[var(--text-muted)] border border-[var(--border-color)]"
+            : "w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-white dark:text-black font-semibold shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40 transition-all active:scale-[0.98]"
         }
       >
         {pending ? "Signing in…" : "Sign in with Email"}
@@ -82,13 +82,15 @@ export function CredentialsForm({ callbackUrl = "/" }: Props) {
 
       <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
         <Link
-          href="/auth/register"
+          href="/register"
           className="hover:underline text-[var(--accent)]"
         >
           Create account
         </Link>
         <span>·</span>
-        <span>Forgot password? (coming soon)</span>
+        <Link href="/forgot-password" className="hover:underline text-[var(--accent)]">
+          Forgot password?
+        </Link>
       </div>
     </form>
   );

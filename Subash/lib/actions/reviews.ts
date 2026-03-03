@@ -40,7 +40,7 @@ async function syncReputation(userId: string) {
  */
 export async function addToWardrobe(
     perfumeId: string,
-    shelf: "HAVE" | "HAD" | "WANT" | "SIGNATURE" = "HAVE"
+    listType: "HAVE" | "HAD" | "WANT" | "SIGNATURE" = "HAVE"
 ): Promise<{ success: boolean; error?: string; reputationScore?: number }> {
     const session = await auth();
     if (!session?.user?.id) {
@@ -51,8 +51,8 @@ export async function addToWardrobe(
     try {
         await prisma.wardrobeItem.upsert({
             where: { userId_perfumeId: { userId, perfumeId } },
-            update: { shelf },
-            create: { userId, perfumeId, shelf },
+            update: { shelf: listType },
+            create: { userId, perfumeId, shelf: listType },
         });
 
         const reputationScore = await syncReputation(userId);
@@ -74,13 +74,13 @@ export async function addToWardrobe(
 // ── Check if current user owns a perfume ────────────────────────────────────
 export async function checkWardrobeStatus(
     perfumeId: string
-): Promise<{ shelf: string | null }> {
+): Promise<{ listType: string | null }> {
     const session = await auth();
-    if (!session?.user?.id) return { shelf: null };
+    if (!session?.user?.id) return { listType: null };
 
     const item = await prisma.wardrobeItem.findUnique({
         where: { userId_perfumeId: { userId: session.user.id, perfumeId } },
         select: { shelf: true },
     });
-    return { shelf: item?.shelf ?? null };
+    return { listType: item?.shelf ?? null };
 }

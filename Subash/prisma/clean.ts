@@ -23,10 +23,6 @@ async function main() {
   const { count: wi } = await prisma.wardrobeItem.deleteMany({});
   console.log(`   ↳ ${wi} wardrobe items deleted`);
 
-  console.log("🗑  Deleting Fragram likes…");
-  const { count: fl } = await prisma.fragramLike.deleteMany({});
-  console.log(`   ↳ ${fl} fragram likes deleted`);
-
   console.log("🗑  Deleting Fragram posts…");
   const { count: fp } = await prisma.fragramPost.deleteMany({});
   console.log(`   ↳ ${fp} fragram posts deleted`);

@@ -36,15 +36,15 @@ async function getWardrobe(userId: string): Promise<Record<string, WardrobePerfu
   };
 
   for (const item of items) {
-    const shelf = item.shelf as string;
-    if (!grouped[shelf]) grouped[shelf] = [];
-    grouped[shelf].push({
+    const listType = item.shelf as string;
+    if (!grouped[listType]) grouped[listType] = [];
+    grouped[listType].push({
       id: item.perfume.id,
       name: item.perfume.name,
       brand: item.perfume.brand,
       image_url: item.perfume.image_url,
       slug: item.perfume.slug,
-      shelf,
+      shelf: listType,
     });
   }
 
@@ -57,7 +57,7 @@ export default async function WardrobePage() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    redirect("/auth/signin?callbackUrl=/wardrobe");
+    redirect("/login?callbackUrl=/wardrobe");
   }
 
   const userId = session.user.id;

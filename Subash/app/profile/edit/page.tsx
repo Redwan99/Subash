@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Edit Profile" };
 
 export default async function ProfileEditPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/auth/signin?callbackUrl=/profile/edit");
+  if (!session?.user?.id) redirect("/login?callbackUrl=/profile/edit");
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -87,7 +87,7 @@ export default async function ProfileEditPage() {
                     Verify your Bangladeshi phone number (+880) to unlock the Decant Marketplace.
                   </p>
                   <Link
-                    href="/auth/verify-phone"
+                    href="/verify-phone"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_4px_12px_rgba(139,92,246,0.3)]"
                   >
                     <Phone size={13} /> Verify Now
