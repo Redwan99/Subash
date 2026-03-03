@@ -1,88 +1,100 @@
-# =============================================
-#  Subash — Docker Compose
-#  Services: PostgreSQL (db) + Next.js (web)
-#
-#  CasaOS (SSH):     docker compose up -d --build
-#  First boot seed:  SEED_DB=true in .env → auto-imports all 70k perfumes
-#  After seeding:    set SEED_DB=false (or remove it) to skip re-seeding
-# =============================================
+﻿name: subash
 
 services:
   # ------------------------------------------
-  #  PostgreSQL Database
-  # ------------------------------------------
-  db:
-    image: postgres:16-alpine
-    container_name: subash_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-subash_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-strong_password}
-      POSTGRES_DB: ${POSTGRES_DB:-subash_db}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U subash_user -d subash_db" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ------------------------------------------
-  #  Next.js Web Application
+  #  Next.js Web Application (SQLite — no separate DB service)
   # ------------------------------------------
   web:
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
-    # image: subash:latest
-    image: ghcr.io/redwan002117/subash:latest
+    image: ghcr.io/redwan99/subash:latest
     container_name: subash_web
     restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
+    hostname: subash_web
+    privileged: false
+    cpu_shares: 90
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    ports:
+      - mode: ingress
+        target: 9864
+        published: "${APP_PORT:-9864}"
+        protocol: tcp
+      # Prisma Studio — only active when you run it manually inside the container:
+      #   docker exec -it subash_web npx prisma studio --port 5555 --browser none
+      # Then open http://<casaos-ip>:5555 in your browser.
+      - mode: ingress
+        target: 5555
+        published: "${PRISMA_STUDIO_PORT:-5555}"
+        protocol: tcp
+    volumes:
+      # SQLite database — persisted on the CasaOS host disk across updates/restarts
+      # DATA_DIR defaults to the standard CasaOS path; override in .env if needed.
+      - type: bind
+        source: ${DATA_DIR:-/DATA/AppData/subash/data}
+        target: /app/data
+    devices: []
+    cap_add: []
+    command: []
+    networks:
+      - default
     environment:
-      # NOTE: Use db:5432 (service name) — NOT localhost:5432
-      DATABASE_URL: postgresql://${POSTGRES_USER:-subash_user}:${POSTGRES_PASSWORD:-strong_password}@db:5432/${POSTGRES_DB:-subash_db}?schema=public
+      # --- Database (SQLite) ------------------------------------------
+      # Set in .env: DATABASE_URL=file:/app/data/subash.db
+      # entrypoint.sh creates the file if missing; Prisma reads this at runtime.
+      DATABASE_URL: ${DATABASE_URL:-file:/app/data/subash.db}
+
+      # --- Seeding ----------------------------------------------------
+      # Set to "true" on FIRST boot to import all ~70k perfumes (~3-5 min).
+      # Set to "false" (or remove) after seeding so restarts are fast.
+      SEED_DB: ${SEED_DB:-false}
+
+      # --- Auth -------------------------------------------------------
       AUTH_SECRET: ${AUTH_SECRET}
       AUTH_URL: ${AUTH_URL}
+
+      # --- OAuth ------------------------------------------------------
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       FACEBOOK_CLIENT_ID: ${FACEBOOK_CLIENT_ID}
       FACEBOOK_CLIENT_SECRET: ${FACEBOOK_CLIENT_SECRET}
+
+      # --- App config -------------------------------------------------
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       NEXT_PUBLIC_DEFAULT_CITY: ${NEXT_PUBLIC_DEFAULT_CITY}
       OPENWEATHERMAP_API_KEY: ${OPENWEATHERMAP_API_KEY}
+
+      # --- Firebase ---------------------------------------------------
       NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY}
       NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
       NEXT_PUBLIC_FIREBASE_APP_ID: ${NEXT_PUBLIC_FIREBASE_APP_ID}
-      # ——— Seeding ———————————————————————————————
-      # Set to "true" on FIRST boot only — imports all ~70k perfumes from the
-      # bundled CSVs. After the seed is done, set to "false" (or remove) so
-      # subsequent restarts don’t re-check the DB on every boot.
-      SEED_DB: ${SEED_DB:-false}
-    ports:
-      - "9864:9864"
 
-volumes:
-  postgres_data:
-    driver: local
+networks:
+  default:
+    name: subash_default
 
+# ------------------------------------------
+#  CasaOS App Store Metadata
+# ------------------------------------------
 x-casaos:
   architectures:
     - amd64
     - arm64
   main: web
+  scheme: http
+  index: /
+  hostname: ""
   description:
-    en_us: Subash is an open-source clone of Fragrantica/Parfumo, with Next.js and PostgreSQL.
+    en_us: Subash is an open-source clone of Fragrantica/Parfumo, powered by Next.js and SQLite.
   tagline:
     en_us: Open-source perfume database and community.
-  developer: "Redwan002117"
-  author: "Redwan002117"
-  icon: https://raw.githubusercontent.com/Redwan002117/Subash/main/public/favicon.ico
-  thumbnail: https://raw.githubusercontent.com/Redwan002117/Subash/main/public/og-image.png
+  developer: Redwan Rashid
+  author: Redwan Rashid
+  icon: https://raw.githubusercontent.com/Redwan99/Subash/main/public/favicon.ico
+  thumbnail: https://raw.githubusercontent.com/Redwan99/Subash/main/public/og-image.png
   title:
     en_us: Subash
+    custom: ""
   category: Web
   port_map: "9864"

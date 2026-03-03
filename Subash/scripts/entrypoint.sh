@@ -54,6 +54,6 @@ fi
 
 # ── 4. Start Next.js ─────────────────────────────────────────────────────────
 echo ""
-echo "🚀  Starting Subash on port ${PORT:-3000}..."
+echo "🚀  Starting Subash on port ${PORT:-9864}..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 exec node server.js

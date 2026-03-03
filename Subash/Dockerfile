@@ -48,18 +48,17 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL="file:./subash.db"
+# Runtime default — overridden by docker-compose DATABASE_URL env var.
+# Points to the bind-mounted volume so SQLite survives container updates.
+ENV DATABASE_URL="file:/app/data/subash.db"
 
-# Create a non-root user for security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser  --system --uid 1001 nextjs
-
-# Create scripts directory
-RUN mkdir -p /app/scripts
+# Create scripts and data directories
+# /app/data is the bind-mount target for the persistent SQLite file.
+RUN mkdir -p /app/scripts /app/data
 
 # Copy the standalone build output
 COPY --from=builder /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
 # Copy entire node_modules to ensure all Prisma dependencies are available
@@ -75,17 +74,14 @@ COPY --from=builder /app/.ts-out/import-csv.js ./scripts/seed.js
 COPY --from=builder /app/prisma/fra_perfumes.csv ./prisma/fra_perfumes.csv
 COPY --from=builder /app/prisma/fra_cleaned.csv  ./prisma/fra_cleaned.csv
 
-# Entrypoint: migrate → conditional seed → start
+# Entrypoint: schema sync → conditional seed → start
 COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh
 RUN chmod +x /app/scripts/entrypoint.sh
 
-# Create and set permissions for .next/cache so nextjs user can write to it
-RUN mkdir -p /app/.next/cache && chown -R nextjs:nodejs /app/.next
-
-# Fix permissions for scripts and prisma directories
-RUN chown -R nextjs:nodejs /app/scripts /app/prisma
-
-USER nextjs
+# Create .next/cache; ensure /app/data is writable at runtime.
+# Running as root so the bind-mounted /app/data (which Docker creates as
+# root on the CasaOS host) is always writable.
+RUN mkdir -p /app/.next/cache
 
 EXPOSE 9864
 ENV PORT=9864
