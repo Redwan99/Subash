@@ -34,7 +34,7 @@ export default async function ProfileEditPage() {
 
         {/* ─── Avatar + Name display ─────────────────────────────── */}
         <div className="flex items-center gap-4 p-5 rounded-2xl bg-[var(--bg-glass)] border border-[var(--bg-glass-border)]">
-          <div className="shrink-0 w-14 h-14 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg text-white bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)]">
+          <div className="shrink-0 w-14 h-14 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg text-white bg-[linear-gradient(135deg,#E84393,#C2255C)]">
             {user.image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={user.image} alt={user.name ?? "Avatar"} className="w-full h-full object-cover" />
@@ -70,7 +70,7 @@ export default async function ProfileEditPage() {
           <div className="rounded-2xl p-5 bg-[var(--bg-glass)] border border-[var(--bg-glass-border)]">
             {user.phoneVerified && user.phone ? (
               <div className="flex items-center gap-3">
-                <CheckCircle size={18} className="shrink-0 text-[#34D399]" />
+                <CheckCircle size={18} className="shrink-0 text-[#F783AC]" />
                 <div>
                   <p className="text-sm font-semibold text-[var(--text-primary)]">Phone verified</p>
                   <p className="text-xs text-[var(--text-muted)]">{user.phone}</p>
@@ -88,7 +88,7 @@ export default async function ProfileEditPage() {
                   </p>
                   <Link
                     href="/verify-phone"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_4px_12px_rgba(139,92,246,0.3)]"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#E84393,#F783AC)] shadow-[0_4px_12px_rgba(232,67,147,0.3)]"
                   >
                     <Phone size={13} /> Verify Now
                   </Link>

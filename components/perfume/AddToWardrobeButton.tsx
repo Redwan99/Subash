@@ -18,7 +18,7 @@ const SHELF_LABELS: Record<Shelf, string> = {
 };
 
 const SHELF_COLORS: Record<Shelf, string> = {
-    HAVE: "text-[#10B981]",
+    HAVE: "text-[#E84393]",
     HAD: "text-[#60A5FA]",
     WANT: "text-[#F59E0B]",
     SIGNATURE: "text-[var(--accent)]",
@@ -53,8 +53,8 @@ export function AddToWardrobeButton({
                 disabled={isPending}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all border
           ${shelf
-                        ? "bg-[rgba(139,92,246,0.12)] border-[rgba(139,92,246,0.3)] text-[var(--accent)]"
-                        : "bg-[var(--bg-glass)] border-[var(--bg-glass-border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[rgba(139,92,246,0.25)]"
+                        ? "bg-[rgba(232,67,147,0.12)] border-[rgba(232,67,147,0.3)] text-[var(--accent)]"
+                        : "bg-[var(--bg-glass)] border-[var(--bg-glass-border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-[rgba(232,67,147,0.25)]"
                     }`}
             >
                 {shelf
@@ -84,7 +84,7 @@ export function AddToWardrobeButton({
                             <button
                                 key={s}
                                 onClick={() => handleSelect(s)}
-                                className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-[rgba(139,92,246,0.08)]
+                                className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-[rgba(232,67,147,0.08)]
                   ${shelf === s ? `font-semibold ${SHELF_COLORS[s]}` : "text-[var(--text-secondary)]"}`}
                             >
                                 {SHELF_LABELS[s]}

@@ -69,8 +69,8 @@ export default async function WardrobePage() {
       <div className="max-w-5xl mx-auto px-4 md:px-6 py-8">
 
         {/* ─── Hero ────────────────────────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-2xl mb-8 px-6 py-8 bg-[linear-gradient(135deg,rgba(139,92,246,0.12)_0%,rgba(109,40,217,0.06)_60%,transparent_100%)] border border-[#8B5CF6]/25">
-          <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(139,92,246,0.2)_0%,transparent_70%)]" />
+        <div className="relative overflow-hidden rounded-2xl mb-8 px-6 py-8 bg-[linear-gradient(135deg,rgba(232,67,147,0.12)_0%,rgba(194,37,92,0.06)_60%,transparent_100%)] border border-[#E84393]/25">
+          <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(232,67,147,0.2)_0%,transparent_70%)]" />
           <div className="relative flex items-center gap-3 mb-2">
             <Archive size={22} className="text-[var(--accent)]" />
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">My Wardrobe</h1>

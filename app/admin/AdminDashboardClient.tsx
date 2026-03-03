@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 // app/admin/AdminDashboardClient.tsx
-// Phase 9 — Pro Max Glassmorphism Admin Dashboard Client Component
+// Phase 9 � Pro Max Glassmorphism Admin Dashboard Client Component
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
@@ -16,7 +16,7 @@ import { CsvImporter } from "@/components/admin/CsvImporter";
 import BulkImporter from "@/components/admin/BulkImporter";
 import type { ReviewStatus, AdminReview as Review, AdminUser, BrandClaim, AuditLog } from "./types";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// -- Types ---------------------------------------------------------------------
 
 type Props = {
     totalUsers: number;
@@ -31,24 +31,24 @@ type Props = {
     brandClaims: BrandClaim[];
 };
 
-// ── Role display helpers ──────────────────────────────────────────────────────
+// -- Role display helpers ------------------------------------------------------
 
 const ROLE_DISPLAY: Record<Role, { label: string; color: string }> = {
     SUPER_ADMIN: { label: "Super Admin", color: "text-[#F59E0B] bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.3)]" },
-    MODERATOR: { label: "Moderator", color: "text-[#A78BFA] bg-[rgba(139,92,246,0.12)] border-[rgba(139,92,246,0.3)]" },
-    SELLER: { label: "Seller", color: "text-[#34D399] bg-[rgba(52,211,153,0.12)] border-[rgba(52,211,153,0.3)]" },
+    MODERATOR: { label: "Moderator", color: "text-[#F783AC] bg-[rgba(232,67,147,0.12)] border-[rgba(232,67,147,0.3)]" },
+    SELLER: { label: "Seller", color: "text-[#F783AC] bg-[rgba(247,131,172,0.12)] border-[rgba(247,131,172,0.3)]" },
     DECANTER: { label: "Decanter", color: "text-[#60A5FA] bg-[rgba(96,165,250,0.12)] border-[rgba(96,165,250,0.3)]" },
     BRAND_PARTNER: { label: "Brand Partner", color: "text-[#EC4899] bg-[rgba(236,72,153,0.12)] border-[rgba(236,72,153,0.3)]" },
     STANDARD: { label: "User", color: "text-[var(--text-muted)] bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.10)]" },
 };
 
 const STATUS_DISPLAY: Record<ReviewStatus, { label: string; color: string; icon: React.ReactNode }> = {
-    APPROVED: { label: "Approved", color: "text-[#34D399] bg-[rgba(52,211,153,0.12)] border-[rgba(52,211,153,0.3)]", icon: <CheckCircle2 size={11} /> },
+    APPROVED: { label: "Approved", color: "text-[#F783AC] bg-[rgba(247,131,172,0.12)] border-[rgba(247,131,172,0.3)]", icon: <CheckCircle2 size={11} /> },
     PENDING: { label: "Pending", color: "text-[#F59E0B] bg-[rgba(245,158,11,0.12)] border-[rgba(245,158,11,0.3)]", icon: <AlertTriangle size={11} /> },
     SPAM: { label: "Spam", color: "text-[#EF4444] bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.3)]", icon: <ShieldAlert size={11} /> },
 };
 
-// ── Metric Card ───────────────────────────────────────────────────────────────
+// -- Metric Card ---------------------------------------------------------------
 
 function MetricCard({ label, value, icon, accent, glow }: {
     label: string; value: number; icon: React.ReactNode;
@@ -73,7 +73,7 @@ function MetricCard({ label, value, icon, accent, glow }: {
     );
 }
 
-// ── Reviews Table ──────────────────────────────────────────────────────────────
+// -- Reviews Table --------------------------------------------------------------
 
 function ReviewsTable({ reviews }: { reviews: Review[] }) {
     const [query, setQuery] = useState("");
@@ -109,8 +109,8 @@ function ReviewsTable({ reviews }: { reviews: Review[] }) {
                 <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by reviewer, perfume, or text…"
-                    className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(139,92,246,0.4)]"
+                    placeholder="Search by reviewer, perfume, or text�"
+                    className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(232,67,147,0.4)]"
                 />
             </div>
 
@@ -136,7 +136,7 @@ function ReviewsTable({ reviews }: { reviews: Review[] }) {
                                         {review.user.image ? (
                                             <Image src={review.user.image} alt="" width={28} height={28} className="rounded-full" />
                                         ) : (
-                                            <div className="w-7 h-7 rounded-full bg-[rgba(139,92,246,0.2)] flex items-center justify-center text-xs text-[#A78BFA] font-bold">
+                                            <div className="w-7 h-7 rounded-full bg-[rgba(232,67,147,0.2)] flex items-center justify-center text-xs text-[#F783AC] font-bold">
                                                 {review.user.name?.[0] ?? "?"}
                                             </div>
                                         )}
@@ -155,7 +155,7 @@ function ReviewsTable({ reviews }: { reviews: Review[] }) {
                                             <p className="text-white font-medium text-[13px] leading-tight line-clamp-1">{review.perfume.name}</p>
                                             <p className="text-[10px] text-[rgba(255,255,255,0.35)]">{review.perfume.brand}</p>
                                         </div>
-                                    ) : <span className="text-[rgba(255,255,255,0.25)]">—</span>}
+                                    ) : <span className="text-[rgba(255,255,255,0.25)]">�</span>}
                                 </td>
                                 {/* Rating */}
                                 <td className="px-4 py-3">
@@ -211,7 +211,7 @@ function ReviewsTable({ reviews }: { reviews: Review[] }) {
     );
 }
 
-// ── Users Table ────────────────────────────────────────────────────────────────
+// -- Users Table ----------------------------------------------------------------
 
 function UsersTable({ users }: { users: AdminUser[] }) {
     const [query, setQuery] = useState("");
@@ -238,8 +238,8 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                 <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by name or email…"
-                    className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(139,92,246,0.4)]"
+                    placeholder="Search by name or email�"
+                    className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(232,67,147,0.4)]"
                 />
             </div>
 
@@ -263,14 +263,14 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                                         {user.image ? (
                                             <Image src={user.image} alt="" width={28} height={28} className="rounded-full" />
                                         ) : (
-                                            <div className="w-7 h-7 rounded-full bg-[rgba(139,92,246,0.2)] flex items-center justify-center text-xs text-[#A78BFA] font-bold">
+                                            <div className="w-7 h-7 rounded-full bg-[rgba(232,67,147,0.2)] flex items-center justify-center text-xs text-[#F783AC] font-bold">
                                                 {user.name?.[0] ?? "?"}
                                             </div>
                                         )}
                                         <p className="text-white font-medium text-[13px] line-clamp-1">{user.name ?? "Anonymous"}</p>
                                     </div>
                                 </td>
-                                <td className="px-4 py-3 text-[rgba(255,255,255,0.45)] text-[12px]">{user.email ?? "—"}</td>
+                                <td className="px-4 py-3 text-[rgba(255,255,255,0.45)] text-[12px]">{user.email ?? "�"}</td>
                                 <td className="px-4 py-3">
                                     <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full border ${ROLE_DISPLAY[user.role].color}`}>
                                         {ROLE_DISPLAY[user.role].label}
@@ -287,7 +287,7 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                                             disabled={pending}
                                             aria-label={`Change role for ${user.name ?? user.email}`}
                                             onChange={(e) => handleRoleChange(user.id, e.target.value as Role)}
-                                            className="appearance-none text-xs font-semibold px-3 py-1.5 pr-7 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] text-white outline-none cursor-pointer hover:border-[rgba(139,92,246,0.4)] disabled:opacity-40 transition-all"
+                                            className="appearance-none text-xs font-semibold px-3 py-1.5 pr-7 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] text-white outline-none cursor-pointer hover:border-[rgba(232,67,147,0.4)] disabled:opacity-40 transition-all"
                                         >
                                             {Object.entries(ROLE_DISPLAY).map(([role, { label }]) => (
                                                 <option key={role} value={role} className="bg-[#0D0A1E]">{label}</option>
@@ -308,7 +308,7 @@ function UsersTable({ users }: { users: AdminUser[] }) {
     );
 }
 
-// ── Audit Logs Table ───────────────────────────────────────────────────────────
+// -- Audit Logs Table -----------------------------------------------------------
 
 function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
     const [query, setQuery] = useState("");
@@ -327,8 +327,8 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
                 <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search logs by User ID, Action, or Details…"
-                    className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(139,92,246,0.4)]"
+                    placeholder="Search logs by User ID, Action, or Details�"
+                    className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(232,67,147,0.4)]"
                 />
             </div>
 
@@ -358,11 +358,11 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
                                         {log.action}
                                     </span>
                                 </td>
-                                <td className="px-4 py-3 text-[11px] font-mono text-[#A78BFA] tracking-tight">
+                                <td className="px-4 py-3 text-[11px] font-mono text-[#F783AC] tracking-tight">
                                     {log.userId}
                                 </td>
                                 <td className="px-4 py-3 text-[12px] text-[rgba(255,255,255,0.65)] line-clamp-2">
-                                    {log.details || "—"}
+                                    {log.details || "�"}
                                 </td>
                             </tr>
                         ))}
@@ -376,7 +376,7 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
     );
 }
 
-// ── Main Dashboard ─────────────────────────────────────────────────────────────
+// -- Main Dashboard -------------------------------------------------------------
 
 type Tab = "overview" | "reviews" | "users" | "system" | "audit" | "claims" | "import";
 
@@ -424,9 +424,9 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
             {/* Ambient orbs */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-20%] left-[-10%] w-[55vw] h-[55vw] rounded-full opacity-20"
-                    style={{ background: "radial-gradient(circle, rgba(16,185,129,0.3) 0%, transparent 70%)", filter: "blur(100px)" }} />
+                    style={{ background: "radial-gradient(circle, rgba(232,67,147,0.3) 0%, transparent 70%)", filter: "blur(100px)" }} />
                 <div className="absolute bottom-[-20%] right-[-10%] w-[45vw] h-[45vw] rounded-full opacity-15"
-                    style={{ background: "radial-gradient(circle, rgba(16,185,129,0.2) 0%, transparent 70%)", filter: "blur(80px)" }} />
+                    style={{ background: "radial-gradient(circle, rgba(232,67,147,0.2) 0%, transparent 70%)", filter: "blur(80px)" }} />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -438,12 +438,12 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                         </div>
                         <div>
                             <h1 className="text-2xl font-black tracking-tight text-white">God Mode</h1>
-                            <p className="text-xs text-[rgba(255,255,255,0.35)] font-medium">Admin Dashboard · Subash Platform</p>
+                            <p className="text-xs text-[rgba(255,255,255,0.35)] font-medium">Admin Dashboard � Subash Platform</p>
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[rgba(52,211,153,0.25)] bg-[rgba(52,211,153,0.08)]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#34D399] animate-pulse" />
-                        <span className="text-[11px] font-bold text-[#34D399]">LIVE</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[rgba(247,131,172,0.25)] bg-[rgba(247,131,172,0.08)]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#F783AC] animate-pulse" />
+                        <span className="text-[11px] font-bold text-[#F783AC]">LIVE</span>
                     </div>
                 </div>
 
@@ -453,7 +453,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     {tabs.map(({ id, label, icon }) => (
                         <button key={id} onClick={() => setTab(id)}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${tab === id
-                                ? "bg-brand-500/20 text-brand-500 border border-brand-500/30 shadow-[0_0_16px_rgba(16,185,129,0.2)]"
+                                ? "bg-brand-500/20 text-brand-500 border border-brand-500/30 shadow-[0_0_16px_rgba(232,67,147,0.2)]"
                                 : "text-[rgba(255,255,255,0.4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
                                 }`}>
                             {icon} {label}
@@ -461,14 +461,14 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     ))}
                 </div>
 
-                {/* ── Overview Tab ── */}
+                {/* -- Overview Tab -- */}
                 {tab === "overview" && (
                     <div className="space-y-8">
                         {/* Stat cards */}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                            <MetricCard label="Total Users" value={totalUsers} icon={<Users size={16} />} accent="text-[#A78BFA]" glow="shadow-[0_0_30px_rgba(139,92,246,0.1)]" />
+                            <MetricCard label="Total Users" value={totalUsers} icon={<Users size={16} />} accent="text-[#F783AC]" glow="shadow-[0_0_30px_rgba(232,67,147,0.1)]" />
                             <MetricCard label="Total Reviews" value={totalReviews} icon={<Star size={16} />} accent="text-[#F59E0B]" glow="shadow-[0_0_30px_rgba(245,158,11,0.1)]" />
-                            <MetricCard label="Total Perfumes" value={totalPerfumes} icon={<Sparkles size={16} />} accent="text-[#34D399]" glow="shadow-[0_0_30px_rgba(52,211,153,0.1)]" />
+                            <MetricCard label="Total Perfumes" value={totalPerfumes} icon={<Sparkles size={16} />} accent="text-[#F783AC]" glow="shadow-[0_0_30px_rgba(247,131,172,0.1)]" />
                             <MetricCard label="Pending" value={pendingReviews} icon={<AlertTriangle size={16} />} accent="text-[#F59E0B]" glow="shadow-[0_0_30px_rgba(245,158,11,0.1)]" />
                             <MetricCard label="Spam Caught" value={spamReviews} icon={<ShieldCheck size={16} />} accent="text-[#EF4444]" glow="shadow-[0_0_30px_rgba(239,68,68,0.1)]" />
                         </div>
@@ -490,8 +490,8 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                                     </div>
                                 </button>
                                 <button onClick={() => setTab("users")}
-                                    className="flex items-center gap-3 p-4 rounded-xl border border-[rgba(139,92,246,0.2)] bg-[rgba(139,92,246,0.05)] hover:bg-[rgba(139,92,246,0.1)] transition-all text-left">
-                                    <Users size={18} className="text-[#A78BFA]" />
+                                    className="flex items-center gap-3 p-4 rounded-xl border border-[rgba(232,67,147,0.2)] bg-[rgba(232,67,147,0.05)] hover:bg-[rgba(232,67,147,0.1)] transition-all text-left">
+                                    <Users size={18} className="text-[#F783AC]" />
                                     <div>
                                         <p className="text-sm font-bold text-white">{totalUsers} users</p>
                                         <p className="text-xs text-[rgba(255,255,255,0.35)]">Manage roles & access</p>
@@ -510,7 +510,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     </div>
                 )}
 
-                {/* ── Reviews Tab ── */}
+                {/* -- Reviews Tab -- */}
                 {tab === "reviews" && (
                     <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
                         style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}>
@@ -527,16 +527,16 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     </div>
                 )}
 
-                {/* ── Users Tab ── */}
+                {/* -- Users Tab -- */}
                 {tab === "users" && (
                     <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
                         style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}>
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-2">
-                                <Users size={18} className="text-[#A78BFA]" />
+                                <Users size={18} className="text-[#F783AC]" />
                                 <h2 className="text-lg font-bold text-white">User Management</h2>
                             </div>
-                            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[rgba(139,92,246,0.1)] border border-[rgba(139,92,246,0.25)] text-[#A78BFA]">
+                            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[rgba(232,67,147,0.1)] border border-[rgba(232,67,147,0.25)] text-[#F783AC]">
                                 {users.length} members
                             </span>
                         </div>
@@ -544,7 +544,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     </div>
                 )}
 
-                {/* ── System Features Tab (Kill Switches) ── */}
+                {/* -- System Features Tab (Kill Switches) -- */}
                 {tab === "system" && (
                     <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
                         style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}>
@@ -570,7 +570,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                             ].map(feature => (
                                 <div key={feature.key} className="flex items-center justify-between p-5 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.015)] hover:bg-[rgba(255,255,255,0.03)] transition-colors">
                                     <div className="flex gap-3">
-                                        <div className={`mt-0.5 w-8 h-8 rounded-full flex items-center justify-center ${toggles[feature.key] ? 'bg-[rgba(52,211,153,0.15)] text-[#34D399]' : 'bg-[rgba(239,68,68,0.15)] text-[#EF4444]'}`}>
+                                        <div className={`mt-0.5 w-8 h-8 rounded-full flex items-center justify-center ${toggles[feature.key] ? 'bg-[rgba(247,131,172,0.15)] text-[#F783AC]' : 'bg-[rgba(239,68,68,0.15)] text-[#EF4444]'}`}>
                                             {toggles[feature.key] ? feature.icon : <Power size={14} />}
                                         </div>
                                         <div>
@@ -593,16 +593,16 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     </div>
                 )}
 
-                {/* ── Audit Logs Tab ── */}
+                {/* -- Audit Logs Tab -- */}
                 {tab === "audit" && (
                     <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
                         style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}>
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-2">
-                                <Activity size={18} className="text-[#34D399]" />
+                                <Activity size={18} className="text-[#F783AC]" />
                                 <h2 className="text-lg font-bold text-white">Security & Audit Logs</h2>
                             </div>
-                            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[rgba(52,211,153,0.1)] border border-[rgba(52,211,153,0.25)] text-[#34D399]">
+                            <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[rgba(247,131,172,0.1)] border border-[rgba(247,131,172,0.25)] text-[#F783AC]">
                                 {auditLogs.length} events
                             </span>
                         </div>
@@ -613,7 +613,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     </div>
                 )}
 
-                {/* ── B2B Claims Tab ── */}
+                {/* -- B2B Claims Tab -- */}
                 {tab === "claims" && (
                     <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
                         style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}>
@@ -633,7 +633,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     </div>
                 )}
 
-                {/* ── Import Data Tab ── */}
+                {/* -- Import Data Tab -- */}
                 {tab === "import" && (
                     <div className="max-w-3xl mx-auto space-y-8">
                         <CsvImporter />
@@ -645,7 +645,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
     );
 }
 
-// ── B2B Claims Table ────────────────────────────────────────────────────────
+// -- B2B Claims Table --------------------------------------------------------
 function BrandClaimsTable({ claims }: { claims: BrandClaim[] }) {
     const [items, setItems] = useState(claims);
     const [pending, startTransition] = useTransition();

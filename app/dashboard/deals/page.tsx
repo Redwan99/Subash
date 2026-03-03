@@ -58,7 +58,7 @@ export default async function DealsPage() {
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 space-y-10">
 
         {/* ─── Header ────────────────────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-2xl px-6 py-8 bg-[linear-gradient(135deg,rgba(139,92,246,0.12)_0%,rgba(109,40,217,0.06)_60%,transparent_100%)] border border-[#8B5CF6]/25">
+        <div className="relative overflow-hidden rounded-2xl px-6 py-8 bg-[linear-gradient(135deg,rgba(232,67,147,0.12)_0%,rgba(194,37,92,0.06)_60%,transparent_100%)] border border-[#E84393]/25">
           <div className="flex items-center gap-3 mb-2">
             <Tag size={20} className="text-[var(--accent)]" />
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">Deals Dashboard</h1>
@@ -105,7 +105,7 @@ export default async function DealsPage() {
                       {deal.perfume.brand} · {deal.perfume.name}
                     </p>
                     <div className="flex items-center gap-3 mt-0.5">
-                      <span className="text-[11px] font-bold text-[#34D399]">৳{deal.price.toLocaleString()}</span>
+                      <span className="text-[11px] font-bold text-[#F783AC]">৳{deal.price.toLocaleString()}</span>
                       {deal.is_featured && (
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/30">
                           ⭐ Featured

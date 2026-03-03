@@ -221,7 +221,7 @@ export default async function PerfumePage({
           {isShopsEnabled && (
           <div className="rounded-3xl p-6 space-y-4 bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]">
             <div className="flex items-center gap-2 mb-1">
-              <Store size={15} className="text-[#10B981]" />
+              <Store size={15} className="text-[#E84393]" />
               <h2 className="text-lg font-bold text-[var(--text-primary)]">Verified Retailers</h2>
               <Link href="/shops" className="ml-auto text-[10px] text-[var(--accent)] hover:underline">All shops →</Link>
             </div>
@@ -244,19 +244,19 @@ export default async function PerfumePage({
                   const shopName = deal.shop?.name ?? deal.seller.name ?? "Seller";
                   return (
                     <a key={deal.id} href={buyUrl} target="_blank" rel="noopener noreferrer"
-                      className="group flex items-center justify-between rounded-2xl px-4 py-3 border transition-all duration-200 hover:shadow-[0_4px_20px_rgba(16,185,129,0.2)] hover:border-[rgba(16,185,129,0.4)] bg-[rgba(16,185,129,0.05)] border-[rgba(16,185,129,0.15)]">
+                      className="group flex items-center justify-between rounded-2xl px-4 py-3 border transition-all duration-200 hover:shadow-[0_4px_20px_rgba(232,67,147,0.2)] hover:border-[rgba(232,67,147,0.4)] bg-[rgba(232,67,147,0.05)] border-[rgba(232,67,147,0.15)]">
                       <div>
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <p className="text-sm font-bold text-[var(--text-primary)]">{shopName}</p>
                           {deal.shop?.isVerified && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981]">✓ VERIFIED</span>
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[rgba(232,67,147,0.15)] text-[#E84393]">✓ VERIFIED</span>
                           )}
                           {deal.is_featured && (
                             <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[rgba(245,158,11,0.15)] text-[#F59E0B]">★ FEATURED</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-lg font-black text-[#10B981]">৳{deal.price.toLocaleString()}</span>
+                          <span className="text-lg font-black text-[#E84393]">৳{deal.price.toLocaleString()}</span>
                           {deal.discountPercentage && (
                             <span className="flex items-center gap-1 text-xs font-semibold text-[#F59E0B]">
                               <Tag size={10} /> {deal.discountPercentage}% OFF
@@ -264,7 +264,7 @@ export default async function PerfumePage({
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#10B981,#059669)] shadow-[0_2px_12px_rgba(16,185,129,0.3)] group-hover:shadow-[0_4px_20px_rgba(16,185,129,0.5)] transition-all">
+                      <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#E84393,#D6336C)] shadow-[0_2px_12px_rgba(232,67,147,0.3)] group-hover:shadow-[0_4px_20px_rgba(232,67,147,0.5)] transition-all">
                         Buy <ExternalLink size={12} />
                       </div>
                     </a>

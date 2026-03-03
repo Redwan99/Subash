@@ -4,14 +4,14 @@
 
 @layer base {
   :root {
-    --ambient-bg: #f8fafc;
-    --ambient-grad-1: rgba(210, 215, 230, 0.5); /* Soft lavender */
-    --ambient-grad-2: rgba(230, 225, 210, 0.5); /* Soft champagne */
+    --ambient-bg: #FAF5F7;
+    --ambient-grad-1: rgba(245, 200, 215, 0.45); /* Soft rose mist */
+    --ambient-grad-2: rgba(255, 225, 210, 0.40); /* Warm peach bloom */
   }
   .dark {
     --ambient-bg: #050505;
-    --ambient-grad-1: rgba(40, 30, 15, 0.4); /* Amber glow */
-    --ambient-grad-2: rgba(20, 15, 40, 0.4); /* Violet glow */
+    --ambient-grad-1: rgba(60, 20, 35, 0.4);  /* Deep rose glow */
+    --ambient-grad-2: rgba(45, 15, 30, 0.4);  /* Warm plum glow */
   }
 }
 
@@ -26,14 +26,14 @@
 
 /* =============================================
    Subash | Global Design System
-   Glassmorphism · Violet Accents · Dark/Light
+   Glassmorphism · Rose Floral Accents · Dark/Light
    ============================================= */
 
 /* --- CSS Custom Properties (Design Tokens) --- */
 :root {
   /* Light Mode Defaults */
-  --bg-primary: #F8FAFC;       /* pearlescent off-white */
-  --bg-base:    #F8FAFC;
+  --bg-primary: #FAF5F7;       /* warm rose-white */
+  --bg-base:    #FAF5F7;
   --bg-surface: #FFFFFF;
   --bg-elevated: #FFFFFF;
   --bg-glass: rgba(255, 255, 255, 0.80);
@@ -46,14 +46,14 @@
   --border-color: rgba(0, 0, 0, 0.10);
   --shadow-glass: 0 8px 40px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255,255,255,0.9);
 
-  --accent: #8B5CF6;
-  --accent-light: #A78BFA;
-  --accent-dark: #6D28D9;
-  --accent-glow: rgba(139, 92, 246, 0.3);
-  --bg-glow-color: rgba(139, 92, 246, 0.18);
+  --accent: #E84393;
+  --accent-light: #F783AC;
+  --accent-dark: #C2255C;
+  --accent-glow: rgba(232, 67, 147, 0.3);
+  --bg-glow-color: rgba(232, 67, 147, 0.18);
 
-  --sidebar-width: 260px;
-  --sidebar-right-width: 300px;
+  --sidebar-width: 220px;
+  --sidebar-right-width: 260px;
   --topnav-height: 60px;
   --topbar-height: 60px;
   --bottom-nav-height: 64px;
@@ -85,7 +85,7 @@
 
   --border-color: rgba(255, 255, 255, 0.07);
   --shadow-glass: 0 8px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.05);
-  --bg-glow-color: rgba(139, 92, 246, 0.20);
+  --bg-glow-color: rgba(232, 67, 147, 0.20);
 }
 
 /* =============================================
@@ -231,7 +231,7 @@ body::-webkit-scrollbar { display: none; }
 
   /* Accent gradient text */
   .text-accent-gradient {
-    background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 50%, #6D28D9 100%);
+    background: linear-gradient(135deg, #E84393 0%, #F783AC 50%, #C2255C 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

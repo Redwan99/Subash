@@ -78,7 +78,7 @@ export function CsvImporter() {
     return (
         <div className="bg-[var(--bg-glass)] backdrop-blur-[12px] border border-[var(--border-color)] rounded-2xl p-6 sm:p-8">
             <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-[rgba(139,92,246,0.15)] flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-[rgba(232,67,147,0.15)] flex items-center justify-center shrink-0">
                     <Database size={20} className="text-[var(--accent)]" />
                 </div>
                 <div>
@@ -89,9 +89,9 @@ export function CsvImporter() {
 
             <div
                 className={`relative w-full h-48 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all ${isDragging
-                    ? "border-[var(--accent)] bg-[rgba(139,92,246,0.05)] shadow-[0_0_30px_rgba(139,92,246,0.15)] glow-pulse"
+                    ? "border-[var(--accent)] bg-[rgba(232,67,147,0.05)] shadow-[0_0_30px_rgba(232,67,147,0.15)] glow-pulse"
                     : file
-                        ? "border-[#34D399]/50 bg-[#34D399]/5"
+                        ? "border-[#F783AC]/50 bg-[#F783AC]/5"
                         : "border-[var(--border-color)] hover:border-[rgba(255,255,255,0.2)]"
                     }`}
                 onDragOver={handleDragOver}
@@ -114,7 +114,7 @@ export function CsvImporter() {
                     </div>
                 ) : file ? (
                     <div className="flex flex-col items-center text-center">
-                        <FileSpreadsheet size={36} className="text-[#34D399] mb-3" />
+                        <FileSpreadsheet size={36} className="text-[#F783AC] mb-3" />
                         <span className="text-sm font-bold text-[var(--text-primary)]">{file.name}</span>
                         <span className="text-[11px] text-[var(--text-muted)] mt-1">{(file.size / 1024).toFixed(1)} KB</span>
                         <button
@@ -127,7 +127,7 @@ export function CsvImporter() {
                 ) : (
                     <div className="flex flex-col items-center text-center pointer-events-none">
                         <UploadCloud size={40} className="text-[var(--text-muted)] mb-4" />
-                        <span className="text-sm font-semibold text-[var(--text-secondary)]">Drag & Drop CSV or <span className="text-[var(--accent)] underline decoration-[rgba(139,92,246,0.4)] underline-offset-4">Click to Browse</span></span>
+                        <span className="text-sm font-semibold text-[var(--text-secondary)]">Drag & Drop CSV or <span className="text-[var(--accent)] underline decoration-[rgba(232,67,147,0.4)] underline-offset-4">Click to Browse</span></span>
                         <span className="text-[11px] text-[var(--text-muted)] mt-2">Required columns: name, brand</span>
                     </div>
                 )}
@@ -140,16 +140,16 @@ export function CsvImporter() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, height: 0 }}
                         className={`mt-4 p-4 rounded-lg flex items-start gap-3 border ${result.success
-                            ? "bg-[#34D399]/10 border-[#34D399]/20"
+                            ? "bg-[#F783AC]/10 border-[#F783AC]/20"
                             : "bg-red-500/10 border-red-500/20"
                             }`}
                     >
                         {result.success ? (
-                            <CheckCircle2 size={18} className="text-[#34D399] shrink-0 mt-0.5" />
+                            <CheckCircle2 size={18} className="text-[#F783AC] shrink-0 mt-0.5" />
                         ) : (
                             <AlertCircle size={18} className="text-red-400 shrink-0 mt-0.5" />
                         )}
-                        <p className={`text-sm ${result.success ? "text-[#34D399]" : "text-red-400"}`}>
+                        <p className={`text-sm ${result.success ? "text-[#F783AC]" : "text-red-400"}`}>
                             {result.message}
                         </p>
                     </motion.div>
@@ -161,7 +161,7 @@ export function CsvImporter() {
                     onClick={handleUpload}
                     disabled={!file || loading}
                     className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${file && !loading
-                        ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] text-white"
+                        ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] hover:shadow-[0_0_20px_rgba(232,67,147,0.3)] text-white"
                         : "bg-[var(--bg-glass-border)] text-[var(--text-muted)] cursor-not-allowed"
                         }`}
                 >

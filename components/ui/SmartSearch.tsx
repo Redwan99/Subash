@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 // components/ui/SmartSearch.tsx
-// Phase 4.1 — Smart Autocomplete Search
+// Phase 4.1 � Smart Autocomplete Search
 // Replaces the static SearchBar in TopNavbar.
 // Uses the searchPerfumes server action with debounce + transition.
 
@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { useDebounce } from "use-debounce";
 
 
-// ─── Result Row ───────────────────────────────────────────────────────────────
+// --- Result Row ---------------------------------------------------------------
 
 function ResultRow({
   result,
@@ -30,11 +30,11 @@ function ResultRow({
       whileHover={shouldReduceMotion ? {} : { x: 3 }}
       transition={{ type: "spring", stiffness: 400, damping: 28 }}
       onClick={onSelect}
-      className="w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors hover:bg-[#8B5CF6]/10"
+      className="w-full flex items-center gap-3 px-4 py-2.5 text-left cursor-pointer transition-colors hover:bg-[#E84393]/10"
     >
       {/* Bottle thumbnail */}
       <div
-        className="shrink-0 w-8 h-10 rounded-lg flex items-center justify-center overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6]/20"
+        className="shrink-0 w-8 h-10 rounded-lg flex items-center justify-center overflow-hidden bg-[#E84393]/10 border border-[#E84393]/20"
       >
         {result.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -44,7 +44,7 @@ function ResultRow({
             className="w-full h-full object-contain p-0.5"
           />
         ) : (
-          <span className="text-lg">🧴</span>
+          <span className="text-lg">??</span>
         )}
       </div>
 
@@ -63,7 +63,7 @@ function ResultRow({
   );
 }
 
-// ─── Smart Search ─────────────────────────────────────────────────────────────
+// --- Smart Search -------------------------------------------------------------
 
 type SmartSearchProps = {
   id?: string;
@@ -79,7 +79,7 @@ export function SmartSearch({
   className,
   containerClassName,
   onSelectResult,
-  placeholder = "Search perfumes, brands, notes…",
+  placeholder = "Search perfumes, brands, notes�",
   autoNavigate = true,
 }: SmartSearchProps) {
   const [query, setQuery] = useState("");
@@ -145,14 +145,14 @@ export function SmartSearch({
 
   return (
     <div ref={containerRef} className={cn("relative w-full", containerClassName)}>
-      {/* ── Input pill ──────────────────────────────────────── */}
+      {/* -- Input pill ---------------------------------------- */}
       <motion.div
         animate={
           shouldReduceMotion
             ? {}
             : {
               boxShadow: focused
-                ? "0 0 0 2px rgba(139,92,246,0.40), 0 4px 24px rgba(0,0,0,0.15)"
+                ? "0 0 0 2px rgba(232,67,147,0.40), 0 4px 24px rgba(0,0,0,0.15)"
                 : "0 0 0 1px var(--border-color)",
             }
         }
@@ -212,7 +212,7 @@ export function SmartSearch({
         </AnimatePresence>
       </motion.div>
 
-      {/* ── Results dropdown ─────────────────────────────────── */}
+      {/* -- Results dropdown ----------------------------------- */}
       <AnimatePresence>
         {open && results.length > 0 && (
           <motion.div
@@ -246,7 +246,7 @@ export function SmartSearch({
                 {results.length} result{results.length !== 1 ? "s" : ""} found
               </span>
               <span className="text-[10px] text-[var(--text-muted)]">
-                ↵ to open first
+                ? to open first
               </span>
             </div>
           </motion.div>

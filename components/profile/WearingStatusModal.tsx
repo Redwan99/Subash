@@ -357,7 +357,7 @@ export function WearingStatusModal() {
                     className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
                       disabledSave
                         ? "bg-[var(--bg-surface)] text-[var(--text-muted)] cursor-not-allowed"
-                        : "bg-[linear-gradient(135deg,#10B981,#34D399)] text-gray-900 shadow-[0_10px_30px_rgba(16,185,129,0.35)] hover:shadow-[0_12px_36px_rgba(16,185,129,0.45)]"
+                        : "bg-[linear-gradient(135deg,#E84393,#F783AC)] text-gray-900 shadow-[0_10px_30px_rgba(232,67,147,0.35)] hover:shadow-[0_12px_36px_rgba(232,67,147,0.45)]"
                     }`}
                   >
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
@@ -382,7 +382,7 @@ export function WearingStatusModal() {
                     Preview
                   </p>
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.35)_0%,transparent_70%)] flex items-center justify-center overflow-hidden border border-emerald-400/40 text-3xl">
+                    <div className="w-16 h-16 rounded-2xl bg-[radial-gradient(circle_at_top,rgba(232,67,147,0.35)_0%,transparent_70%)] flex items-center justify-center overflow-hidden border border-brand-400/40 text-3xl">
                       {selectedPerfume?.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -433,7 +433,7 @@ export function WearingStatusModal() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-emerald-400 transition-colors"
+        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-brand-400 transition-colors"
         title="Currently Wearing"
       >
         <Droplet className="w-5 h-5" />

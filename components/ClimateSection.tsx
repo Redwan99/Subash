@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 // components/ClimateSection.tsx
 // Client wrapper for the weather + climate picks panel.
 // 1. Server renders with fallback Dhaka data (SSR).
@@ -37,7 +37,7 @@ function WeatherIcon({ condition, isNight, size = 20 }: { condition: string; isN
   }
   if (condition === "Snow") return <Snowflake size={size} className="text-[#AECDE0]" />;
   if (condition === "Clouds") return <Wind size={size} className="text-[var(--text-muted)]" />;
-  if (isNight) return <span style={{ fontSize: size }}>🌙</span>;
+  if (isNight) return <span style={{ fontSize: size }}>??</span>;
   return <Sun size={size} className="text-[#C9A84C]" />;
 }
 
@@ -46,12 +46,12 @@ function ClimateTag({ tag }: { tag: string }) {
   const map: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
     HOT:   { label: "HOT",   icon: <Flame size={10} />,     color: "text-[#C87C42] bg-[rgba(200,124,66,0.12)] border-[rgba(200,124,66,0.3)]" },
     COLD:  { label: "COLD",  icon: <Snowflake size={10} />, color: "text-[#8BAEC8] bg-[rgba(139,174,200,0.12)] border-[rgba(139,174,200,0.3)]" },
-    MILD:  { label: "MILD",  icon: <Sun size={10} />,       color: "text-[var(--accent)] bg-[rgba(139,92,246,0.12)] border-[rgba(139,92,246,0.3)]" },
+    MILD:  { label: "MILD",  icon: <Sun size={10} />,       color: "text-[var(--accent)] bg-[rgba(232,67,147,0.12)] border-[rgba(232,67,147,0.3)]" },
     HUMID: { label: "HUMID", icon: <Droplets size={10} />,  color: "text-[#3D9E8C] bg-[rgba(61,158,140,0.12)] border-[rgba(61,158,140,0.3)]" },
-    DRY:   { label: "DRY",   icon: <Wind size={10} />,      color: "text-[var(--text-muted)] bg-[rgba(139,92,246,0.08)] border-[rgba(139,92,246,0.2)]" },
+    DRY:   { label: "DRY",   icon: <Wind size={10} />,      color: "text-[var(--text-muted)] bg-[rgba(232,67,147,0.08)] border-[rgba(232,67,147,0.2)]" },
     RAINY: { label: "RAINY", icon: <CloudRain size={10} />, color: "text-[#5882A8] bg-[rgba(88,130,168,0.12)] border-[rgba(88,130,168,0.3)]" },
   };
-  const m = map[tag] ?? { label: tag, icon: null, color: "text-[var(--accent)] bg-[rgba(139,92,246,0.1)] border-[rgba(139,92,246,0.25)]" };
+  const m = map[tag] ?? { label: tag, icon: null, color: "text-[var(--accent)] bg-[rgba(232,67,147,0.1)] border-[rgba(232,67,147,0.25)]" };
   return (
     <span className={`inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full font-semibold border ${m.color}`}>
       {m.icon}{m.label}
@@ -102,7 +102,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
     setGeoStatus("requesting");
 
     const timeout = setTimeout(() => {
-      // Geolocation timed out — try IP fallback
+      // Geolocation timed out � try IP fallback
       setGeoStatus("ip");
       void fetchIpWeather();
     }, 6000);
@@ -134,7 +134,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
       },
       () => {
         clearTimeout(timeout);
-        // Browser geo denied — try IP-based fallback
+        // Browser geo denied � try IP-based fallback
         setGeoStatus("ip");
         void fetchIpWeather();
       },
@@ -145,7 +145,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
 
   async function fetchIpWeather() {
     try {
-      // /api/weather with no params — server reads client IP
+      // /api/weather with no params � server reads client IP
       const res = await fetch("/api/weather?source=ip");
       if (!res.ok) return;
       const data = await res.json() as {
@@ -171,7 +171,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-      {/* ── Left: weather info ─────────────────────────────────── */}
+      {/* -- Left: weather info ----------------------------------- */}
       <div className="space-y-3 lg:flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <p className="text-xs uppercase tracking-widest text-[var(--text-muted)]">Climate Lens</p>
@@ -182,7 +182,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
             <motion.span
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-1 text-[10px] text-[#34D399] font-medium"
+              className="flex items-center gap-1 text-[10px] text-[#F783AC] font-medium"
             >
               <MapPin size={9} /> Live Location
             </motion.span>
@@ -216,7 +216,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-semibold leading-tight text-[var(--text-primary)]">
                   {weather ? (
                     <>
-                      It&apos;s {Math.round(weather.temp)}°C in {weather.city}
+                      It&apos;s {Math.round(weather.temp)}�C in {weather.city}
                       {weather.country ? `, ${weather.country}` : ""}.
                     </>
                   ) : (
@@ -240,7 +240,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
           )}
         </div>
 
-        {/* Geo permission prompt — only shown once before a decision */}
+        {/* Geo permission prompt � only shown once before a decision */}
         {geoStatus === "idle" && (
           <motion.p
             initial={{ opacity: 0 }}
@@ -252,11 +252,11 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
         )}
       </div>
 
-      {/* ── Right: animated product slider ──────────────────── */}
+      {/* -- Right: animated product slider -------------------- */}
       <div className="w-full lg:max-w-sm mx-auto lg:mx-0 shrink-0">
         {picks.length === 0 ? (
           <p className="text-sm text-center py-6 text-[var(--text-muted)]">
-            No climate-matched reviews yet — add a review to help build picks.
+            No climate-matched reviews yet � add a review to help build picks.
           </p>
         ) : (
           <AnimatePresence mode="wait">

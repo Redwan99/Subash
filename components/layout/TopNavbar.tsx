@@ -79,7 +79,7 @@ function NavLink({
         whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 28 }}
         className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl border ${active
-          ? "bg-[rgba(139,92,246,0.14)] border-[rgba(139,92,246,0.28)]"
+          ? "bg-[rgba(232,67,147,0.14)] border-[rgba(232,67,147,0.28)]"
           : "border-transparent"
           }`}
       >
@@ -138,7 +138,7 @@ function AvatarMenu() {
           whileHover={shouldReduceMotion ? {} : { scale: 1.04 }}
           whileTap={shouldReduceMotion ? {} : { scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white active:scale-[0.97]"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[linear-gradient(135deg,#E84393,#F783AC)] text-white active:scale-[0.97]"
         >
           <LogIn size={14} />
           <span className="hidden sm:block">Sign In</span>
@@ -160,7 +160,7 @@ function AvatarMenu() {
         whileHover={shouldReduceMotion ? {} : { scale: 1.06 }}
         whileTap={shouldReduceMotion ? {} : { scale: 0.94 }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
-        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden focus-visible:outline-none border-2 border-[var(--accent)] text-white ${session.user?.image ? "bg-transparent" : "bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)]"
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden focus-visible:outline-none border-2 border-[var(--accent)] text-white ${session.user?.image ? "bg-transparent" : "bg-[linear-gradient(135deg,#E84393,#C2255C)]"
           }`}
         aria-label="Open profile menu"
         aria-expanded={open}

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 // components/layout/BottomNav.tsx
 // Phase 3.3 — Mobile Bottom Navigation Bar
 // Pro Max: Heavy glassmorphism blur, haptic-feel spring "pop" on tap.
@@ -56,8 +56,8 @@ function NavItem({
       >
         {accent ? (
           /* ── Prominent "Add" button ──────────────────── */
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-[linear-gradient(135deg,#059669_0%,#10b981_50%,#34d399_100%)] [box-shadow:0_4px_16px_rgba(16,185,129,0.45),_0_1px_0_rgba(255,255,255,0.2)_inset]">
-            <Icon size={22} strokeWidth={2.5} className="text-gray-900 dark:text-white" />
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg bg-[linear-gradient(135deg,#D6336C_0%,#E84393_50%,#F783AC_100%)] [box-shadow:0_4px_16px_rgba(232,67,147,0.45),_0_1px_0_rgba(255,255,255,0.2)_inset]">
+            <Icon size={22} strokeWidth={2.5} className="text-white" />
           </div>
         ) : (
           /* ── Standard icon ───────────────────────────── */

@@ -259,7 +259,7 @@ export default function VerifyPhonePage() {
             </p>
             <Link
               href="/"
-              className="inline-block w-full py-3 rounded-xl font-semibold text-sm text-center transition-all duration-200 hover:scale-[1.02] text-white bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)]"
+              className="inline-block w-full py-3 rounded-xl font-semibold text-sm text-center transition-all duration-200 hover:scale-[1.02] text-white bg-[linear-gradient(135deg,#E84393_0%,#F783AC_50%,#C2255C_100%)]"
             >
               Go to Home →
             </Link>

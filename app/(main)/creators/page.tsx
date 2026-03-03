@@ -85,7 +85,7 @@ export default async function CreatorsPage() {
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {allCreators.map((creator, i) => {
                     const initials = creator.name
                         .split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase();

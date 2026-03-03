@@ -76,11 +76,11 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
             <Loader2 className="w-8 h-8 text-brand-500 animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 w-full contain-paint">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5 sm:gap-6 w-full contain-paint">
             {results.map(perfume => (
               <Link key={perfume.id} href={`/perfume/${perfume.slug}`} className="flex flex-col bg-gray-50 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 group gpu-accelerate">
-                <div className="relative w-full aspect-square sm:aspect-[4/5] bg-gradient-to-b from-gray-50/50 to-transparent dark:from-white/5 dark:to-transparent p-3 sm:p-5 flex items-center justify-center">
-                  <Image src={perfume.transparentImageUrl || perfume.image_url} alt={perfume.name} fill className="object-contain p-4 drop-shadow-xl group-hover:scale-110 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 50vw, 25vw" />
+                <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] bg-gradient-to-b from-gray-50/50 to-transparent dark:from-white/5 dark:to-transparent p-3 sm:p-5 flex items-center justify-center">
+                  <Image src={perfume.transparentImageUrl || perfume.image_url} alt={perfume.name} fill className="object-contain p-4 drop-shadow-xl group-hover:scale-110 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw" />
                 </div>
                 <div className="p-3 sm:p-4 flex flex-col gap-0.5 border-t border-gray-100 dark:border-white/5 bg-white dark:bg-transparent">
                   <h3 className="font-bold text-gray-900 dark:text-white text-sm sm:text-base line-clamp-1 group-hover:text-brand-500 transition-colors">{perfume.name}</h3>

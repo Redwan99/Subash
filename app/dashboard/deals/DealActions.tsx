@@ -31,7 +31,7 @@ export function DealActions({
       className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
         active
           ? "bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/25 hover:bg-[#EF4444]/20"
-          : "bg-[#34D399]/10 text-[#34D399] border border-[#34D399]/25 hover:bg-[#34D399]/20"
+          : "bg-[#F783AC]/10 text-[#F783AC] border border-[#F783AC]/25 hover:bg-[#F783AC]/20"
       }`}
     >
       {isPending ? (

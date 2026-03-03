@@ -56,7 +56,7 @@ export function DealForm({
             aria-label="Select perfume"
             value={perfumeId}
             onChange={(e) => setPerfumeId(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] outline-none focus:border-[#8B5CF6]/50 text-[var(--text-primary)]"
+            className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] outline-none focus:border-[#E84393]/50 text-[var(--text-primary)]"
           >
             <option value="">— select perfume —</option>
             {perfumes.map((p) => (
@@ -78,7 +78,7 @@ export function DealForm({
             onChange={(e) => setPrice(e.target.value)}
             placeholder="e.g. 2500"
             min={1}
-            className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] outline-none focus:border-[#8B5CF6]/50 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+            className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] outline-none focus:border-[#E84393]/50 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
           />
         </div>
       </div>
@@ -93,7 +93,7 @@ export function DealForm({
           value={link}
           onChange={(e) => setLink(e.target.value)}
           placeholder="https://your-shop.com/product"
-          className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] outline-none focus:border-[#8B5CF6]/50 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
+          className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] outline-none focus:border-[#E84393]/50 text-[var(--text-primary)] placeholder:text-[var(--text-muted)]"
         />
       </div>
 
@@ -102,7 +102,7 @@ export function DealForm({
       <button
         type="submit"
         disabled={isPending || !perfumeId || !price}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_4px_14px_rgba(139,92,246,0.3)]"
+        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed bg-[linear-gradient(135deg,#E84393,#F783AC)] shadow-[0_4px_14px_rgba(232,67,147,0.3)]"
       >
         {done ? (
           <><CheckCircle size={14} /> Listed!</>

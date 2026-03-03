@@ -113,11 +113,11 @@ export default async function CreatorProfilePage({ params }: Props) {
                     No perfumes linked to this creator yet.
                 </div>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {hydratedPerfumes.map((p: Perfume) => (
                         <Link key={p.id} href={`/perfume/${p.slug}`} prefetch={false}>
-                            <div className="group rounded-2xl overflow-hidden border border-[var(--bg-glass-border)] hover:border-[rgba(139,92,246,0.35)] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(139,92,246,0.15)] transition-all duration-300 glass">
-                                <div className="relative h-36 bg-gradient-to-b from-[rgba(139,92,246,0.06)] to-transparent flex items-center justify-center">
+                            <div className="group rounded-2xl overflow-hidden border border-[var(--bg-glass-border)] hover:border-[rgba(232,67,147,0.35)] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(232,67,147,0.15)] transition-all duration-300 glass">
+                                <div className="relative h-44 bg-gradient-to-b from-[rgba(232,67,147,0.06)] to-transparent flex items-center justify-center">
                                     {p.image_url ? (
                                         <Image src={p.image_url} alt={p.name} fill sizes="200px"
                                             className="object-contain p-3 transition-transform duration-500 group-hover:scale-105" unoptimized />
@@ -130,7 +130,7 @@ export default async function CreatorProfilePage({ params }: Props) {
                                     <h3 className="text-sm font-bold text-[var(--text-primary)] line-clamp-2 leading-snug mb-1.5">{p.name}</h3>
                                     <div className="flex flex-wrap gap-1">
                                         {p.accords.slice(0, 2).map((a: string) => (
-                                            <span key={a} className="text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(139,92,246,0.1)] text-[var(--text-muted)] capitalize">{a}</span>
+                                            <span key={a} className="text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(232,67,147,0.1)] text-[var(--text-muted)] capitalize">{a}</span>
                                         ))}
                                     </div>
                                 </div>

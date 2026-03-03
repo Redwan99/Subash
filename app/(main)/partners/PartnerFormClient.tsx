@@ -58,7 +58,7 @@ export function PartnerFormClient() {
                     name="brandName"
                     required
                     placeholder="e.g. Creed"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#8B5CF6] transition-colors"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#E84393] transition-colors"
                 />
             </div>
 
@@ -71,7 +71,7 @@ export function PartnerFormClient() {
                     name="officialEmail"
                     required
                     placeholder="contact@brand.com"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#8B5CF6] transition-colors"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#E84393] transition-colors"
                 />
             </div>
 
@@ -83,14 +83,14 @@ export function PartnerFormClient() {
                     name="message"
                     rows={3}
                     placeholder="How can we help your brand grow?"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#8B5CF6] transition-colors resize-none"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#E84393] transition-colors resize-none"
                 />
             </div>
 
             <button
                 type="submit"
                 disabled={isPending}
-                className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#8B5CF6] to-[#A78BFA] hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 mt-2 shadow-[0_4px_14px_0_rgba(139,92,246,0.39)] hover:shadow-[0_6px_20px_rgba(139,92,246,0.23)]"
+                className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-[#E84393] to-[#F783AC] hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2 mt-2 shadow-[0_4px_14px_0_rgba(232,67,147,0.39)] hover:shadow-[0_6px_20px_rgba(232,67,147,0.23)]"
             >
                 {isPending && <Loader2 size={18} className="animate-spin" />}
                 Submit Claim Request

@@ -26,8 +26,8 @@ export async function sendWelcomeEmail(userEmail: string, userName: string) {
           <!-- Logo -->
           <tr>
             <td align="center" style="padding-bottom:32px;">
-              <div style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(139,92,246,0.05));border:1px solid rgba(139,92,246,0.3);border-radius:16px;">
-                <span style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#8B5CF6,#A78BFA);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">সুবাশ</span>
+              <div style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,rgba(232,67,147,0.15),rgba(232,67,147,0.05));border:1px solid rgba(232,67,147,0.3);border-radius:16px;">
+                <span style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#E84393,#F783AC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">সুবাশ</span>
                 <span style="display:block;font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#6B7280;margin-top:-2px;">Subash</span>
               </div>
             </td>
@@ -38,13 +38,13 @@ export async function sendWelcomeEmail(userEmail: string, userName: string) {
             <td style="background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.08);border-radius:24px;overflow:hidden;">
 
               <!-- Purple top bar -->
-              <div style="height:4px;background:linear-gradient(90deg,#8B5CF6,#A78BFA,#6D28D9);"></div>
+              <div style="height:4px;background:linear-gradient(90deg,#E84393,#F783AC,#C2255C);"></div>
 
               <!-- Content -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding:40px 36px 32px;">
-                    <p style="margin:0 0 8px;font-size:13px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#8B5CF6;">Welcome to the Fold</p>
+                    <p style="margin:0 0 8px;font-size:13px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#E84393;">Welcome to the Fold</p>
                     <h1 style="margin:0 0 20px;font-size:32px;font-weight:900;color:#F9FAFB;line-height:1.2;">
                       Hello, ${firstName}. 👋
                     </h1>
@@ -81,7 +81,7 @@ export async function sendWelcomeEmail(userEmail: string, userName: string) {
                       <tr>
                         <td>
                           <a href="${process.env.NEXT_PUBLIC_BASE_URL ?? "https://subash.app"}" 
-                             style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#8B5CF6,#A78BFA);border-radius:14px;font-size:14px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:0.02em;box-shadow:0 4px 24px rgba(139,92,246,0.4);">
+                             style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#E84393,#F783AC);border-radius:14px;font-size:14px;font-weight:800;color:#ffffff;text-decoration:none;letter-spacing:0.02em;box-shadow:0 4px 24px rgba(232,67,147,0.4);">
                             Explore Now →
                           </a>
                         </td>
@@ -156,7 +156,7 @@ export async function sendNewsletterConfirmation(email: string) {
                 exclusive reviews, and fragrance news from Bangladesh and beyond.
               </p>
               <a href="${process.env.NEXT_PUBLIC_BASE_URL ?? "https://subash.app"}"
-                 style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#8B5CF6,#A78BFA);border-radius:12px;font-size:13px;font-weight:800;color:#ffffff;text-decoration:none;">
+                 style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#E84393,#F783AC);border-radius:12px;font-size:13px;font-weight:800;color:#ffffff;text-decoration:none;">
                 Check it out →
               </a>
             </td>

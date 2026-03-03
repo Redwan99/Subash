@@ -60,7 +60,7 @@ export default async function SignInPage({
         {/* Logo / Title */}
         <div className="text-center space-y-2">
           <h1
-            className="font-display text-4xl font-bold bg-[linear-gradient(135deg,#059669_0%,#10b981_50%,#34d399_100%)] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
+            className="font-display text-4xl font-bold bg-[linear-gradient(135deg,#D6336C_0%,#E84393_50%,#F783AC_100%)] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
           >
             সুবাশ
           </h1>

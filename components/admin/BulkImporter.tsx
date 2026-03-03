@@ -45,7 +45,7 @@ export default function BulkImporter() {
         onClick={handleImport}
         disabled={isPending || !jsonInput.trim()}
         aria-label="Run bulk import"
-        className="bg-brand-500 hover:bg-brand-400 disabled:opacity-50 text-black font-bold px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
+        className="bg-brand-500 hover:bg-brand-400 disabled:opacity-50 text-white font-bold px-6 py-2 rounded-lg flex items-center gap-2 transition-colors"
       >
         {isPending ? (
           <Loader2 className="w-4 h-4 animate-spin" />

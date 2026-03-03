@@ -61,11 +61,11 @@ export function NewsletterFooter() {
                                         key="done"
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.3)]"
+                                        className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-[rgba(232,67,147,0.1)] border border-[rgba(232,67,147,0.3)]"
                                     >
-                                        <CheckCircle size={20} className="text-[#10B981] shrink-0" />
+                                        <CheckCircle size={20} className="text-[#E84393] shrink-0" />
                                         <div>
-                                            <p className="text-sm font-bold text-[#10B981]">You&apos;re subscribed!</p>
+                                            <p className="text-sm font-bold text-[#E84393]">You&apos;re subscribed!</p>
                                             <p className="text-xs text-[var(--text-muted)]">Check your inbox for a confirmation.</p>
                                         </div>
                                     </motion.div>
@@ -86,7 +86,7 @@ export function NewsletterFooter() {
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder="your@email.com"
                                                     required
-                                                    className="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] text-[var(--text-primary)] outline-none focus:border-[rgba(139,92,246,0.5)] placeholder:text-[var(--text-muted)] transition-colors"
+                                                    className="w-full pl-10 pr-4 py-3 text-sm rounded-xl bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] text-[var(--text-primary)] outline-none focus:border-[rgba(232,67,147,0.5)] placeholder:text-[var(--text-muted)] transition-colors"
                                                 />
                                             </div>
                                             <motion.button
@@ -94,7 +94,7 @@ export function NewsletterFooter() {
                                                 disabled={isPending}
                                                 whileHover={{ scale: 1.03 }}
                                                 whileTap={{ scale: 0.97 }}
-                                                className="flex items-center gap-1.5 px-5 py-3 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_4px_14px_rgba(139,92,246,0.35)] disabled:opacity-60 disabled:cursor-not-allowed hover:shadow-[0_6px_20px_rgba(139,92,246,0.5)] transition-all"
+                                                className="flex items-center gap-1.5 px-5 py-3 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#E84393,#F783AC)] shadow-[0_4px_14px_rgba(232,67,147,0.35)] disabled:opacity-60 disabled:cursor-not-allowed hover:shadow-[0_6px_20px_rgba(232,67,147,0.5)] transition-all"
                                             >
                                                 {isPending ? (
                                                     <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
@@ -115,7 +115,7 @@ export function NewsletterFooter() {
                 {/* Bottom bar */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
                     <div className="flex items-center gap-2">
-                        <span className="font-black text-base bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] bg-clip-text text-transparent">সুবাশ</span>
+                        <span className="font-black text-base bg-[linear-gradient(135deg,#E84393,#F783AC)] bg-clip-text text-transparent">সুবাশ</span>
                         <span>© {new Date().getFullYear()} Subash. All rights reserved.</span>
                     </div>
                     <div className="flex items-center gap-4">

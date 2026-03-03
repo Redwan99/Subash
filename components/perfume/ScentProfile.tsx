@@ -1,17 +1,17 @@
-﻿"use client";
+"use client";
 // components/perfume/ScentProfile.tsx
-// Phase 4.3 — Interactive Scent Profile
-//   · Expanding Note Pyramid (whileInView stagger)
-//   · Performance Radar (aggregated longevity + sillage bar display)
-//   · Description expand/collapse toggle
-//   · Accord pills with accent glow on hover
+// Phase 4.3 � Interactive Scent Profile
+//   � Expanding Note Pyramid (whileInView stagger)
+//   � Performance Radar (aggregated longevity + sillage bar display)
+//   � Description expand/collapse toggle
+//   � Accord pills with accent glow on hover
 
 import { useState } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { PenSquare, X } from "lucide-react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 export type ScentProfileProps = {
   perfumeId:   string;
@@ -19,8 +19,8 @@ export type ScentProfileProps = {
   heart_notes:  string[];
   base_notes:   string[];
   /** Aggregated from all reviews */
-  avgLongevity: number; // 1–5
-  avgSillage:   number; // 1–5
+  avgLongevity: number; // 1�5
+  avgSillage:   number; // 1�5
   reviewCount:  number;
   // Kaggle-imported enrichment fields
   description:  string | null;
@@ -33,20 +33,20 @@ const ReviewForm = dynamic(
   { ssr: false }
 );
 
-// ─── Note Chip ────────────────────────────────────────────────────────────────
+// --- Note Chip ----------------------------------------------------------------
 
 const NOTE_COLORS = {
   top: {
-    chip: "bg-[#A7F3D0]/15 border-[#34D399]/30 text-[#34D399]",
-    label: "text-[#34D399]",
+    chip: "bg-[#FCC2D7]/15 border-[#F783AC]/30 text-[#F783AC]",
+    label: "text-[#F783AC]",
   },
   heart: {
     chip: "bg-[#FCD34D]/15 border-[#F59E0B]/30 text-[#F59E0B]",
     label: "text-[#F59E0B]",
   },
   base: {
-    chip: "bg-[#A78BFA]/15 border-[#8B5CF6]/30 text-[#A78BFA]",
-    label: "text-[#A78BFA]",
+    chip: "bg-[#F783AC]/15 border-[#E84393]/30 text-[#F783AC]",
+    label: "text-[#F783AC]",
   },
 };
 
@@ -66,7 +66,7 @@ function NoteChip({
   );
 }
 
-// ─── Pyramid Row ──────────────────────────────────────────────────────────────
+// --- Pyramid Row --------------------------------------------------------------
 
 function PyramidRow({
   tier,
@@ -131,7 +131,7 @@ function PyramidRow({
   );
 }
 
-// ─── Radar / Bar ──────────────────────────────────────────────────────────────
+// --- Radar / Bar --------------------------------------------------------------
 
 const METRIC_LABELS = [
   "Very Weak",
@@ -149,12 +149,12 @@ function RadarBar({
   shouldReduceMotion,
 }: {
   label: string;
-  value: number; // 1–5
+  value: number; // 1�5
   valueClass: string;
   barClass: string;
   shouldReduceMotion: boolean | null;
 }) {
-  const pct = ((value - 1) / 4) * 100; // map 1–5 → 0–100%
+  const pct = ((value - 1) / 4) * 100; // map 1�5 ? 0�100%
 
   return (
     <div>
@@ -188,7 +188,7 @@ function RadarBar({
   );
 }
 
-// ─── Scent Profile ────────────────────────────────────────────────────────────
+// --- Scent Profile ------------------------------------------------------------
 
 export function ScentProfile({
   perfumeId,
@@ -212,7 +212,7 @@ export function ScentProfile({
   return (
     <div className="space-y-10">
 
-      {/* ── Encyclopedia Header — Description, Perfumer, Accords ───── */}
+      {/* -- Encyclopedia Header � Description, Perfumer, Accords ----- */}
       {(description || perfumer || accords.length > 0) && (
         <section className="rounded-2xl p-6 bg-[var(--bg-glass)] backdrop-blur-[10px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] space-y-5">
 
@@ -267,7 +267,7 @@ export function ScentProfile({
                       backdrop-blur-sm
                       hover:bg-[var(--accent)]/15 hover:border-[var(--accent)]/40
                       hover:text-[var(--accent)]
-                      hover:shadow-[0_0_10px_var(--accent-glow,rgba(139,92,246,0.3))]
+                      hover:shadow-[0_0_10px_var(--accent-glow,rgba(232,67,147,0.3))]
                       transition-all duration-200"
                   >
                     {accord}
@@ -279,21 +279,21 @@ export function ScentProfile({
         </section>
       )}
 
-      {/* ── Note Pyramid ──────────────────────────────────────── */}
+      {/* -- Note Pyramid ---------------------------------------- */}
       <section>
         <div className="flex items-center gap-2 mb-6">
           <h2 className="text-lg font-bold text-[var(--text-primary)]">
             Scent Pyramid
           </h2>
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#8B5CF6]/15 text-[var(--accent)]">
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#E84393]/15 text-[var(--accent)]">
             {top_notes.length + heart_notes.length + base_notes.length} notes
           </span>
         </div>
 
-        {/* Pyramid: top → widest, base → narrowest */}
+        {/* Pyramid: top ? widest, base ? narrowest */}
         <div className="flex flex-col items-center gap-6">
           <PyramidRow
-            tier="top"   label="Top"   icon="🍃"
+            tier="top"   label="Top"   icon="??"
             notes={top_notes}   index={0} shouldReduceMotion={shouldReduceMotion}
           />
 
@@ -303,7 +303,7 @@ export function ScentProfile({
           )}
 
           <PyramidRow
-            tier="heart" label="Heart" icon="🌸"
+            tier="heart" label="Heart" icon="??"
             notes={heart_notes} index={1} shouldReduceMotion={shouldReduceMotion}
           />
 
@@ -312,13 +312,13 @@ export function ScentProfile({
           )}
 
           <PyramidRow
-            tier="base"  label="Base"  icon="🪵"
+            tier="base"  label="Base"  icon="??"
             notes={base_notes}  index={2} shouldReduceMotion={shouldReduceMotion}
           />
         </div>
       </section>
 
-      {/* ── Performance Radar ─────────────────────────────────── */}
+      {/* -- Performance Radar ----------------------------------- */}
       <section className="rounded-2xl p-6 bg-[var(--bg-glass)] backdrop-blur-[10px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-2">
@@ -344,7 +344,7 @@ export function ScentProfile({
 
         {reviewCount === 0 ? (
           <p className="text-sm text-center py-4 text-[var(--text-muted)]">
-            No reviews yet — be the first!
+            No reviews yet � be the first!
           </p>
         ) : (
           <div className="space-y-5">
@@ -358,8 +358,8 @@ export function ScentProfile({
             <RadarBar
               label="Sillage (Projection)"
               value={avgSillage}
-              valueClass="text-[#A78BFA]"
-              barClass="bg-[linear-gradient(90deg,rgba(167,139,250,0.5),#A78BFA)] shadow-[0_0_8px_rgba(167,139,250,0.35)]"
+              valueClass="text-[#F783AC]"
+              barClass="bg-[linear-gradient(90deg,rgba(247,131,172,0.5),#F783AC)] shadow-[0_0_8px_rgba(247,131,172,0.35)]"
               shouldReduceMotion={shouldReduceMotion}
             />
           </div>

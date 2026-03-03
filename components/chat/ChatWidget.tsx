@@ -60,9 +60,9 @@ function PerfumeCard({ p }: { p: BotPerfume }) {
       className="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all
         bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10
         hover:bg-[var(--accent)]/15 hover:border-[var(--accent)]/35
-        hover:shadow-[0_0_10px_var(--accent-glow,rgba(139,92,246,0.25))]"
+        hover:shadow-[0_0_10px_var(--accent-glow,rgba(232,67,147,0.25))]"
     >
-      <div className="w-9 h-11 shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-[#8B5CF6]/10 border border-[#8B5CF6]/20">
+      <div className="w-9 h-11 shrink-0 rounded-lg overflow-hidden flex items-center justify-center bg-[#E84393]/10 border border-[#E84393]/20">
         {p.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={p.image_url} alt={p.name} className="w-full h-full object-contain p-0.5" />
@@ -118,7 +118,7 @@ function SubashAIPanel() {
               <div className={cn(
                 "rounded-2xl px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap",
                 msg.role === "user"
-                  ? "rounded-tr-sm text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)]"
+                  ? "rounded-tr-sm text-white bg-[linear-gradient(135deg,#E84393,#F783AC)]"
                   : "rounded-tl-sm text-[var(--text-primary)] bg-[var(--bg-surface)] border border-[var(--border-color)]"
               )}>
                 {msg.text}
@@ -146,7 +146,7 @@ function SubashAIPanel() {
           <div className="flex flex-wrap gap-1.5 pt-2">
             {AI_CHIPS.map((chip) => (
               <button key={chip} onClick={() => sendQuery(chip)}
-                className="text-[10px] px-2.5 py-1.5 rounded-full font-medium text-[var(--accent)] bg-[#8B5CF6]/10 border border-[#8B5CF6]/25 hover:bg-[#8B5CF6]/20 transition-colors">
+                className="text-[10px] px-2.5 py-1.5 rounded-full font-medium text-[var(--accent)] bg-[#E84393]/10 border border-[#E84393]/25 hover:bg-[#E84393]/20 transition-colors">
                 {chip}
               </button>
             ))}
@@ -167,10 +167,10 @@ function SubashAIPanel() {
         <input type="text" value={input} onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendQuery(input); } }}
           placeholder="Ask me anything…" disabled={isPending}
-          className="flex-1 bg-[var(--bg-surface)] px-3 py-2 rounded-xl text-xs outline-none border border-[var(--border-color)] focus:border-[#8B5CF6]/50 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] caret-[var(--accent)] disabled:opacity-50"
+          className="flex-1 bg-[var(--bg-surface)] px-3 py-2 rounded-xl text-xs outline-none border border-[var(--border-color)] focus:border-[#E84393]/50 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] caret-[var(--accent)] disabled:opacity-50"
         />
         <button onClick={() => sendQuery(input)} disabled={!input.trim() || isPending}
-          className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-white disabled:opacity-40 disabled:cursor-not-allowed bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)]"
+          className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-white disabled:opacity-40 disabled:cursor-not-allowed bg-[linear-gradient(135deg,#E84393,#F783AC)]"
           aria-label="Send">
           {isPending ? <Loader2 size={12} className="animate-spin" /> : <Send size={13} />}
         </button>
@@ -199,7 +199,7 @@ export function ChatWidget({ featureToggles }: { featureToggles?: Record<string,
           "fixed z-50 bottom-20 right-4 md:bottom-6 md:right-6",
           "w-[52px] h-[52px] rounded-2xl flex items-center justify-center text-white",
           "bg-brand-500",
-          "shadow-[0_8px_28px_rgba(16,185,129,0.55),0_0_0_1px_rgba(16,185,129,0.25)]"
+          "shadow-[0_8px_28px_rgba(232,67,147,0.55),0_0_0_1px_rgba(232,67,147,0.25)]"
         )}
       >
         <AnimatePresence mode="wait">
@@ -240,16 +240,16 @@ export function ChatWidget({ featureToggles }: { featureToggles?: Record<string,
             style={{ height: "520px" }}
           >
             {/* Header */}
-            <div className="shrink-0 px-4 py-4 border-b border-gray-200 dark:border-white/10 bg-[rgba(139,92,246,0.07)]">
+            <div className="shrink-0 px-4 py-4 border-b border-gray-200 dark:border-white/10 bg-[rgba(232,67,147,0.07)]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)] shadow-[0_0_10px_rgba(139,92,246,0.45)]">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[linear-gradient(135deg,#E84393,#C2255C)] shadow-[0_0_10px_rgba(232,67,147,0.45)]">
                     <Sparkles size={16} className="text-white" />
                   </div>
                   <div>
-                    <p className="text-sm font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#A78BFA] to-[#8B5CF6]">Subash AI</p>
-                    <p className="text-[9px] text-[#34D399] leading-none mt-1 flex items-center gap-1">
-                      <span className="w-1 h-1 rounded-full bg-[#34D399] animate-pulse" />
+                    <p className="text-sm font-bold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#F783AC] to-[#E84393]">Subash AI</p>
+                    <p className="text-[9px] text-[#F783AC] leading-none mt-1 flex items-center gap-1">
+                      <span className="w-1 h-1 rounded-full bg-[#F783AC] animate-pulse" />
                       Online • Fragrance Expert
                     </p>
                   </div>

@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 // components/wardrobe/WardrobePanel.tsx
-// Phase 5 — Client component: 4 shelf tabs + add-to-wardrobe modal (owner only).
+// Phase 5 � Client component: 4 shelf tabs + add-to-wardrobe modal (owner only).
 
 import { useState, useTransition, useCallback, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -18,18 +18,18 @@ import { upsertWardrobeItem, removeWardrobeItem } from "@/lib/actions/decant";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
 import type { WardrobePerfume, WardrobeShelf as WardrobeShelfType } from "@/types/wardrobe";
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
+// --- Types ---------------------------------------------------------------------
 
 type Shelf = WardrobeShelfType;
 
 const SHELVES: { key: Shelf; label: string; emoji: string; desc: string }[] = [
-  { key: "HAVE", label: "Have", emoji: "✅", desc: "Owns it" },
-  { key: "HAD", label: "Had", emoji: "📦", desc: "Owned before" },
-  { key: "WANT", label: "Want", emoji: "💛", desc: "On the wish list" },
-  { key: "SIGNATURE", label: "Signature", emoji: "✍️", desc: "Go-to scent" },
+  { key: "HAVE", label: "Have", emoji: "?", desc: "Owns it" },
+  { key: "HAD", label: "Had", emoji: "??", desc: "Owned before" },
+  { key: "WANT", label: "Want", emoji: "??", desc: "On the wish list" },
+  { key: "SIGNATURE", label: "Signature", emoji: "??", desc: "Go-to scent" },
 ];
 
-// ─── Bottle card ───────────────────────────────────────────────────────────────
+// --- Bottle card ---------------------------------------------------------------
 
 function BottleCard({
   perfume,
@@ -62,7 +62,7 @@ function BottleCard({
       <Link href={`/perfume/${perfume.slug}`} prefetch={false}>
         <div className="rounded-2xl overflow-hidden p-3 text-center bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] transition-all hover:-translate-y-[3px] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
           {/* Bottle image */}
-          <div className="w-full h-24 flex items-center justify-center rounded-xl mb-2 overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6]/20">
+          <div className="w-full h-24 flex items-center justify-center rounded-xl mb-2 overflow-hidden bg-[#E84393]/10 border border-[#E84393]/20">
             {perfume.image_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -71,7 +71,7 @@ function BottleCard({
                 className="h-full object-contain p-1 transition-transform duration-200 group-hover:scale-105"
               />
             ) : (
-              <span className="text-[32px]">🧴</span>
+              <span className="text-[32px]">??</span>
             )}
           </div>
 
@@ -85,7 +85,7 @@ function BottleCard({
         </div>
       </Link>
 
-      {/* Remove button — owner only, appears on hover */}
+      {/* Remove button � owner only, appears on hover */}
       {isOwner && (
         <button
           onClick={handleRemove}
@@ -104,7 +104,7 @@ function BottleCard({
   );
 }
 
-// ─── Add to Wardrobe Modal ─────────────────────────────────────────────────────
+// --- Add to Wardrobe Modal -----------------------------------------------------
 
 function AddModal({
   onClose,
@@ -175,7 +175,7 @@ function AddModal({
 
         {done ? (
           <div className="py-6 text-center">
-            <CheckCircle size={40} className="mx-auto mb-2 text-[#34D399]" />
+            <CheckCircle size={40} className="mx-auto mb-2 text-[#F783AC]" />
             <p className="text-sm font-semibold text-[var(--text-primary)]">Added!</p>
           </div>
         ) : (
@@ -195,7 +195,7 @@ function AddModal({
                   type="text"
                   value={query}
                   onChange={(e) => search(e.target.value)}
-                  placeholder="Sauvage, Oud Wood…"
+                  placeholder="Sauvage, Oud Wood�"
                   className="flex-1 bg-transparent text-sm outline-none text-[var(--text-primary)] caret-[var(--accent)]"
                   autoFocus
                 />
@@ -208,14 +208,14 @@ function AddModal({
                     <button
                       key={r.id}
                       onClick={() => { setSel(r); setQuery(""); setResults([]); }}
-                      className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-[#8B5CF6]/10"
+                      className="w-full flex items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-[#E84393]/10"
                     >
-                      <div className="shrink-0 w-6 h-8 rounded overflow-hidden flex items-center justify-center bg-[#8B5CF6]/10">
+                      <div className="shrink-0 w-6 h-8 rounded overflow-hidden flex items-center justify-center bg-[#E84393]/10">
                         {r.image_url ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={r.image_url} alt={r.name} className="w-full h-full object-contain" />
                         ) : (
-                          <span className="text-xs">🧴</span>
+                          <span className="text-xs">??</span>
                         )}
                       </div>
                       <div className="min-w-0">
@@ -229,7 +229,7 @@ function AddModal({
 
               {/* Selected pill */}
               {selected && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/25">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#E84393]/10 border border-[#E84393]/25">
                   <span className="text-sm font-semibold flex-1 truncate text-[var(--text-primary)]">
                     {selected.name}
                   </span>
@@ -254,7 +254,7 @@ function AddModal({
                     className={cn(
                       "flex flex-col items-center gap-0.5 py-2 rounded-xl text-center transition-colors",
                       shelf === key
-                        ? "bg-[#8B5CF6]/15 border border-[#8B5CF6]/35 text-[var(--text-primary)]"
+                        ? "bg-[#E84393]/15 border border-[#E84393]/35 text-[var(--text-primary)]"
                         : "bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-muted)]"
                     )}
                   >
@@ -272,12 +272,12 @@ function AddModal({
               className={cn(
                 "w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm",
                 !selected || isPending
-                  ? "bg-[#8B5CF6]/30 text-[#8B5CF6]/60 cursor-not-allowed"
-                  : "bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white shadow-[0_4px_14px_rgba(139,92,246,0.25)] cursor-pointer"
+                  ? "bg-[#E84393]/30 text-[#E84393]/60 cursor-not-allowed"
+                  : "bg-[linear-gradient(135deg,#E84393,#F783AC)] text-white shadow-[0_4px_14px_rgba(232,67,147,0.25)] cursor-pointer"
               )}
             >
               {isPending ? (
-                <><Loader2 size={14} className="animate-spin" /> Saving…</>
+                <><Loader2 size={14} className="animate-spin" /> Saving�</>
               ) : (
                 <><Plus size={14} /> Add to Wardrobe</>
               )}
@@ -289,7 +289,7 @@ function AddModal({
   );
 }
 
-// ─── Wardrobe Panel (main export) ─────────────────────────────────────────────
+// --- Wardrobe Panel (main export) ---------------------------------------------
 
 export function WardrobePanel({
   grouped,
@@ -346,7 +346,7 @@ export function WardrobePanel({
             whileHover={shouldReduceMotion ? {} : { scale: 1.04 }}
             whileTap={shouldReduceMotion ? {} : { scale: 0.96 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_4px_12px_rgba(139,92,246,0.25)]"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[linear-gradient(135deg,#E84393,#F783AC)] shadow-[0_4px_12px_rgba(232,67,147,0.25)]"
           >
             <Plus size={14} /> Add Perfume
           </motion.button>
@@ -372,7 +372,7 @@ export function WardrobePanel({
               {isActive && (
                 <motion.div
                   layoutId="wardrobe-tab-pill"
-                  className="absolute inset-0 rounded-lg bg-[#8B5CF6]/15 border border-[#8B5CF6]/30"
+                  className="absolute inset-0 rounded-lg bg-[#E84393]/15 border border-[#E84393]/30"
                   transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
@@ -383,7 +383,7 @@ export function WardrobePanel({
                   className={cn(
                     "relative text-[10px] font-bold px-1.5 py-0.5 rounded-full",
                     isActive
-                      ? "bg-[#8B5CF6]/25 text-[var(--accent)]"
+                      ? "bg-[#E84393]/25 text-[var(--accent)]"
                       : "bg-[var(--bg-surface)] text-[var(--text-muted)]"
                   )}
                 >

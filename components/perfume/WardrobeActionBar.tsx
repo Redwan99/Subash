@@ -42,7 +42,7 @@ export function WardrobeActionBar({
       return "border border-transparent text-gray-400 hover:text-[var(--text-primary)] hover:bg-gray-100 dark:hover:bg-white/5";
     }
 
-    return "bg-brand-500/10 text-brand-500 border-brand-500/50 border shadow-[0_0_14px_rgba(16,185,129,0.25)]";
+    return "bg-brand-500/10 text-brand-500 border-brand-500/50 border shadow-[0_0_14px_rgba(232,67,147,0.25)]";
   };
 
   return (

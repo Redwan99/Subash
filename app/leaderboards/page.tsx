@@ -1,5 +1,5 @@
-﻿// app/leaderboards/page.tsx
-// Phase 5 / Phase 6 Gamification — Top Reviewers Leaderboard.
+// app/leaderboards/page.tsx
+// Phase 5 / Phase 6 Gamification � Top Reviewers Leaderboard.
 // Server component: queries top 50 users by review_count.
 
 import prisma from "@/lib/prisma";
@@ -8,10 +8,10 @@ import { Trophy, Star } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-// Always render at request time — no DB connection available at build time.
+// Always render at request time � no DB connection available at build time.
 export const dynamic = 'force-dynamic';
 
-// ─── Badge helper ──────────────────────────────────────────────────────────────
+// --- Badge helper --------------------------------------------------------------
 
 type BadgeTier = {
   emoji: string;
@@ -23,15 +23,15 @@ type BadgeTier = {
 function getBadge(count: number): BadgeTier {
   if (count >= 150) {
     return {
-      emoji: "🥇",
+      emoji: "??",
       label: "VIP Nose",
-      gradientClass: "bg-[linear-gradient(135deg,#8B5CF6,#A78BFA,#6D28D9)]",
-      shadowClass: "shadow-[0_0_12px_rgba(139,92,246,0.45)]",
+      gradientClass: "bg-[linear-gradient(135deg,#E84393,#F783AC,#C2255C)]",
+      shadowClass: "shadow-[0_0_12px_rgba(232,67,147,0.45)]",
     };
   }
   if (count >= 50) {
     return {
-      emoji: "🥈",
+      emoji: "??",
       label: "Collector",
       gradientClass: "bg-[linear-gradient(135deg,#8E9CB5,#C2CAD8,#6B7A8D)]",
       shadowClass: "shadow-[0_0_10px_rgba(142,156,181,0.35)]",
@@ -39,21 +39,21 @@ function getBadge(count: number): BadgeTier {
   }
   if (count >= 11) {
     return {
-      emoji: "🥉",
+      emoji: "??",
       label: "Enthusiast",
       gradientClass: "bg-[linear-gradient(135deg,#A0684A,#C8875E,#7A4F38)]",
       shadowClass: "shadow-[0_0_10px_rgba(160,104,74,0.3)]",
     };
   }
   return {
-    emoji: "🌱",
+    emoji: "??",
     label: "Novice",
     gradientClass: "",
     shadowClass: "",
   };
 }
 
-// ─── Row ───────────────────────────────────────────────────────────────────────
+// --- Row -----------------------------------------------------------------------
 
 function LeaderRow({
   user,
@@ -66,12 +66,12 @@ function LeaderRow({
   const isTop3  = rank <= 3;
 
   const rankTextClass: Record<number, string> = {
-    1: "text-[#8B5CF6]",
+    1: "text-[#E84393]",
     2: "text-[#A0A8B0]",
     3: "text-[#A0684A]",
   };
   const rankBorderClass: Record<number, string> = {
-    1: "border-[#8B5CF6]",
+    1: "border-[#E84393]",
     2: "border-[#A0A8B0]",
     3: "border-[#A0684A]",
   };
@@ -85,10 +85,10 @@ function LeaderRow({
             ? cn(
                 "backdrop-blur-[8px] shadow-[var(--shadow-glass)]",
                 rank === 1
-                  ? "bg-[linear-gradient(90deg,rgba(139,92,246,0.10)_0%,transparent_80%)] border border-[#8B5CF6]/30"
+                  ? "bg-[linear-gradient(90deg,rgba(232,67,147,0.10)_0%,transparent_80%)] border border-[#E84393]/30"
                   : rank === 2
-                  ? "bg-[linear-gradient(90deg,rgba(139,92,246,0.05)_0%,transparent_80%)] border border-[#8B5CF6]/15"
-                  : "bg-[linear-gradient(90deg,rgba(139,92,246,0.04)_0%,transparent_80%)] border border-[#8B5CF6]/15"
+                  ? "bg-[linear-gradient(90deg,rgba(232,67,147,0.05)_0%,transparent_80%)] border border-[#E84393]/15"
+                  : "bg-[linear-gradient(90deg,rgba(232,67,147,0.04)_0%,transparent_80%)] border border-[#E84393]/15"
               )
             : "bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)]"
         )}
@@ -101,15 +101,15 @@ function LeaderRow({
             rankTextClass[rank] ?? "text-[var(--text-muted)]"
           )}
         >
-          {rank <= 3 ? ["🥇","🥈","🥉"][rank - 1] : `#${rank}`}
+          {rank <= 3 ? ["??","??","??"][rank - 1] : `#${rank}`}
         </div>
 
         {/* Avatar */}
         <div
           className={cn(
             "shrink-0 w-9 h-9 rounded-full overflow-hidden flex items-center justify-center font-bold text-sm text-white border-2",
-            user.image ? "bg-transparent" : "bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)]",
-            isTop3 ? (rankBorderClass[rank] ?? "border-[#8B5CF6]") : "border-[var(--border-color)]"
+            user.image ? "bg-transparent" : "bg-[linear-gradient(135deg,#E84393,#C2255C)]",
+            isTop3 ? (rankBorderClass[rank] ?? "border-[#E84393]") : "border-[var(--border-color)]"
           )}
         >
           {user.image ? (
@@ -144,7 +144,7 @@ function LeaderRow({
                 "shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full",
                 badge.gradientClass
                   ? cn(
-                      "[background-clip:text] [-webkit-background-clip:text] [-webkit-text-fill-color:transparent] border border-[#8B5CF6]/20",
+                      "[background-clip:text] [-webkit-background-clip:text] [-webkit-text-fill-color:transparent] border border-[#E84393]/20",
                       badge.gradientClass,
                       badge.shadowClass
                     )
@@ -179,7 +179,7 @@ function LeaderRow({
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
+// --- Page ----------------------------------------------------------------------
 
 export default async function LeaderboardsPage() {
   const users = await prisma.user.findMany({
@@ -195,10 +195,10 @@ export default async function LeaderboardsPage() {
   });
 
   const tiers = [
-    { label: "VIP Nose",    emoji: "🥇", min: 150, gradientClass: "bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)]" },
-    { label: "Collector",   emoji: "🥈", min: 50,  gradientClass: "bg-[linear-gradient(135deg,#8E9CB5,#C2CAD8)]" },
-    { label: "Enthusiast",  emoji: "🥉", min: 11,  gradientClass: "bg-[linear-gradient(135deg,#A0684A,#C8875E)]" },
-    { label: "Novice",      emoji: "🌱", min: 0,   gradientClass: "" },
+    { label: "VIP Nose",    emoji: "??", min: 150, gradientClass: "bg-[linear-gradient(135deg,#E84393,#F783AC)]" },
+    { label: "Collector",   emoji: "??", min: 50,  gradientClass: "bg-[linear-gradient(135deg,#8E9CB5,#C2CAD8)]" },
+    { label: "Enthusiast",  emoji: "??", min: 11,  gradientClass: "bg-[linear-gradient(135deg,#A0684A,#C8875E)]" },
+    { label: "Novice",      emoji: "??", min: 0,   gradientClass: "" },
   ];
 
   return (
@@ -206,10 +206,10 @@ export default async function LeaderboardsPage() {
       <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">
         {/* Hero */}
         <div
-          className="relative overflow-hidden rounded-2xl mb-8 px-6 py-8 bg-[linear-gradient(135deg,rgba(139,92,246,0.12)_0%,rgba(109,40,217,0.06)_60%,transparent_100%)] border border-[#8B5CF6]/25"
+          className="relative overflow-hidden rounded-2xl mb-8 px-6 py-8 bg-[linear-gradient(135deg,rgba(232,67,147,0.12)_0%,rgba(194,37,92,0.06)_60%,transparent_100%)] border border-[#E84393]/25"
         >
           <div
-            className="absolute -top-12 -right-12 w-44 h-44 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(139,92,246,0.2)_0%,transparent_70%)]"
+            className="absolute -top-12 -right-12 w-44 h-44 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(232,67,147,0.2)_0%,transparent_70%)]"
           />
           <div className="relative flex items-center gap-3 mb-3">
             <Trophy size={24} className="text-[var(--accent)]" />
@@ -269,6 +269,6 @@ export default async function LeaderboardsPage() {
 }
 
 export const metadata = {
-  title: "Leaderboard — Subash",
+  title: "Leaderboard � Subash",
   description: "Top fragrance reviewers in the Subash community.",
 };

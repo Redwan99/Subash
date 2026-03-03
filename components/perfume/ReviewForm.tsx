@@ -225,7 +225,7 @@ function SignInCTA() {
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm bg-[linear-gradient(135deg,#059669,#10b981)] text-black shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm bg-[linear-gradient(135deg,#D6336C,#E84393)] text-black shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
         >
           <LogIn size={15} />
           Sign In to Review
@@ -311,7 +311,7 @@ export function ReviewForm({
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
           className={`flex items-start gap-2 p-3 rounded-xl mb-5 text-sm border ${state.success
-            ? "bg-[#34D399]/15 border-[#34D399]/30 text-[#34D399]"
+            ? "bg-[#F783AC]/15 border-[#F783AC]/30 text-[#F783AC]"
             : "bg-[#EF4444]/15 border-[#EF4444]/30 text-[#EF4444]"
             }`}
         >
@@ -367,8 +367,8 @@ export function ReviewForm({
           onChange={setLongevity}
           labelMap={LONGEVITY_LABELS}
           valueClass="text-brand-500"
-          barClass="bg-[linear-gradient(90deg,rgba(16,185,129,0.5),#10b981)] shadow-[0_0_10px_rgba(16,185,129,0.35)]"
-          knobClass="bg-brand-500 shadow-[0_2px_8px_rgba(16,185,129,0.55)]"
+          barClass="bg-[linear-gradient(90deg,rgba(232,67,147,0.5),#E84393)] shadow-[0_0_10px_rgba(232,67,147,0.35)]"
+          knobClass="bg-brand-500 shadow-[0_2px_8px_rgba(232,67,147,0.55)]"
         />
 
         {/* Sillage slider */}
@@ -379,8 +379,8 @@ export function ReviewForm({
           onChange={setSillage}
           labelMap={SILLAGE_LABELS}
           valueClass="text-brand-400"
-          barClass="bg-[linear-gradient(90deg,rgba(52,211,153,0.5),#34d399)] shadow-[0_0_10px_rgba(52,211,153,0.35)]"
-          knobClass="bg-brand-400 shadow-[0_2px_8px_rgba(52,211,153,0.55)]"
+          barClass="bg-[linear-gradient(90deg,rgba(247,131,172,0.5),#F783AC)] shadow-[0_0_10px_rgba(247,131,172,0.35)]"
+          knobClass="bg-brand-400 shadow-[0_2px_8px_rgba(247,131,172,0.55)]"
         />
 
         {/* Weather chips */}
@@ -398,7 +398,7 @@ export function ReviewForm({
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
                 title={desc}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer select-none border transition-all duration-150 ${weatherTags.includes(value)
-                  ? "bg-[var(--accent)]/20 border-[var(--accent)]/50 text-[var(--accent)] shadow-[0_0_8px_var(--accent-glow,rgba(139,92,246,0.25))]"
+                  ? "bg-[var(--accent)]/20 border-[var(--accent)]/50 text-[var(--accent)] shadow-[0_0_8px_var(--accent-glow,rgba(232,67,147,0.25))]"
                   : "bg-[var(--border-color)] border-transparent text-[var(--text-muted)] hover:border-[var(--accent)]/30"
                   }`}
                 aria-pressed={weatherTags.includes(value)}
@@ -536,7 +536,7 @@ export function ReviewForm({
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
           className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors ${loading
             ? "bg-[var(--border-color)] text-[var(--text-muted)] cursor-not-allowed"
-            : "bg-[linear-gradient(135deg,#059669,#10b981)] text-black shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
+            : "bg-[linear-gradient(135deg,#D6336C,#E84393)] text-black shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40"
             }`}
         >
           <Send size={15} />

@@ -66,9 +66,9 @@ async function search(q: string): Promise<PerfumeResult[]> {
 function ResultCard({ p }: { p: PerfumeResult }) {
   return (
     <Link href={`/perfume/${p.slug}`} prefetch={false}>
-      <div className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] hover:border-[#8B5CF6]/35 hover:-translate-y-[2px] hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)]">
+      <div className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] hover:border-[#E84393]/35 hover:-translate-y-[2px] hover:shadow-[0_6px_24px_rgba(0,0,0,0.10)]">
         {/* Image */}
-        <div className="shrink-0 w-12 h-16 rounded-xl flex items-center justify-center overflow-hidden bg-[#8B5CF6]/10 border border-[#8B5CF6]/20">
+        <div className="shrink-0 w-12 h-16 rounded-xl flex items-center justify-center overflow-hidden bg-[#E84393]/10 border border-[#E84393]/20">
           {p.image_url ? (
             <Image
               src={p.image_url}

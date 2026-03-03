@@ -37,7 +37,7 @@ export default async function RegisterPage() {
         <div className="text-center space-y-1">
           <Link
             href="/"
-            className="font-display text-3xl font-bold block bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
+            className="font-display text-3xl font-bold block bg-[linear-gradient(135deg,#E84393_0%,#F783AC_50%,#C2255C_100%)] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
           >
             সুবাশ
           </Link>

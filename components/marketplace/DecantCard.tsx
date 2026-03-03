@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 // components/marketplace/DecantCard.tsx
-// Phase 4 — Decant Marketplace
+// Phase 4 � Decant Marketplace
 // Displays a single peer-to-peer decant offer. Action button opens WhatsApp.
 
 import Image from "next/image";
@@ -9,7 +9,7 @@ import { MessageCircle, ShieldCheck, Package, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// --- Types --------------------------------------------------------------------
 
 export type DecantCardData = {
   id: string;
@@ -32,7 +32,7 @@ export type DecantCardData = {
   };
 };
 
-// ─── WhatsApp URL Builder ─────────────────────────────────────────────────────
+// --- WhatsApp URL Builder -----------------------------------------------------
 
 function buildWhatsAppUrl(phone: string | null, perfumeName: string): string {
   if (!phone) return "#";
@@ -53,25 +53,25 @@ function buildWhatsAppUrl(phone: string | null, perfumeName: string): string {
   return `https://wa.me/${normalized.replace(/\D/g, "")}?text=${message}`;
 }
 
-// ─── Price Badge ──────────────────────────────────────────────────────────────
+// --- Price Badge --------------------------------------------------------------
 
 function PriceBadge({ label, price }: { label: string; price: number | null }) {
   if (price == null) return null;
   return (
     <div
-      className="flex flex-col items-center px-3 py-2 rounded-xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/20"
+      className="flex flex-col items-center px-3 py-2 rounded-xl bg-[#E84393]/10 border border-[#E84393]/20"
     >
       <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
         {label}
       </span>
       <span className="text-base font-bold mt-0.5 text-[var(--accent)]">
-        ৳{price.toLocaleString()}
+        ?{price.toLocaleString()}
       </span>
     </div>
   );
 }
 
-// ─── Decant Card ──────────────────────────────────────────────────────────────
+// --- Decant Card --------------------------------------------------------------
 
 export function DecantCard({
   listing,
@@ -106,13 +106,13 @@ export function DecantCard({
       className={cn(
         "rounded-2xl overflow-hidden bg-[var(--bg-glass)] backdrop-blur-[12px] shadow-[var(--shadow-glass)] transition-all duration-200 hover:shadow-[0_8px_32px_rgba(0,0,0,0.16)]",
         isAvailable
-          ? "border border-[var(--bg-glass-border)] hover:border-[#8B5CF6]/30"
+          ? "border border-[var(--bg-glass-border)] hover:border-[#E84393]/30"
           : "border border-[#EF4444]/20 hover:border-[#EF4444]/35"
       )}
     >
-      {/* ── Proof image ──────────────────────────────────────── */}
+      {/* -- Proof image ---------------------------------------- */}
       <div
-        className="relative w-full h-32 overflow-hidden bg-[#8B5CF6]/10"
+        className="relative w-full h-32 overflow-hidden bg-[#E84393]/10"
       >
         {listing.proof_image_url ? (
           <Image
@@ -133,7 +133,7 @@ export function DecantCard({
           className={cn(
             "absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide backdrop-blur-[8px]",
             isAvailable
-              ? "bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/35"
+              ? "bg-[#F783AC]/20 text-[#F783AC] border border-[#F783AC]/35"
               : "bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/35"
           )}
         >
@@ -144,24 +144,24 @@ export function DecantCard({
         <div
           className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full bg-[rgba(0,0,0,0.55)] backdrop-blur-[8px]"
         >
-          <ShieldCheck size={10} className="text-[#34D399]" />
+          <ShieldCheck size={10} className="text-[#F783AC]" />
           <span className="text-[10px] font-mono font-semibold text-[#E5E7EB]">
             Batch: {listing.batch_code}
           </span>
         </div>
       </div>
 
-      {/* ── Card body ────────────────────────────────────────── */}
+      {/* -- Card body ------------------------------------------ */}
       <div className="p-4">
         {/* Seller row */}
         <div className="flex items-center gap-2.5 mb-3">
           {/* Avatar */}
           <div
             className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden border-2 border-[#8B5CF6]/35",
+              "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 overflow-hidden border-2 border-[#E84393]/35",
               seller.image
                 ? "bg-transparent"
-                : "bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)] text-white"
+                : "bg-[linear-gradient(135deg,#E84393,#C2255C)] text-white"
             )}
           >
             {seller.image ? (

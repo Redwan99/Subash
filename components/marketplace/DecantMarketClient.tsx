@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 // components/marketplace/DecantMarketClient.tsx
-// Phase 5 — Client wrapper that owns the sort-toggle + empty state for DecantMarket.
+// Phase 5 � Client wrapper that owns the sort-toggle + empty state for DecantMarket.
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -17,7 +17,7 @@ export function DecantMarketClient({ listings }: { listings: DecantCardData[] })
 
   const sorted = useMemo(() => {
     if (sort === "newest") return [...listings];
-    // Lowest price 5ml — listings without price_5ml float to bottom
+    // Lowest price 5ml � listings without price_5ml float to bottom
     return [...listings].sort((a, b) => {
       if (a.price_5ml == null && b.price_5ml == null) return 0;
       if (a.price_5ml == null) return 1;
@@ -51,7 +51,7 @@ export function DecantMarketClient({ listings }: { listings: DecantCardData[] })
               {sort === key && (
                 <motion.div
                   layoutId="decant-sort-pill"
-                  className="absolute inset-0 rounded-lg bg-[#8B5CF6]/15 border border-[#8B5CF6]/30"
+                  className="absolute inset-0 rounded-lg bg-[#E84393]/15 border border-[#E84393]/30"
                   transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
@@ -67,7 +67,7 @@ export function DecantMarketClient({ listings }: { listings: DecantCardData[] })
             whileHover={shouldReduceMotion ? {} : { scale: 1.03 }}
             whileTap={shouldReduceMotion ? {} : { scale: 0.97 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_4px_14px_rgba(139,92,246,0.25)]"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-[linear-gradient(135deg,#E84393,#F783AC)] shadow-[0_4px_14px_rgba(232,67,147,0.25)]"
           >
             <PlusCircle size={14} />
             List a Decant
@@ -80,7 +80,7 @@ export function DecantMarketClient({ listings }: { listings: DecantCardData[] })
         <div
           className="rounded-2xl p-16 text-center bg-[var(--bg-glass)] border border-dashed border-[var(--border-color)]"
         >
-          <span className="text-5xl">🧪</span>
+          <span className="text-5xl">??</span>
           <p className="text-base font-semibold mt-4 text-[var(--text-secondary)]">
             No decant listings yet
           </p>
@@ -89,7 +89,7 @@ export function DecantMarketClient({ listings }: { listings: DecantCardData[] })
           </p>
           <Link href="/decants/create">
             <span
-              className="inline-block px-5 py-2 rounded-xl text-sm font-semibold text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)]"
+              className="inline-block px-5 py-2 rounded-xl text-sm font-semibold text-white bg-[linear-gradient(135deg,#E84393,#F783AC)]"
             >
               List Your First Decant
             </span>

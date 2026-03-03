@@ -16,7 +16,7 @@ export function ScentOfTheDay({ data }: { data: SOTDData | null }) {
     return (
         <div className="relative group">
             {/* Ambient Glow */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-[var(--accent)] to-[#A78BFA] rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-[var(--accent)] to-[#F783AC] rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200" />
 
             <div className="relative glass-card rounded-[1.8rem] overflow-hidden border border-gray-200 dark:border-white/10 shadow-xl shadow-black/5 flex flex-col md:flex-row gap-6 p-6 md:p-8">
 

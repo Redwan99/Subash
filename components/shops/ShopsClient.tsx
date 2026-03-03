@@ -27,13 +27,13 @@ function ShopCard({ shop, index, selected, onSelect }: {
             transition={{ duration: 0.25, delay: index * 0.05 }}
             onClick={onSelect}
             className={`group relative rounded-2xl p-4 border cursor-pointer transition-all duration-200 ${selected
-                    ? "bg-[rgba(139,92,246,0.12)] border-[rgba(139,92,246,0.4)] shadow-[0_0_20px_rgba(139,92,246,0.15)]"
-                    : "glass border-[var(--bg-glass-border)] hover:border-[rgba(139,92,246,0.25)]"
+                    ? "bg-[rgba(232,67,147,0.12)] border-[rgba(232,67,147,0.4)] shadow-[0_0_20px_rgba(232,67,147,0.15)]"
+                    : "glass border-[var(--bg-glass-border)] hover:border-[rgba(232,67,147,0.25)]"
                 }`}
         >
             {/* Verified badge */}
             {shop.isVerified && (
-                <span className="absolute top-3 right-3 flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981]">
+                <span className="absolute top-3 right-3 flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-[rgba(232,67,147,0.15)] text-[#E84393]">
                     <CheckCircle size={9} /> VERIFIED
                 </span>
             )}
@@ -63,7 +63,7 @@ function ShopCard({ shop, index, selected, onSelect }: {
             {shop.website && (
                 <a href={shop.website} target="_blank" rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="mt-3 flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-bold text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_2px_10px_rgba(139,92,246,0.3)] hover:shadow-[0_4px_18px_rgba(139,92,246,0.5)] transition-all">
+                    className="mt-3 flex items-center justify-center gap-1.5 w-full py-2 rounded-xl text-xs font-bold text-white bg-[linear-gradient(135deg,#E84393,#F783AC)] shadow-[0_2px_10px_rgba(232,67,147,0.3)] hover:shadow-[0_4px_18px_rgba(232,67,147,0.5)] transition-all">
                     <Globe size={11} /> Visit Website
                 </a>
             )}
@@ -79,20 +79,20 @@ function MapView({ selectedShop }: { selectedShop: Shop | null }) {
             <div className="absolute inset-0 opacity-[0.06]"
                 style={{
                     backgroundImage: `
-            linear-gradient(rgba(139,92,246,0.8) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(139,92,246,0.8) 1px, transparent 1px)
+            linear-gradient(rgba(232,67,147,0.8) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(232,67,147,0.8) 1px, transparent 1px)
           `,
                     backgroundSize: "40px 40px",
                 }}
             />
 
             {/* Radial glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.06)_0%,transparent_70%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(232,67,147,0.06)_0%,transparent_70%)]" />
 
             {/* Dot grid overlay */}
             <div className="absolute inset-0 opacity-[0.03]"
                 style={{
-                    backgroundImage: "radial-gradient(circle, rgba(139,92,246,1) 1px, transparent 1px)",
+                    backgroundImage: "radial-gradient(circle, rgba(232,67,147,1) 1px, transparent 1px)",
                     backgroundSize: "20px 20px",
                 }}
             />
@@ -121,7 +121,7 @@ function MapView({ selectedShop }: { selectedShop: Shop | null }) {
                     transition={{ delay: 0.3 + i * 0.1, type: "spring", stiffness: 300 }}
                     className="absolute w-6 h-6 -translate-x-1/2 -translate-y-1/2"
                     style={{ left: `${x}%`, top: `${y}%` }}>
-                    <div className="w-6 h-6 rounded-full bg-[var(--accent)] flex items-center justify-center shadow-[0_0_12px_rgba(139,92,246,0.6)] cursor-pointer hover:scale-125 transition-transform">
+                    <div className="w-6 h-6 rounded-full bg-[var(--accent)] flex items-center justify-center shadow-[0_0_12px_rgba(232,67,147,0.6)] cursor-pointer hover:scale-125 transition-transform">
                         <MapPin size={12} className="text-white" />
                     </div>
                     <motion.div className="absolute inset-0 rounded-full bg-[var(--accent)] opacity-30"
@@ -135,7 +135,7 @@ function MapView({ selectedShop }: { selectedShop: Shop | null }) {
                 <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="w-16 h-16 rounded-full border border-[rgba(139,92,246,0.3)] border-dashed flex items-center justify-center mb-4 backdrop-blur-sm">
+                    className="w-16 h-16 rounded-full border border-[rgba(232,67,147,0.3)] border-dashed flex items-center justify-center mb-4 backdrop-blur-sm">
                     <Navigation size={22} className="text-[var(--accent)]" />
                 </motion.div>
 
@@ -149,7 +149,7 @@ function MapView({ selectedShop }: { selectedShop: Shop | null }) {
                 )}
 
                 {/* Loading shimmer bar */}
-                <div className="mt-4 w-32 h-1.5 rounded-full bg-[rgba(139,92,246,0.15)] overflow-hidden">
+                <div className="mt-4 w-32 h-1.5 rounded-full bg-[rgba(232,67,147,0.15)] overflow-hidden">
                     <motion.div className="h-full bg-[var(--accent)] rounded-full"
                         animate={{ x: ["-100%", "200%"] }}
                         transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} />
@@ -174,7 +174,7 @@ export function ShopsClient({ shops }: { shops: Shop[] }) {
         <div className="min-h-screen px-4 md:px-6 py-6 max-w-7xl mx-auto">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
-                <div className="w-9 h-9 rounded-xl bg-[rgba(139,92,246,0.15)] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-[rgba(232,67,147,0.15)] flex items-center justify-center">
                     <ShoppingBag size={17} className="text-[var(--accent)]" />
                 </div>
                 <div>
@@ -191,7 +191,7 @@ export function ShopsClient({ shops }: { shops: Shop[] }) {
                 <div className="space-y-6">
                     {verified.length > 0 && (
                         <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#10B981] mb-3 flex items-center gap-1.5">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#E84393] mb-3 flex items-center gap-1.5">
                                 <CheckCircle size={11} /> Verified Boutiques
                             </p>
                             <div className="space-y-3">

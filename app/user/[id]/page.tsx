@@ -1,4 +1,4 @@
-﻿// app/user/[id]/page.tsx
+// app/user/[id]/page.tsx
 // Phase 6.3 — Individual User Profile Page
 // Shows avatar, badge, bio, review history, and wardrobe shelves.
 // Wardrobe add/remove only available to the profile owner.
@@ -32,10 +32,10 @@ export async function generateMetadata({
 // ─── Badge helper ─────────────────────────────────────────────────────────────
 
 function getBadge(count: number) {
-  if (count >= 150) return { emoji: "🥇", label: "VIP Nose", color: "text-[#8B5CF6]" };
+  if (count >= 150) return { emoji: "🥇", label: "VIP Nose", color: "text-[#E84393]" };
   if (count >= 50) return { emoji: "🥈", label: "Collector", color: "text-[#9CA3AF]" };
   if (count >= 11) return { emoji: "🥉", label: "Enthusiast", color: "text-[#A0684A]" };
-  return { emoji: "🌱", label: "Novice", color: "text-[#34D399]" };
+  return { emoji: "🌱", label: "Novice", color: "text-[#F783AC]" };
 }
 
 const timeDisplay = (tag: string | null) => {
@@ -155,10 +155,10 @@ export default async function UserProfilePage({
 
         {/* ─── Currently Wearing Banner (if any) ─────────────── */}
         {status && (
-          <div className="relative mb-4 overflow-hidden rounded-2xl p-4 md:p-5 bg-[linear-gradient(135deg,rgba(16,185,129,0.16)_0%,rgba(59,130,246,0.08)_50%,transparent_100%)] border border-emerald-400/40 shadow-[0_16px_45px_rgba(6,95,70,0.45)]">
-            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(16,185,129,0.35)_0%,transparent_70%)]" />
+          <div className="relative mb-4 overflow-hidden rounded-2xl p-4 md:p-5 bg-[linear-gradient(135deg,rgba(232,67,147,0.16)_0%,rgba(59,130,246,0.08)_50%,transparent_100%)] border border-brand-400/40 shadow-[0_16px_45px_rgba(6,95,70,0.45)]">
+            <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(232,67,147,0.35)_0%,transparent_70%)]" />
             <div className="relative flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-black/40 flex items-center justify-center overflow-hidden border border-emerald-300/60">
+              <div className="w-14 h-14 rounded-2xl bg-black/40 flex items-center justify-center overflow-hidden border border-brand-300/60">
                 {status.perfume?.image_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -183,7 +183,7 @@ export default async function UserProfilePage({
                     const info = timeDisplay(status.timeTag);
                     if (!info) return null;
                     return (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-300/60 text-[10px] font-semibold">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-brand-500/20 border border-brand-300/60 text-[10px] font-semibold">
                         {info.icon}
                         <span>{info.label}</span>
                       </span>
@@ -201,11 +201,11 @@ export default async function UserProfilePage({
         )}
 
         {/* ─── Profile Hero ──────────────────────────────────── */}
-        <div className="relative overflow-hidden rounded-2xl p-6 bg-[linear-gradient(135deg,rgba(139,92,246,0.10)_0%,rgba(109,40,217,0.04)_60%,transparent_100%)] border border-[#8B5CF6]/20">
-          <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(139,92,246,0.18)_0%,transparent_70%)]" />
+        <div className="relative overflow-hidden rounded-2xl p-6 bg-[linear-gradient(135deg,rgba(232,67,147,0.10)_0%,rgba(194,37,92,0.04)_60%,transparent_100%)] border border-[#E84393]/20">
+          <div className="absolute -top-10 -right-10 w-36 h-36 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(232,67,147,0.18)_0%,transparent_70%)]" />
 
           <div className="relative flex items-start gap-5">
-            <div className="shrink-0 w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-bold text-xl text-white bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)] border-2 border-[#8B5CF6]/40">
+            <div className="shrink-0 w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-bold text-xl text-white bg-[linear-gradient(135deg,#E84393,#C2255C)] border-2 border-[#E84393]/40">
               {user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={user.image} alt={user.name ?? "User"} className="w-full h-full object-cover" />
@@ -225,14 +225,14 @@ export default async function UserProfilePage({
                       {badge.emoji} {badge.label}
                     </span>
                     {user.role !== "STANDARD" && (
-                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#8B5CF6]/15 text-[var(--accent)] border border-[#8B5CF6]/30">
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#E84393]/15 text-[var(--accent)] border border-[#E84393]/30">
                         {user.role.replace("_", " ")}
                       </span>
                     )}
                   </div>
                 </div>
                 {isOwner && (
-                  <Link href="/profile/edit" className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[var(--text-secondary)] bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] hover:border-[#8B5CF6]/35 transition-colors">
+                  <Link href="/profile/edit" className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[var(--text-secondary)] bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] hover:border-[#E84393]/35 transition-colors">
                     <Edit size={12} /> Edit Profile
                   </Link>
                 )}
@@ -339,7 +339,7 @@ export default async function UserProfilePage({
             <div className="space-y-3">
               {user.reviews.map((r) => (
                 <Link key={r.id} href={`/perfume/${r.perfume.slug}`} prefetch={false}>
-                  <div className="rounded-2xl px-4 py-4 cursor-pointer transition-all bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] hover:border-[#8B5CF6]/30 hover:-translate-y-[1px]">
+                  <div className="rounded-2xl px-4 py-4 cursor-pointer transition-all bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] hover:border-[#E84393]/30 hover:-translate-y-[1px]">
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="min-w-0">
                         <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--accent)]">{r.perfume.brand}</p>

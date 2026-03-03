@@ -119,7 +119,7 @@ export default function LicensingPage() {
                         </div>
 
                         {/* Glowing CTA */}
-                        <div className="mt-8 rounded-3xl border border-[rgba(139,92,246,0.35)] bg-[rgba(139,92,246,0.05)] p-8 flex flex-col md:flex-row items-center gap-6">
+                        <div className="mt-8 rounded-3xl border border-[rgba(232,67,147,0.35)] bg-[rgba(232,67,147,0.05)] p-8 flex flex-col md:flex-row items-center gap-6">
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
                                     <ShieldCheck size={16} className="text-[var(--accent)]" />
@@ -134,7 +134,7 @@ export default function LicensingPage() {
                             </div>
                             <a
                                 href={`mailto:${COMMERCIAL_EMAIL}?subject=Commercial%20Partnership%20Enquiry%20%E2%80%94%20${COMPANY}&body=Organisation%3A%0AIntended%20use%3A%0AData%20scope%20required%3A`}
-                                className="shrink-0 flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-bold text-white bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_4px_24px_rgba(139,92,246,0.4)] hover:shadow-[0_6px_32px_rgba(139,92,246,0.6)] transition-all"
+                                className="shrink-0 flex items-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-bold text-white bg-[linear-gradient(135deg,#E84393,#F783AC)] shadow-[0_4px_24px_rgba(232,67,147,0.4)] hover:shadow-[0_6px_32px_rgba(232,67,147,0.6)] transition-all"
                             >
                                 <Mail size={15} />
                                 Contact for Licensing

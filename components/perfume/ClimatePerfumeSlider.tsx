@@ -179,9 +179,9 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
 
   // For background accent color animation
   const accentColors = [
-    "rgba(139,92,246,0.10)",
-    "rgba(109,40,217,0.10)",
-    "rgba(167,139,250,0.10)",
+    "rgba(232,67,147,0.10)",
+    "rgba(194,37,92,0.10)",
+    "rgba(247,131,172,0.10)",
     "rgba(192,132,252,0.10)",
     "rgba(99,211,155,0.08)",
     "rgba(96,165,250,0.08)",
@@ -300,7 +300,7 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
         onClick={() => go(-1)}
         whileHover={{ scale: 1.1, x: -2 }}
         whileTap={{ scale: 0.92 }}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-20 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm border border-[rgba(139,92,246,0.25)] bg-[rgba(139,92,246,0.12)] text-[var(--accent)] shadow-md"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 z-20 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm border border-[rgba(232,67,147,0.25)] bg-[rgba(232,67,147,0.12)] text-[var(--accent)] shadow-md"
         aria-label="Previous"
       >
         <ChevronLeft size={16} />
@@ -309,7 +309,7 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
         onClick={() => go(1)}
         whileHover={{ scale: 1.1, x: 2 }}
         whileTap={{ scale: 0.92 }}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-20 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm border border-[rgba(139,92,246,0.25)] bg-[rgba(139,92,246,0.12)] text-[var(--accent)] shadow-md"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 z-20 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-sm border border-[rgba(232,67,147,0.25)] bg-[rgba(232,67,147,0.12)] text-[var(--accent)] shadow-md"
         aria-label="Next"
       >
         <ChevronRight size={16} />
@@ -327,7 +327,7 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
             animate={{
               width: i === current ? 20 : 6,
               opacity: i === current ? 1 : 0.35,
-              backgroundColor: i === current ? "var(--accent)" : "rgba(139,92,246,0.4)",
+              backgroundColor: i === current ? "var(--accent)" : "rgba(232,67,147,0.4)",
             }}
             transition={{ type: "spring", stiffness: 420, damping: 28 }}
             className="h-1.5 rounded-full cursor-pointer"
@@ -337,7 +337,7 @@ export function ClimatePerfumeSlider({ picks }: { picks: SliderPerfume[] }) {
       </div>
 
       {/* ── Thin progress bar ─── */}
-      <div className="mt-2 mx-2 h-px bg-[rgba(139,92,246,0.08)] rounded-full overflow-hidden">
+      <div className="mt-2 mx-2 h-px bg-[rgba(232,67,147,0.08)] rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-[var(--accent)] rounded-full origin-left"
           animate={{ scaleX: progressPercent / 100 }}

@@ -48,7 +48,7 @@ export function PerfumeHero({
       initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
       animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
       transition={{ duration: 0.45, ease: [0.22, 0.61, 0.36, 1] }}
-      className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-[var(--bg-glass-border)] bg-gradient-to-br from-gray-50 to-white dark:from-[rgba(15,23,42,0.96)] dark:to-[rgba(15,23,42,0.96)] dark:bg-[radial-gradient(circle_at_top,_rgba(139,92,246,0.16)_0,_transparent_55%)] shadow-sm dark:shadow-[var(--shadow-glass)] px-5 py-6 sm:px-7 sm:py-7 lg:px-9 lg:py-8"
+      className="relative overflow-hidden rounded-3xl border border-gray-200 dark:border-[var(--bg-glass-border)] bg-gradient-to-br from-gray-50 to-white dark:from-[rgba(15,23,42,0.96)] dark:to-[rgba(15,23,42,0.96)] dark:bg-[radial-gradient(circle_at_top,_rgba(232,67,147,0.16)_0,_transparent_55%)] shadow-sm dark:shadow-[var(--shadow-glass)] px-5 py-6 sm:px-7 sm:py-7 lg:px-9 lg:py-8"
     >
       <div className="pointer-events-none absolute -top-12 -right-10 h-44 w-44 rounded-full bg-[radial-gradient(circle,rgba(129,140,248,0.28)_0%,transparent_70%)]" />
       <div className="pointer-events-none absolute -bottom-10 -left-10 h-36 w-36 rounded-full bg-[radial-gradient(circle,rgba(236,72,153,0.18)_0%,transparent_70%)]" />
@@ -67,7 +67,7 @@ export function PerfumeHero({
             <div
               className={`relative w-full aspect-square md:aspect-[4/5] rounded-[2.5rem] flex items-center justify-center p-8 group ${
                 perfume.transparentImageUrl
-                  ? "bg-gradient-to-b from-brand-900/40 to-black border border-brand-500/20 shadow-[0_0_50px_-15px_rgba(16,185,129,0.3)]"
+                  ? "bg-gradient-to-b from-brand-900/40 to-black border border-brand-500/20 shadow-[0_0_50px_-15px_rgba(232,67,147,0.3)]"
                   : "bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10"
               }`}
             >
@@ -153,7 +153,7 @@ export function PerfumeHero({
                 Longevity index {Math.max(1, Math.round(avgLongevity))}/10
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-white/5 px-2 py-0.5">
-                <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                <span className="h-1 w-1 rounded-full bg-brand-400" />
                 Sillage index {Math.max(1, Math.round(avgSillage))}/10
               </span>
             </div>
@@ -169,7 +169,7 @@ export function PerfumeHero({
                       key={accord}
                       className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-[rgba(15,23,42,0.85)] px-2.5 py-0.5 text-[11px] text-slate-700 dark:text-slate-100 shadow-[0_0_0_1px_rgba(148,163,184,0.2)] dark:shadow-[0_0_0_1px_rgba(148,163,184,0.35)]"
                     >
-                      <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-br from-indigo-400 via-sky-400 to-emerald-400" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-br from-indigo-400 via-sky-400 to-brand-400" />
                       {accord}
                     </span>
                   ))}

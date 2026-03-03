@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 // app/decants/create/page.tsx
-// Phase 5 — Create Decant Listing form.
+// Phase 5 � Create Decant Listing form.
 // Route is guarded by middleware: requires signed-in, phone verified, 50+ reviews.
 // Uses react-hook-form + zod. SmartSearch-style perfume picker to get a perfumeId.
 
@@ -25,7 +25,7 @@ import { createDecantListing } from "@/lib/actions/decant";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
 import { cn } from "@/lib/utils";
 
-// ─── Form schema ───────────────────────────────────────────────────────────────
+// --- Form schema ---------------------------------------------------------------
 
 const schema = z
   .object({
@@ -42,7 +42,7 @@ const schema = z
 
 type FormValues = z.infer<typeof schema>;
 
-// ─── Perfume Picker ────────────────────────────────────────────────────────────
+// --- Perfume Picker ------------------------------------------------------------
 
 function PerfumePicker({
   value: _value,
@@ -100,7 +100,7 @@ function PerfumePicker({
       {selected ? (
         // Selected state
         <div
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#8B5CF6]/10 border border-[#8B5CF6]/30"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#E84393]/10 border border-[#E84393]/30"
         >
           {selected.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -110,7 +110,7 @@ function PerfumePicker({
               className="w-8 h-10 object-contain rounded"
             />
           ) : (
-            <span className="text-[22px]">🧴</span>
+            <span className="text-[22px]">??</span>
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate text-[var(--text-primary)]">
@@ -143,7 +143,7 @@ function PerfumePicker({
               type="text"
               value={query}
               onChange={(e) => search(e.target.value)}
-              placeholder="Search perfume name or brand…"
+              placeholder="Search perfume name or brand�"
               className="flex-1 bg-transparent text-sm outline-none text-[var(--text-primary)] caret-[var(--accent)]"
             />
           </div>
@@ -162,16 +162,16 @@ function PerfumePicker({
                     key={r.id}
                     type="button"
                     onClick={() => pick(r)}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#8B5CF6]/10"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#E84393]/10"
                   >
                     <div
-                      className="shrink-0 w-7 h-9 rounded-lg overflow-hidden flex items-center justify-center bg-[#8B5CF6]/10 border border-[#8B5CF6]/20"
+                      className="shrink-0 w-7 h-9 rounded-lg overflow-hidden flex items-center justify-center bg-[#E84393]/10 border border-[#E84393]/20"
                     >
                       {r.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={r.image_url} alt={r.name} className="w-full h-full object-contain" />
                       ) : (
-                        <span className="text-sm">🧴</span>
+                        <span className="text-sm">??</span>
                       )}
                     </div>
                     <div className="min-w-0">
@@ -191,7 +191,7 @@ function PerfumePicker({
   );
 }
 
-// ─── Field wrapper ─────────────────────────────────────────────────────────────
+// --- Field wrapper -------------------------------------------------------------
 
 function Field({
   label,
@@ -227,7 +227,7 @@ function Field({
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
+// --- Page ----------------------------------------------------------------------
 
 export default function CreateDecantPage() {
   const router            = useRouter();
@@ -270,12 +270,12 @@ export default function CreateDecantPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center"
         >
-          <CheckCircle size={56} className="mx-auto mb-4 text-[#34D399]" />
+          <CheckCircle size={56} className="mx-auto mb-4 text-[#F783AC]" />
           <h2 className="text-xl font-bold mb-1 text-[var(--text-primary)]">
             Listing Created!
           </h2>
           <p className="text-sm text-[var(--text-muted)]">
-            Redirecting to the marketplace…
+            Redirecting to the marketplace�
           </p>
         </motion.div>
       </div>
@@ -328,7 +328,7 @@ export default function CreateDecantPage() {
           {/* Batch Code */}
           <Field
             label="Batch Code"
-            hint="e.g. B24Q3 — used for authenticity tracing"
+            hint="e.g. B24Q3 � used for authenticity tracing"
             error={errors.batch_code?.message}
             icon={Hash}
           >
@@ -345,7 +345,7 @@ export default function CreateDecantPage() {
           {/* Prices */}
           <div className="grid grid-cols-2 gap-4">
             <Field
-              label="Price — 5ml (BDT)"
+              label="Price � 5ml (BDT)"
               hint="Leave 0 if not offered"
               error={errors.price_5ml?.message}
               icon={DollarSign}
@@ -363,7 +363,7 @@ export default function CreateDecantPage() {
             </Field>
 
             <Field
-              label="Price — 10ml (BDT)"
+              label="Price � 10ml (BDT)"
               hint="Leave 0 if not offered"
               error={errors.price_10ml?.message}
               icon={DollarSign}
@@ -391,7 +391,7 @@ export default function CreateDecantPage() {
             <input
               {...register("proof_image_url")}
               type="url"
-              placeholder="https://i.imgur.com/…"
+              placeholder="https://i.imgur.com/�"
               className={cn(
                 "w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-[var(--bg-surface)] text-[var(--text-primary)] caret-[var(--accent)] border",
                 errors.proof_image_url ? "border-[#EF4444]" : "border-[var(--border-color)]"
@@ -424,14 +424,14 @@ export default function CreateDecantPage() {
             className={cn(
               "w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm",
               isPending
-                ? "bg-[#8B5CF6]/40 text-[#8B5CF6]/70 opacity-80 cursor-not-allowed"
-                : "bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white shadow-[0_4px_16px_rgba(139,92,246,0.3)]"
+                ? "bg-[#E84393]/40 text-[#E84393]/70 opacity-80 cursor-not-allowed"
+                : "bg-[linear-gradient(135deg,#E84393,#F783AC)] text-white shadow-[0_4px_16px_rgba(232,67,147,0.3)]"
             )}
           >
             {isPending ? (
               <>
                 <Loader2 size={15} className="animate-spin" />
-                Publishing…
+                Publishing�
               </>
             ) : (
               <>

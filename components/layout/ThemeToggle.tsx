@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 // components/layout/ThemeToggle.tsx
 // Pro Max animated Dark/Light mode toggle.
 // Uses next-themes + Framer Motion spring physics.
@@ -15,7 +15,7 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const [mounted, setMounted] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
-  // Avoid hydration mismatch — only render after mount
+  // Avoid hydration mismatch � only render after mount
   useEffect(() => setMounted(true), []);
   if (!mounted) {
     return <div className="w-14 h-7 rounded-full bg-[var(--border-color)]" />;
@@ -43,7 +43,7 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
         <div
           className={cn(
             "relative w-14 h-7 rounded-full p-0.5 transition-colors duration-300 border border-[var(--accent)]",
-            isDark ? "bg-[#8B5CF6]/20" : "bg-[#8B5CF6]/15"
+            isDark ? "bg-[#E84393]/20" : "bg-[#E84393]/15"
           )}
         >
           {/* Sliding knob */}

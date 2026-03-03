@@ -62,12 +62,12 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           style={{
             position: "absolute",
             inset: 0,
-            background: "radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%)",
+            background: "radial-gradient(circle at center, rgba(232, 67, 147, 0.15) 0%, transparent 70%)",
           }}
         />
 
         <div style={{ position: "absolute", top: 40, left: 40, display: "flex", alignItems: "center" }}>
-          <span style={{ fontSize: 32, fontWeight: 800, color: "#a78bfa", letterSpacing: "-0.05em" }}>SUBASH</span>
+          <span style={{ fontSize: 32, fontWeight: 800, color: "#F783AC", letterSpacing: "-0.05em" }}>SUBASH</span>
         </div>
 
         {imageUrl && (
@@ -90,8 +90,8 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           style={{
             marginTop: 50,
             padding: "16px 32px",
-            background: "rgba(139, 92, 246, 0.2)",
-            border: "1px solid rgba(139, 92, 246, 0.4)",
+            background: "rgba(232, 67, 147, 0.2)",
+            border: "1px solid rgba(232, 67, 147, 0.4)",
             borderRadius: 100,
             color: "#d8b4fe",
             fontSize: 24,

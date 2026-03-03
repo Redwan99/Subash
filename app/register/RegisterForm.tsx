@@ -25,7 +25,7 @@ function SubmitButton({ disabledOverride }: { disabledOverride: boolean }) {
         "w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100 border",
         isDisabled
           ? "bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border-color)]"
-          : "bg-[linear-gradient(135deg,#8B5CF6_0%,#A78BFA_50%,#6D28D9_100%)] text-white border-[var(--border-color)]"
+          : "bg-[linear-gradient(135deg,#E84393_0%,#F783AC_50%,#C2255C_100%)] text-white border-[var(--border-color)]"
       )}
     >
       {pending ? "Creating account…" : "Create Account"}

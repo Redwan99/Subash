@@ -1,5 +1,5 @@
-﻿// app/decants/page.tsx
-// Phase 5 — Global Decant Exchange (server component)
+// app/decants/page.tsx
+// Phase 5 � Global Decant Exchange (server component)
 // Lists all AVAILABLE decant listings; client sub-component handles sort toggle.
 
 import prisma from "@/lib/prisma";
@@ -9,7 +9,7 @@ import { ShieldCheck, Package } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 
-// ─── Data fetching ─────────────────────────────────────────────────────────────
+// --- Data fetching -------------------------------------------------------------
 
 async function getListings(): Promise<DecantCardData[]> {
   const rows = await prisma.decantListing.findMany({
@@ -34,16 +34,16 @@ async function getListings(): Promise<DecantCardData[]> {
   }));
 }
 
-// ─── Hero Banner ───────────────────────────────────────────────────────────────
+// --- Hero Banner ---------------------------------------------------------------
 
 function MarketHero({ total }: { total: number }) {
   return (
     <div
-      className="relative overflow-hidden rounded-2xl mb-8 px-6 py-10 md:px-10 bg-[linear-gradient(135deg,rgba(139,92,246,0.12)_0%,rgba(109,40,217,0.06)_50%,rgba(13,13,13,0)_100%)] border border-[#8B5CF6]/25"
+      className="relative overflow-hidden rounded-2xl mb-8 px-6 py-10 md:px-10 bg-[linear-gradient(135deg,rgba(232,67,147,0.12)_0%,rgba(194,37,92,0.06)_50%,rgba(13,13,13,0)_100%)] border border-[#E84393]/25"
     >
       {/* Decorative glow */}
       <div
-        className="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(139,92,246,0.18)_0%,transparent_70%)]"
+        className="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(232,67,147,0.18)_0%,transparent_70%)]"
       />
 
       <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -87,7 +87,7 @@ function MarketHero({ total }: { total: number }) {
   );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
+// --- Page ----------------------------------------------------------------------
 
 export default async function DecantMarketPage() {
   const listings = await getListings();
@@ -105,7 +105,7 @@ export default async function DecantMarketPage() {
 }
 
 export const metadata = {
-  title: "The Decant Exchange — Subash",
+  title: "The Decant Exchange � Subash",
   description:
     "Browse authentic fragrance decants from verified sellers in Bangladesh's fragrance community.",
 };

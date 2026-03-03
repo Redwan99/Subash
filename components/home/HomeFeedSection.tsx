@@ -68,7 +68,7 @@ export function HomeFeedSection({
 
       {/* Content */}
       {tab === "TRENDING" ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5 sm:gap-6 w-full">
           {trendingPerfumes.map((p) => {
             const weekly = p.weeklySearchCount ?? 0;
             const hasTraffic = weekly > 0;
@@ -80,13 +80,13 @@ export function HomeFeedSection({
                 href={`/perfume/${p.slug}`}
                 className="flex flex-col gpu-accelerate bg-gray-50 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 group"
               >
-                <div className="relative w-full aspect-square sm:aspect-[4/5] bg-gradient-to-b from-gray-50/50 to-transparent dark:from-white/5 dark:to-transparent p-3 sm:p-5 flex items-center justify-center">
+                <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] bg-gradient-to-b from-gray-50/50 to-transparent dark:from-white/5 dark:to-transparent p-3 sm:p-5 flex items-center justify-center">
                   <Image
                     src={imageSrc}
                     alt={p.name}
                     fill
                     className="object-contain p-4 drop-shadow-xl group-hover:scale-110 transition-transform duration-700 ease-out"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>
 

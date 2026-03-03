@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 // components/layout/RightSidebar.tsx
 // Live activity feed: reviews + fragram posts from /api/sidebar.
 // Trending This Week from real DB data.
@@ -35,7 +35,7 @@ interface SidebarData {
 
 // Icon + color per type
 function itemMeta(type: string) {
-  if (type === "fragram") return { icon: Camera, bg: "bg-[#34D399]/10", text: "text-[#34D399]" };
+  if (type === "fragram") return { icon: Camera, bg: "bg-[#F783AC]/10", text: "text-[#F783AC]" };
   if (type === "deal") return { icon: Zap, bg: "bg-[#60A5FA]/10", text: "text-[#60A5FA]" };
   return { icon: Star, bg: "bg-[#F59E0B]/10", text: "text-[#F59E0B]" };
 }
@@ -58,7 +58,7 @@ function ActivityCard({ item, index, shouldReduceMotion }: { item: ActivityItem;
           whileHover={shouldReduceMotion ? {} : { y: -2 }}
           whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="group p-3 rounded-xl cursor-pointer bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--border-color)] transition-all hover:border-[rgba(139,92,246,0.25)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.12)]"
+          className="group p-3 rounded-xl cursor-pointer bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--border-color)] transition-all hover:border-[rgba(232,67,147,0.25)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.12)]"
         >
           <div className="flex items-start gap-2.5">
             <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center mt-0.5 ${bg}`}>
@@ -80,7 +80,7 @@ function ActivityCard({ item, index, shouldReduceMotion }: { item: ActivityItem;
   );
 }
 
-// Right Sidebar — fetches live data from /api/sidebar
+// Right Sidebar � fetches live data from /api/sidebar
 export function RightSidebar() {
   const shouldReduceMotion = useReducedMotion();
   const [data, setData] = useState<SidebarData | null>(null);
@@ -127,7 +127,7 @@ export function RightSidebar() {
           <motion.div
             animate={shouldReduceMotion ? {} : { opacity: [1, 0.3, 1] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-            className="w-1.5 h-1.5 rounded-full ml-auto bg-[#34D399]"
+            className="w-1.5 h-1.5 rounded-full ml-auto bg-[#F783AC]"
           />
         </div>
       </div>
@@ -173,10 +173,10 @@ export function RightSidebar() {
                 </div>
               </Link>
             ))
-            : ["—", "—", "—"].map((_, i) => (
+            : ["�", "�", "�"].map((_, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className="text-[10px] font-bold w-4 text-right text-[var(--accent)]">{i + 1}</span>
-                <span className="text-xs text-[var(--text-muted)]">Loading…</span>
+                <span className="text-xs text-[var(--text-muted)]">Loading�</span>
               </div>
             ))}
         </div>

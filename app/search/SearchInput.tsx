@@ -28,7 +28,7 @@ export function SearchInput({ initialQuery }: { initialQuery: string }) {
   );
 
   return (
-    <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] focus-within:border-[#8B5CF6]/50 transition-colors">
+    <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)] focus-within:border-[#E84393]/50 transition-colors">
       {isPending ? (
         <Loader2 size={16} className="shrink-0 animate-spin text-[var(--accent)]" />
       ) : (

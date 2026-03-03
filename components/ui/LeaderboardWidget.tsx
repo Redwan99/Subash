@@ -58,7 +58,7 @@ export function LeaderboardWidget() {
                             key={tab}
                             onClick={() => setTimeframe(tab)}
                             className={`flex-1 text-[10px] font-bold py-1.5 uppercase rounded-md transition-colors ${timeframe === tab
-                                    ? "bg-[rgba(139,92,246,0.15)] text-[var(--accent)] shadow-sm"
+                                    ? "bg-[rgba(232,67,147,0.15)] text-[var(--accent)] shadow-sm"
                                     : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                                 }`}
                         >
@@ -92,7 +92,7 @@ export function LeaderboardWidget() {
                                     {perfumes.length > 0 ? (
                                         perfumes.map((p, i) => (
                                             <Link key={p.id} href={`/perfume/${p.slug}`} prefetch={false}>
-                                                <div className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[rgba(139,92,246,0.08)] transition-colors">
+                                                <div className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[rgba(232,67,147,0.08)] transition-colors">
                                                     <span className="text-[10px] font-bold w-4 text-center text-[var(--accent)] shrink-0">
                                                         {i + 1}
                                                     </span>
@@ -128,7 +128,7 @@ export function LeaderboardWidget() {
                                                 key={u.id}
                                                 className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                                             >
-                                                <span className="text-[10px] font-bold w-4 text-center text-[#34D399] shrink-0">
+                                                <span className="text-[10px] font-bold w-4 text-center text-[#F783AC] shrink-0">
                                                     {i + 1}
                                                 </span>
                                                 <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 bg-gray-200 dark:bg-[rgba(255,255,255,0.1)] flex items-center justify-center">
@@ -141,9 +141,9 @@ export function LeaderboardWidget() {
                                                 <span className="text-xs text-[var(--text-primary)] font-medium truncate flex-1 block">
                                                     {u.name}
                                                 </span>
-                                                <div className="flex items-center gap-1 shrink-0 bg-[#34D399]/10 px-1.5 py-0.5 rounded">
-                                                    <Award size={9} className="text-[#34D399]" />
-                                                    <span className="text-[9px] font-bold text-[#34D399]">{u.reviewCount}</span>
+                                                <div className="flex items-center gap-1 shrink-0 bg-[#F783AC]/10 px-1.5 py-0.5 rounded">
+                                                    <Award size={9} className="text-[#F783AC]" />
+                                                    <span className="text-[9px] font-bold text-[#F783AC]">{u.reviewCount}</span>
                                                 </div>
                                             </div>
                                         ))}

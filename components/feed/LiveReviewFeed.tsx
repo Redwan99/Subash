@@ -74,7 +74,7 @@ function ReviewCard({ review, isNew }: { review: LiveReview; isNew: boolean }) {
             exit={{ opacity: 0, height: 0, overflow: "hidden" }}
             transition={{ type: "spring", stiffness: 320, damping: 28 }}
             className={`relative rounded-2xl p-4 border transition-colors duration-300 glass overflow-hidden ${isNew
-                ? "border-[rgba(139,92,246,0.4)] shadow-[0_0_24px_rgba(139,92,246,0.15)]"
+                ? "border-[rgba(232,67,147,0.4)] shadow-[0_0_24px_rgba(232,67,147,0.15)]"
                 : "border-[var(--bg-glass-border)]"
                 }`}
         >
@@ -84,14 +84,14 @@ function ReviewCard({ review, isNew }: { review: LiveReview; isNew: boolean }) {
                     initial={{ opacity: 1 }}
                     animate={{ opacity: 0 }}
                     transition={{ delay: 3, duration: 1 }}
-                    className="absolute top-0 left-0 right-0 h-[2px] bg-[linear-gradient(90deg,transparent,#8B5CF6,#A78BFA,transparent)]"
+                    className="absolute top-0 left-0 right-0 h-[2px] bg-[linear-gradient(90deg,transparent,#E84393,#F783AC,transparent)]"
                 />
             )}
 
             <div className="flex gap-3">
                 {/* Perfume thumb */}
                 <Link href={`/perfume/${review.perfume.slug}`} className="shrink-0">
-                    <div className="relative w-12 h-14 rounded-xl overflow-hidden bg-[rgba(139,92,246,0.08)] border border-[var(--bg-glass-border)]">
+                    <div className="relative w-12 h-14 rounded-xl overflow-hidden bg-[rgba(232,67,147,0.08)] border border-[var(--bg-glass-border)]">
                         {review.perfume.image_url ? (
                             <Image
                                 src={review.perfume.image_url}
@@ -144,13 +144,13 @@ function ReviewCard({ review, isNew }: { review: LiveReview; isNew: boolean }) {
                 </div>
                 {/* Sillage */}
                 <div className="flex items-center gap-1 text-[10px] text-[var(--text-muted)]">
-                    <Wind size={10} className="text-[#34D399]" />
+                    <Wind size={10} className="text-[#F783AC]" />
                     <span>Sillage <strong className="text-[var(--text-secondary)]">{review.sillage_score}/10</strong></span>
                 </div>
 
                 {/* Weather tags */}
                 {weatherTags.slice(0, 2).map((tag) => (
-                    <span key={tag} className="flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(139,92,246,0.08)] text-[var(--text-muted)] capitalize">
+                    <span key={tag} className="flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(232,67,147,0.08)] text-[var(--text-muted)] capitalize">
                         <Thermometer size={8} /> {tag.toLowerCase()}
                     </span>
                 ))}
@@ -167,7 +167,7 @@ function ReviewCard({ review, isNew }: { review: LiveReview; isNew: boolean }) {
                 {review.user.image ? (
                     <Image src={review.user.image} alt={review.user.name ?? ""} width={20} height={20} className="rounded-full" />
                 ) : (
-                    <div className="w-5 h-5 rounded-full bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)] flex items-center justify-center text-[8px] font-black text-white">
+                    <div className="w-5 h-5 rounded-full bg-[linear-gradient(135deg,#E84393,#C2255C)] flex items-center justify-center text-[8px] font-black text-white">
                         {initials}
                     </div>
                 )}

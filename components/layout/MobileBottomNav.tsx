@@ -26,7 +26,7 @@ export default function MobileBottomNav() {
             return (
               <button
                 key={item.name}
-                className="relative p-3 mx-1 bg-gradient-to-tr from-emerald-400 to-teal-500 rounded-full text-black shadow-lg shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all duration-300"
+                className="relative p-3 mx-1 bg-gradient-to-tr from-brand-400 to-brand-500 rounded-full text-black shadow-lg shadow-brand-500/30 hover:scale-105 active:scale-95 transition-all duration-300"
                 aria-label="Open currently wearing status"
                 onClick={() => window.dispatchEvent(new Event("open-status-modal"))}
               >

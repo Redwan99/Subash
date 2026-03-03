@@ -172,7 +172,7 @@ function Callout({ children, color = "accent" }: { children: React.ReactNode; co
     const colors =
         color === "red"
             ? "border-[rgba(239,68,68,0.35)] bg-[rgba(239,68,68,0.06)]"
-            : "border-[rgba(139,92,246,0.35)] bg-[rgba(139,92,246,0.06)]";
+            : "border-[rgba(232,67,147,0.35)] bg-[rgba(232,67,147,0.06)]";
     return (
         <div className={`mt-5 rounded-2xl border p-5 text-sm leading-relaxed ${colors}`}>
             {children}

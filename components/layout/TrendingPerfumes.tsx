@@ -29,7 +29,7 @@ export async function TrendingPerfumes() {
         <div className="rounded-2xl p-4 glass border border-[var(--bg-glass-border)] bg-black/5 dark:bg-white/5 backdrop-blur-md">
             {/* Header */}
             <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-[rgba(16,185,129,0.18)]">
+                <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 bg-[rgba(232,67,147,0.18)]">
                     <TrendingUp size={13} className="text-brand-500" />
                 </div>
                 <span className="text-[10px] font-bold tracking-widest uppercase text-brand-500">

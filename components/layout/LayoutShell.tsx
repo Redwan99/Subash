@@ -48,7 +48,7 @@ function AmbientOrbs() {
         className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.20] bg-[var(--bg-glow-color)] transition-colors duration-[2000ms] orb-drift-alt"
       />
       <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[100px] opacity-[0.12] bg-[var(--accent-glow,rgba(139,92,246,0.3))] transition-colors duration-[2000ms] orb-drift-slow"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full blur-[100px] opacity-[0.12] bg-[var(--accent-glow,rgba(232,67,147,0.3))] transition-colors duration-[2000ms] orb-drift-slow"
       />
     </div>
   );

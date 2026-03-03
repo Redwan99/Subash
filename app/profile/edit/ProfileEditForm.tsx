@@ -48,7 +48,7 @@ export function ProfileEditForm({
           className={`w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-surface)] border outline-none transition-colors text-[var(--text-primary)] placeholder:text-[var(--text-muted)] caret-[var(--accent)] ${
             state.fieldErrors?.name
               ? "border-[#EF4444]"
-              : "border-[var(--border-color)] focus:border-[#8B5CF6]/50"
+              : "border-[var(--border-color)] focus:border-[#E84393]/50"
           }`}
           placeholder="Your display name"
         />
@@ -74,7 +74,7 @@ export function ProfileEditForm({
           className={`w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-surface)] border outline-none transition-colors resize-none text-[var(--text-primary)] placeholder:text-[var(--text-muted)] caret-[var(--accent)] ${
             state.fieldErrors?.bio
               ? "border-[#EF4444]"
-              : "border-[var(--border-color)] focus:border-[#8B5CF6]/50"
+              : "border-[var(--border-color)] focus:border-[#E84393]/50"
           }`}
           placeholder="Tell the community about your fragrance journey…"
         />
@@ -92,7 +92,7 @@ export function ProfileEditForm({
 
       {/* Success banner */}
       {state.success && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#34D399]/10 border border-[#34D399]/25 text-[#34D399] text-sm">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#F783AC]/10 border border-[#F783AC]/25 text-[#F783AC] text-sm">
           <CheckCircle size={14} /> Profile updated! Redirecting…
         </div>
       )}
@@ -101,7 +101,7 @@ export function ProfileEditForm({
       <button
         type="submit"
         disabled={isPending}
-        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] shadow-[0_4px_14px_rgba(139,92,246,0.3)]"
+        className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-60 disabled:cursor-not-allowed bg-[linear-gradient(135deg,#E84393,#F783AC)] shadow-[0_4px_14px_rgba(232,67,147,0.3)]"
       >
         {isPending ? (
           <><Loader2 size={14} className="animate-spin" /> Saving…</>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -44,7 +44,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
         <p className="text-gray-500 mb-4">Your feed is quiet. Discover new creators to follow!</p>
         <Link
           href="/encyclopedia"
-          className="px-6 py-2 rounded-full font-bold bg-brand-500 text-black hover:bg-brand-400 transition-colors"
+          className="px-6 py-2 rounded-full font-bold bg-brand-500 text-white hover:bg-brand-400 transition-colors"
         >
           Explore Encyclopedia
         </Link>
@@ -65,7 +65,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
                   {item.user.image ? (
                     <Image src={item.user.image} alt={item.user.name || "User"} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-white/20" />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-brand-500 text-black flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold">
                       {item.user.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                   )}
@@ -104,7 +104,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
                   {item.user.image ? (
                     <Image src={item.user.image} alt={item.user.name || "User"} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-white/20" />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-brand-500 text-black flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold">
                       {item.user.name?.charAt(0).toUpperCase() || "U"}
                     </div>
                   )}

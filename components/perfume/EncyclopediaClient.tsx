@@ -38,7 +38,7 @@ type Props = {
 const GENDER_COLORS: Record<string, string> = {
     men: "text-[#60A5FA] bg-[rgba(96,165,250,0.1)]",
     women: "text-[#F472B6] bg-[rgba(244,114,182,0.1)]",
-    unisex: "text-[#A78BFA] bg-[rgba(167,139,250,0.1)]",
+    unisex: "text-[#F783AC] bg-[rgba(247,131,172,0.1)]",
 };
 
 // ── Single perfume card ───────────────────────────────────────────────────────
@@ -54,9 +54,9 @@ function PerfumeCard({ perfume, index }: { perfume: Perfume; index: number }) {
             className="group"
         >
             <Link href={`/perfume/${perfume.slug}`} prefetch={false}>
-                <div className="relative rounded-2xl overflow-hidden border border-[var(--bg-glass-border)] hover:border-[rgba(139,92,246,0.35)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(139,92,246,0.18)] hover:-translate-y-1 glass">
+                <div className="relative rounded-2xl overflow-hidden border border-[var(--bg-glass-border)] hover:border-[rgba(232,67,147,0.35)] transition-all duration-300 hover:shadow-[0_8px_32px_rgba(232,67,147,0.18)] hover:-translate-y-1 glass">
                     {/* Image */}
-                    <div className="relative h-44 bg-gradient-to-b from-[rgba(139,92,246,0.06)] to-transparent flex items-center justify-center">
+                    <div className="relative h-44 bg-gradient-to-b from-[rgba(232,67,147,0.06)] to-transparent flex items-center justify-center">
                         {perfume.image_url ? (
                             <Image
                                 src={perfume.image_url}
@@ -88,7 +88,7 @@ function PerfumeCard({ perfume, index }: { perfume: Perfume; index: number }) {
                         {/* Accords */}
                         <div className="flex flex-wrap gap-1">
                             {perfume.accords.slice(0, 3).map((a) => (
-                                <span key={a} className="text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(139,92,246,0.1)] text-[var(--text-muted)] capitalize">
+                                <span key={a} className="text-[9px] px-1.5 py-0.5 rounded-full bg-[rgba(232,67,147,0.1)] text-[var(--text-muted)] capitalize">
                                     {a}
                                 </span>
                             ))}
@@ -133,7 +133,7 @@ function FilterPanel({
                             key={g}
                             onClick={() => onSetFilter("gender", activeFilters.gender === g ? null : g)}
                             className={`text-left px-3 py-1.5 rounded-xl text-sm font-medium capitalize transition-all ${activeFilters.gender === g
-                                ? "bg-[rgba(139,92,246,0.2)] text-[var(--accent)] border border-[rgba(139,92,246,0.35)]"
+                                ? "bg-[rgba(232,67,147,0.2)] text-[var(--accent)] border border-[rgba(232,67,147,0.35)]"
                                 : "text-[var(--text-secondary)] hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.05)]"
                                 }`}
                         >
@@ -152,8 +152,8 @@ function FilterPanel({
                             key={a}
                             onClick={() => onSetFilter("accord", activeFilters.accord === a ? null : a)}
                             className={`text-xs px-2.5 py-1 rounded-full font-medium capitalize transition-all border ${activeFilters.accord === a
-                                ? "bg-[rgba(139,92,246,0.2)] border-[rgba(139,92,246,0.4)] text-[var(--accent)]"
-                                : "border-[var(--border-color)] text-[var(--text-muted)] hover:border-[rgba(139,92,246,0.25)]"
+                                ? "bg-[rgba(232,67,147,0.2)] border-[rgba(232,67,147,0.4)] text-[var(--accent)]"
+                                : "border-[var(--border-color)] text-[var(--text-muted)] hover:border-[rgba(232,67,147,0.25)]"
                                 }`}
                         >
                             {a}
@@ -171,7 +171,7 @@ function FilterPanel({
                             key={b}
                             onClick={() => onSetFilter("brand", activeFilters.brand === b ? null : b)}
                             className={`w-full text-left px-2 py-1 rounded-lg text-xs transition-all truncate ${activeFilters.brand === b
-                                ? "text-[var(--accent)] font-semibold bg-[rgba(139,92,246,0.1)]"
+                                ? "text-[var(--accent)] font-semibold bg-[rgba(232,67,147,0.1)]"
                                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.04)]"
                                 }`}
                         >
@@ -275,7 +275,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
             {/* ── Page Header ────────────────────────────────────────────── */}
             <div className="px-4 md:px-6 pt-6 pb-4">
                 <div className="flex items-center gap-3 mb-1">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[rgba(139,92,246,0.15)]">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[rgba(232,67,147,0.15)]">
                         <BookOpen size={17} className="text-[var(--accent)]" />
                     </div>
                     <h1 className="text-2xl font-black text-[var(--text-primary)]">Perfume Encyclopedia</h1>
@@ -293,7 +293,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="Search by name or brand…"
-                        className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] text-[var(--text-primary)] outline-none focus:border-[rgba(139,92,246,0.5)] placeholder:text-[var(--text-muted)]"
+                        className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] text-[var(--text-primary)] outline-none focus:border-[rgba(232,67,147,0.5)] placeholder:text-[var(--text-muted)]"
                     />
                     {query && (
                         <button aria-label="Clear Search" onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -305,7 +305,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                 <button
                     onClick={() => setSidebar(!sidebarOpen)}
                     className={`md:hidden flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-all ${hasFilters || sidebarOpen
-                        ? "bg-[rgba(139,92,246,0.15)] border-[rgba(139,92,246,0.3)] text-[var(--accent)]"
+                        ? "bg-[rgba(232,67,147,0.15)] border-[rgba(232,67,147,0.3)] text-[var(--accent)]"
                         : "bg-[var(--bg-glass)] border-[var(--bg-glass-border)] text-[var(--text-secondary)]"
                         }`}
                 >
@@ -319,7 +319,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                 <div className="px-4 md:px-6 mb-3 flex flex-wrap gap-2">
                     {Object.entries(activeFilters).map(([k, v]) => v ? (
                         <span key={k}
-                            className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-[rgba(139,92,246,0.15)] border border-[rgba(139,92,246,0.3)] text-[var(--accent)]"
+                            className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-[rgba(232,67,147,0.15)] border border-[rgba(232,67,147,0.3)] text-[var(--accent)]"
                         >
                             <span className="capitalize">{v}</span>
                             <button aria-label="Remove Filter" onClick={() => setFilter(k as keyof ActiveFilters, null)}>
@@ -371,14 +371,14 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
                                 {filtered.map((p, i) => <PerfumeCard key={p.id} perfume={p} index={i} />)}
                             </div>
 
                             {/* Infinite Scroll Loader */}
                             {!query && hasMore && (
                                 <div ref={observerRef} className="flex flex-col items-center justify-center py-12">
-                                    <div className="w-8 h-8 rounded-full border-2 border-[rgba(139,92,246,0.3)] border-t-[var(--accent)] animate-spin mb-4"></div>
+                                    <div className="w-8 h-8 rounded-full border-2 border-[rgba(232,67,147,0.3)] border-t-[var(--accent)] animate-spin mb-4"></div>
                                     <span className="text-[10px] text-[var(--text-muted)] tracking-widest uppercase font-bold">Summoning more fragrances...</span>
                                 </div>
                             )}
