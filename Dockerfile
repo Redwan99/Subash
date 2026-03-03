@@ -24,17 +24,25 @@ COPY . .
 RUN npx prisma generate
 
 # Build the Next.js app in standalone mode
-# Dummy build-time env vars prevent Prisma/NextAuth from retrying
+# Dummy build-time args prevent Prisma/NextAuth from retrying
 # connections to a DB that doesn't exist during the build stage.
 # These are overridden by real values in docker-compose.yml at runtime.
+# Using ARG (not ENV) so secrets don't persist in the final image layer.
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV DATABASE_URL="file:./subash.db"
-ENV AUTH_SECRET=build-time-dummy-secret-not-used-at-runtime
-ENV AUTH_URL=http://localhost:9864
-ENV GOOGLE_CLIENT_ID=build-dummy
-ENV GOOGLE_CLIENT_SECRET=build-dummy
-ENV FACEBOOK_CLIENT_ID=build-dummy
-ENV FACEBOOK_CLIENT_SECRET=build-dummy
+ARG DATABASE_URL="file:./subash.db"
+ARG AUTH_SECRET=build-time-placeholder
+ARG AUTH_URL=http://localhost:9864
+ARG GOOGLE_CLIENT_ID=build-dummy
+ARG GOOGLE_CLIENT_SECRET=build-dummy
+ARG FACEBOOK_CLIENT_ID=build-dummy
+ARG FACEBOOK_CLIENT_SECRET=build-dummy
+ENV DATABASE_URL=$DATABASE_URL \
+    AUTH_SECRET=$AUTH_SECRET \
+    AUTH_URL=$AUTH_URL \
+    GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+    GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+    FACEBOOK_CLIENT_ID=$FACEBOOK_CLIENT_ID \
+    FACEBOOK_CLIENT_SECRET=$FACEBOOK_CLIENT_SECRET
 RUN npm run build
 
 # Compile the CSV seed script so it can run with plain node in production

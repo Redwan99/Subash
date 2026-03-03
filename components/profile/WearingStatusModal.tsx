@@ -69,6 +69,7 @@ function WardrobeQuickPick({
                     name: p.name,
                     brand: p.brand,
                     image_url: p.image_url,
+                    slug: p.slug,
                   })
                 }
                 className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${

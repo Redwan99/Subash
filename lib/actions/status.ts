@@ -65,6 +65,7 @@ export type WardrobeQuickPickItem = {
   name: string;
   brand: string;
   image_url: string | null;
+  slug: string;
 };
 
 export async function getMyWardrobePerfumes(): Promise<WardrobeQuickPickItem[]> {
@@ -78,7 +79,7 @@ export async function getMyWardrobePerfumes(): Promise<WardrobeQuickPickItem[]> 
     take: 50,
     include: {
       perfume: {
-        select: { id: true, name: true, brand: true, image_url: true },
+        select: { id: true, name: true, brand: true, image_url: true, slug: true },
       },
     },
   });
@@ -94,6 +95,7 @@ export async function getMyWardrobePerfumes(): Promise<WardrobeQuickPickItem[]> 
         name: item.perfume.name,
         brand: item.perfume.brand,
         image_url: item.perfume.image_url,
+        slug: item.perfume.slug,
       });
     }
   }

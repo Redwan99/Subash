@@ -71,7 +71,6 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         </div>
 
         {imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element -- required: @vercel/og ImageResponse does not support next/image
           <img
             src={imageUrl}
             alt={perfume.name}
