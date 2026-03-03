@@ -18,11 +18,11 @@ export function ScentOfTheDay({ data }: { data: SOTDData | null }) {
             {/* Ambient Glow */}
             <div className="absolute -inset-1 bg-gradient-to-r from-[var(--accent)] to-[#A78BFA] rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-1000 group-hover:duration-200" />
 
-            <div className="relative glass-card rounded-[1.8rem] overflow-hidden border border-white/20 dark:border-white/10 shadow-xl shadow-black/5 flex flex-col md:flex-row gap-6 p-6 md:p-8">
+            <div className="relative glass-card rounded-[1.8rem] overflow-hidden border border-gray-200 dark:border-white/10 shadow-xl shadow-black/5 flex flex-col md:flex-row gap-6 p-6 md:p-8">
 
                 {/* Left: Image & Badge */}
                 <div className="w-full md:w-48 shrink-0 relative">
-                    <div className="aspect-[4/5] relative rounded-2xl overflow-hidden bg-white/50 dark:bg-black/20 flex items-center justify-center p-4 border border-white/20">
+                    <div className="aspect-[4/5] relative rounded-2xl overflow-hidden bg-white/50 dark:bg-black/20 flex items-center justify-center p-4 border border-gray-200 dark:border-white/20">
                         {displayImage ? (
                             <Image
                                 src={displayImage}
@@ -59,7 +59,7 @@ export function ScentOfTheDay({ data }: { data: SOTDData | null }) {
                         </p>
 
                         {data.note && (
-                            <div className="relative bg-white/5 dark:bg-black/10 rounded-xl p-4 border border-white/10 mb-6">
+                            <div className="relative bg-gray-50 dark:bg-black/10 rounded-xl p-4 border border-gray-200 dark:border-white/10 mb-6">
                                 <Quote size={24} className="absolute -top-3 -left-1 text-[var(--accent)] opacity-20 transform -rotate-12" />
                                 <p className="text-sm text-[var(--text-primary)] leading-relaxed italic relative z-10">
                                     {data.note}

@@ -138,7 +138,7 @@ function AvatarMenu() {
           whileHover={shouldReduceMotion ? {} : { scale: 1.04 }}
           whileTap={shouldReduceMotion ? {} : { scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-gray-900 dark:text-white active:scale-[0.97]"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-[linear-gradient(135deg,#8B5CF6,#A78BFA)] text-white active:scale-[0.97]"
         >
           <LogIn size={14} />
           <span className="hidden sm:block">Sign In</span>

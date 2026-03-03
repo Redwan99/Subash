@@ -36,7 +36,7 @@ export function FollowButton({ targetUserId, initialFollowing }: FollowButtonPro
       disabled={isPending}
       className={`relative py-1.5 px-4 text-xs font-bold rounded-full overflow-hidden transition-all flex items-center justify-center gap-1.5 isolate ${
         initialFollowing
-          ? "bg-white/10 text-white border border-white/20 hover:border-red-500 hover:text-red-500 hover:bg-red-500/10"
+          ? "bg-gray-100 dark:bg-white/10 text-[var(--text-primary)] border border-gray-200 dark:border-white/20 hover:border-red-500 hover:text-red-500 hover:bg-red-500/10"
           : "bg-brand-500 hover:bg-brand-400 text-black font-bold border border-transparent"
       } disabled:opacity-50`}
     >

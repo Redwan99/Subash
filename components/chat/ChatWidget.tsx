@@ -58,7 +58,7 @@ function PerfumeCard({ p }: { p: BotPerfume }) {
     <Link
       href={`/perfume/${p.id}`}
       className="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all
-        bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10
+        bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10
         hover:bg-[var(--accent)]/15 hover:border-[var(--accent)]/35
         hover:shadow-[0_0_10px_var(--accent-glow,rgba(139,92,246,0.25))]"
     >
@@ -80,7 +80,7 @@ function PerfumeCard({ p }: { p: BotPerfume }) {
         )}
       </div>
       {p.gender && (
-        <span className="shrink-0 text-[8px] px-1.5 py-0.5 rounded-full border border-white/20 text-[var(--text-muted)]">
+        <span className="shrink-0 text-[8px] px-1.5 py-0.5 rounded-full border border-gray-200 dark:border-white/20 text-[var(--text-muted)]">
           {p.gender.replace("for ", "").replace("women and men", "unisex")}
         </span>
       )}
@@ -234,13 +234,13 @@ export function ChatWidget({ featureToggles }: { featureToggles?: Record<string,
               "w-[calc(100vw-2rem)] max-w-[380px]",
               "rounded-2xl flex flex-col overflow-hidden",
               "bg-white/50 dark:bg-black/50 backdrop-blur-2xl",
-              "border border-white/30 dark:border-white/10",
+              "border border-gray-200 dark:border-white/10",
               "shadow-[0_24px_64px_rgba(0,0,0,0.28),0_0_0_1px_rgba(255,255,255,0.08)]"
             )}
             style={{ height: "520px" }}
           >
             {/* Header */}
-            <div className="shrink-0 px-4 py-4 border-b border-white/20 dark:border-white/10 bg-[rgba(139,92,246,0.07)]">
+            <div className="shrink-0 px-4 py-4 border-b border-gray-200 dark:border-white/10 bg-[rgba(139,92,246,0.07)]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[linear-gradient(135deg,#8B5CF6,#6D28D9)] shadow-[0_0_10px_rgba(139,92,246,0.45)]">

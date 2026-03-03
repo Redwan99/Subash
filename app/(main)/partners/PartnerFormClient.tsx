@@ -32,7 +32,7 @@ export function PartnerFormClient() {
                     <CheckCircle2 size={32} />
                 </div>
                 <div>
-                    <h3 className="text-xl font-bold text-white">Claim Submitted</h3>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)]">Claim Submitted</h3>
                     <p className="text-sm text-[var(--text-secondary)] mt-1">
                         Our partnership team will review your application and reach out within 2-3 business days.
                     </p>
@@ -58,7 +58,7 @@ export function PartnerFormClient() {
                     name="brandName"
                     required
                     placeholder="e.g. Creed"
-                    className="w-full px-4 py-3 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white focus:outline-none focus:border-[#8B5CF6] transition-colors"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#8B5CF6] transition-colors"
                 />
             </div>
 
@@ -71,7 +71,7 @@ export function PartnerFormClient() {
                     name="officialEmail"
                     required
                     placeholder="contact@brand.com"
-                    className="w-full px-4 py-3 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white focus:outline-none focus:border-[#8B5CF6] transition-colors"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#8B5CF6] transition-colors"
                 />
             </div>
 
@@ -83,7 +83,7 @@ export function PartnerFormClient() {
                     name="message"
                     rows={3}
                     placeholder="How can we help your brand grow?"
-                    className="w-full px-4 py-3 rounded-xl bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white focus:outline-none focus:border-[#8B5CF6] transition-colors resize-none"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] text-[var(--text-primary)] focus:outline-none focus:border-[#8B5CF6] transition-colors resize-none"
                 />
             </div>
 

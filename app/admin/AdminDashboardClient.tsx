@@ -419,7 +419,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-[#050505] text-gray-900 dark:text-white">
+        <div className="min-h-screen dark bg-[#050505] text-white">
 
             {/* Ambient orbs */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">

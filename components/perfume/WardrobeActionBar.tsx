@@ -39,14 +39,14 @@ export function WardrobeActionBar({
 
   const getClassName = (key: ActionType) => {
     if (status !== key) {
-      return "border border-transparent text-gray-400 hover:text-white hover:bg-white/5";
+      return "border border-transparent text-gray-400 hover:text-[var(--text-primary)] hover:bg-gray-100 dark:hover:bg-white/5";
     }
 
     return "bg-brand-500/10 text-brand-500 border-brand-500/50 border shadow-[0_0_14px_rgba(16,185,129,0.25)]";
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 p-2 bg-white/5 dark:bg-black/40 backdrop-blur-2xl border border-[var(--bg-glass-border)] rounded-2xl shadow-xl">
+    <div className="flex flex-wrap items-center justify-between gap-2 p-2 bg-gray-50 dark:bg-black/40 backdrop-blur-2xl border border-[var(--bg-glass-border)] rounded-2xl shadow-xl">
       <div className="flex flex-1 items-center gap-1">
         {BUTTONS.map(({ key, label, icon: Icon }) => (
           <button

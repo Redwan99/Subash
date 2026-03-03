@@ -58,7 +58,7 @@ export function CommentSection({
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         placeholder="Share your thoughts on this story..."
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)]/50 transition-all min-h-[100px] resize-none"
+                        className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl p-4 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)]/50 transition-all min-h-[100px] resize-none"
                         disabled={isPending}
                     />
                     <div className="absolute bottom-3 right-3 flex items-center gap-3">
@@ -73,7 +73,7 @@ export function CommentSection({
                     </div>
                 </form>
             ) : (
-                <div className="p-8 rounded-2xl border-2 border-dashed border-white/10 text-center">
+                <div className="p-8 rounded-2xl border-2 border-dashed border-gray-200 dark:border-white/10 text-center">
                     <p className="text-sm text-[var(--text-muted)] mb-4">You must be signed in to join the conversation.</p>
                     <a href="/login" className="text-xs font-bold text-[var(--accent)] uppercase tracking-widest hover:underline">
                         Sign In Now
@@ -90,13 +90,13 @@ export function CommentSection({
                     initialComments.map((comment) => (
                         <div key={comment.id} className="group relative flex gap-4">
                             {/* Vertical Line */}
-                            <div className="absolute left-4 top-10 bottom-0 w-px bg-gradient-to-b from-white/10 to-transparent" />
+                            <div className="absolute left-4 top-10 bottom-0 w-px bg-gradient-to-b from-gray-200 dark:from-white/10 to-transparent" />
 
-                            <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-white/10 border border-white/10">
+                            <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-gray-100 dark:bg-white/10 border border-gray-200 dark:border-white/10">
                                 {comment.user.image ? (
                                     <Image src={comment.user.image} alt={comment.user.name || "User"} fill className="object-cover" />
                                 ) : (
-                                    <span className="flex items-center justify-center h-full text-[10px] font-bold text-white uppercase">
+                                    <span className="flex items-center justify-center h-full text-[10px] font-bold text-[var(--text-primary)] uppercase">
                                         {comment.user.name?.[0] || "U"}
                                     </span>
                                 )}
@@ -116,7 +116,7 @@ export function CommentSection({
                                         })}
                                     </time>
                                 </div>
-                                <div className="text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap mt-2 p-4 rounded-2xl rounded-tl-none bg-white/5 border border-white/5 transition-colors group-hover:bg-white/10">
+                                <div className="text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap mt-2 p-4 rounded-2xl rounded-tl-none bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 transition-colors group-hover:bg-gray-100 dark:group-hover:bg-white/10">
                                     {comment.text}
                                 </div>
                             </div>

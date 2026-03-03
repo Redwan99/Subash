@@ -261,8 +261,8 @@ export function ScentProfile({
                     whileHover={shouldReduceMotion ? {} : { scale: 1.06 }}
                     transition={{ type: "spring", stiffness: 500, damping: 24 }}
                     className="px-3 py-1 rounded-full text-xs font-semibold cursor-default select-none
-                      bg-white/10 dark:bg-white/5
-                      border border-white/20 dark:border-white/10
+                      bg-gray-100 dark:bg-white/5
+                      border border-gray-200 dark:border-white/10
                       text-[var(--text-secondary)]
                       backdrop-blur-sm
                       hover:bg-[var(--accent)]/15 hover:border-[var(--accent)]/40

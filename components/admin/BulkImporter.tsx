@@ -22,8 +22,8 @@ export default function BulkImporter() {
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 p-6 rounded-2xl">
-      <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+    <div className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-6 rounded-2xl">
+      <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
         <UploadCloud className="w-5 h-5 text-brand-500" /> Bulk Import (JSON)
       </h3>
       <p className="text-sm text-gray-400 mb-4">
@@ -38,7 +38,7 @@ export default function BulkImporter() {
         onChange={(e) => setJsonInput(e.target.value)}
         placeholder='[{"name": "Aventus", "brand": "Creed", "image_url": "..."}]'
         aria-label="Paste JSON array of perfumes to import"
-        className="w-full h-48 bg-black/50 border border-white/10 rounded-xl p-4 text-sm text-brand-300 font-mono focus:border-brand-500 outline-none mb-4"
+        className="w-full h-48 bg-gray-50 dark:bg-black/50 border border-gray-200 dark:border-white/10 rounded-xl p-4 text-sm text-brand-300 font-mono focus:border-brand-500 outline-none mb-4"
       />
 
       <button

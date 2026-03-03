@@ -23,7 +23,7 @@ export default async function FragramPage() {
 
       <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6 contain-paint">
         {posts.map(post => (
-          <div key={post.id} className="break-inside-avoid relative group rounded-[2rem] overflow-hidden bg-white/5 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 gpu-accelerate">
+          <div key={post.id} className="break-inside-avoid relative group rounded-[2rem] overflow-hidden bg-gray-50 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 gpu-accelerate">
             <div className="relative w-full" style={{ aspectRatio: "3/4" }}> {/* Adjust based on actual image aspect ratio if known */}
               <Image src={post.imageUrl} alt="Fragram Post" fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 640px) 100vw, 33vw" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

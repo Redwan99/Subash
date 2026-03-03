@@ -122,7 +122,7 @@ export function DupeEngine({ targetPerfumeId, existingDupes }: { targetPerfumeId
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search for a clone or dupe..."
-            className="w-full bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm outline-none focus:border-brand-500 transition-colors placeholder:text-gray-500"
+            className="w-full bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm outline-none focus:border-brand-500 transition-colors placeholder:text-gray-500"
           />
           {isSearching && (
             <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-brand-500" />
@@ -155,12 +155,12 @@ export function DupeEngine({ targetPerfumeId, existingDupes }: { targetPerfumeId
       {/* The List of Existing Dupes */}
       <div className="space-y-2 mt-4">
         {existingDupes.length === 0 ? (
-          <div className="text-center py-6 bg-white/5 rounded-2xl border border-dashed border-gray-200 dark:border-white/10">
+          <div className="text-center py-6 bg-gray-50 dark:bg-white/5 rounded-2xl border border-dashed border-gray-200 dark:border-white/10">
             <p className="text-sm text-gray-500">No dupes suggested yet. Be the first!</p>
           </div>
         ) : (
           [...existingDupes].sort((a,b) => b.votes - a.votes).map(dupe => (
-            <div key={dupe.id} className="flex items-center gap-4 p-3 bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-white/10 transition-colors group">
+            <div key={dupe.id} className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors group">
               <div className="w-12 h-12 relative bg-gray-100 dark:bg-black/50 rounded-xl p-1 shrink-0">
                 {/* Ensure next/image has a valid src by adding a fallback */}
                 <Image src={dupe.dupePerfume.transparentImageUrl || dupe.dupePerfume.image_url || '/placeholder-perfume.jpg'} alt="" fill className="object-contain" />

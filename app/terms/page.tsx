@@ -87,7 +87,7 @@ export default function TermsPage() {
                             ))}
                         </ul>
                         <Callout color="red">
-                            Any entity — individual, corporate, or institutional — wishing to use Subash data, scraped content, API endpoints, or database exports for commercial purposes <strong className="text-white">must enter into a written commercial contract</strong> with {COMPANY} prior to any such use. Violations will be pursued to the fullest extent of applicable law.
+                            Any entity — individual, corporate, or institutional — wishing to use Subash data, scraped content, API endpoints, or database exports for commercial purposes <strong className="text-[var(--text-primary)]">must enter into a written commercial contract</strong> with {COMPANY} prior to any such use. Violations will be pursued to the fullest extent of applicable law.
                         </Callout>
                     </Section>
 

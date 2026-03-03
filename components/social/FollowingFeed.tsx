@@ -63,7 +63,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
               <div className="flex items-center gap-3">
                 <Link href={`/user/${item.user.id}`} className="shrink-0">
                   {item.user.image ? (
-                    <Image src={item.user.image} alt={item.user.name || "User"} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-white/20" />
+                    <Image src={item.user.image} alt={item.user.name || "User"} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-white/20" />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-brand-500 text-black flex items-center justify-center font-bold">
                       {item.user.name?.charAt(0).toUpperCase() || "U"}
@@ -102,7 +102,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
                <div className="flex items-center gap-3">
                 <Link href={`/user/${item.user.id}`} className="shrink-0">
                   {item.user.image ? (
-                    <Image src={item.user.image} alt={item.user.name || "User"} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-white/20" />
+                    <Image src={item.user.image} alt={item.user.name || "User"} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-white/20" />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-brand-500 text-black flex items-center justify-center font-bold">
                       {item.user.name?.charAt(0).toUpperCase() || "U"}

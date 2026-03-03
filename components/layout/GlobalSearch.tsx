@@ -103,7 +103,7 @@ export default function GlobalSearch() {
           {/* Perfumes */}
           {results.perfumes.length > 0 && (
             <div className="p-2">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-2">
+              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 py-2">
                 Fragrances
               </h4>
               {results.perfumes.map((perfume) => {
@@ -139,7 +139,7 @@ export default function GlobalSearch() {
           {/* Users */}
           {results.users.length > 0 && (
             <div className="p-2 border-t border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.02]">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-2">
+              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 py-2">
                 Community
               </h4>
               {results.users.map((user) => (

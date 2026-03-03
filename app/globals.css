@@ -36,15 +36,15 @@
   --bg-base:    #F8FAFC;
   --bg-surface: #FFFFFF;
   --bg-elevated: #FFFFFF;
-  --bg-glass: rgba(255, 255, 255, 0.45);
-  --bg-glass-border: rgba(255, 255, 255, 0.65);
+  --bg-glass: rgba(255, 255, 255, 0.80);
+  --bg-glass-border: rgba(0, 0, 0, 0.08);
 
-  --text-primary: #0D0D0D;
-  --text-secondary: #4A4A4A;
-  --text-muted: #8A8A8A;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
 
-  --border-color: rgba(0, 0, 0, 0.08);
-  --shadow-glass: 0 8px 40px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+  --border-color: rgba(0, 0, 0, 0.10);
+  --shadow-glass: 0 8px 40px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255,255,255,0.9);
 
   --accent: #8B5CF6;
   --accent-light: #A78BFA;
@@ -195,10 +195,10 @@ body::-webkit-scrollbar { display: none; }
 @layer utilities {
   /* Glass Panel — True Glassmorphism */
   .glass {
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.85);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
     backdrop-filter: blur(20px) saturate(1.4);
-    border: 1px solid rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: var(--shadow-glass);
   }
   .dark .glass {
@@ -208,13 +208,14 @@ body::-webkit-scrollbar { display: none; }
 
   /* Subtle glass — for cards */
   .glass-subtle {
-    background: rgba(255, 255, 255, 0.30);
+    background: rgba(255, 255, 255, 0.60);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(0, 0, 0, 0.06);
   }
   .dark .glass-subtle {
     background: rgba(10, 10, 10, 0.45);
+    border-color: var(--border-color);
   }
 
   /* Ambient orb animation helpers */

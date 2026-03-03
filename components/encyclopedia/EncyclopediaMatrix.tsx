@@ -31,7 +31,7 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
     <div className="flex flex-col lg:flex-row gap-8 w-full">
       {/* Left Filter Panel */}
       <div className="w-full lg:w-64 shrink-0 space-y-8">
-        <div className="sticky top-24 bg-white/5 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 p-6 rounded-2xl shadow-xl">
+        <div className="sticky top-24 bg-gray-50 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 p-6 rounded-2xl shadow-xl">
           <div className="flex items-center gap-2 mb-6 border-b border-gray-100 dark:border-white/10 pb-4">
             <Filter className="w-5 h-5 text-brand-500" />
             <h2 className="font-bold text-gray-900 dark:text-white">Discovery Matrix</h2>
@@ -78,7 +78,7 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 w-full contain-paint">
             {results.map(perfume => (
-              <Link key={perfume.id} href={`/perfume/${perfume.slug}`} className="flex flex-col bg-white/5 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 group gpu-accelerate">
+              <Link key={perfume.id} href={`/perfume/${perfume.slug}`} className="flex flex-col bg-gray-50 dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 group gpu-accelerate">
                 <div className="relative w-full aspect-square sm:aspect-[4/5] bg-gradient-to-b from-gray-50/50 to-transparent dark:from-white/5 dark:to-transparent p-3 sm:p-5 flex items-center justify-center">
                   <Image src={perfume.transparentImageUrl || perfume.image_url} alt={perfume.name} fill className="object-contain p-4 drop-shadow-xl group-hover:scale-110 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 50vw, 25vw" />
                 </div>

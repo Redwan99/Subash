@@ -134,9 +134,9 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
                 </div>
 
                 {/* Perfume Context Card */}
-                <div className="mt-20 p-6 rounded-3xl glass border border-[var(--bg-glass-border)] bg-gradient-to-br from-white/5 to-transparent">
+                <div className="mt-20 p-6 rounded-3xl glass border border-[var(--bg-glass-border)] bg-gradient-to-br from-gray-50 dark:from-white/5 to-transparent">
                     <div className="flex flex-col md:flex-row gap-6 items-center">
-                        <div className="relative w-32 h-32 rounded-2xl bg-black/20 overflow-hidden shrink-0 border border-white/10">
+                        <div className="relative w-32 h-32 rounded-2xl bg-gray-100 dark:bg-black/20 overflow-hidden shrink-0 border border-gray-200 dark:border-white/10">
                             {review.perfume.image_url ? (
                                 <Image src={review.perfume.image_url} alt={review.perfume.name} fill className="object-contain p-2" unoptimized />
                             ) : (

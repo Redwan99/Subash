@@ -52,7 +52,7 @@ export function LeaderboardWidget() {
                         Leaderboards
                     </h2>
                 </div>
-                <div className="flex p-1 bg-[rgba(255,255,255,0.03)] rounded-lg">
+                <div className="flex p-1 bg-gray-100 dark:bg-[rgba(255,255,255,0.03)] rounded-lg">
                     {(["today", "week", "month"] as Timeframe[]).map((tab) => (
                         <button
                             key={tab}
@@ -104,7 +104,7 @@ export function LeaderboardWidget() {
                                                             {p.brand}
                                                         </span>
                                                     </div>
-                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[rgba(255,255,255,0.05)] text-[var(--text-secondary)] shrink-0">
+                                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-[rgba(255,255,255,0.05)] text-[var(--text-secondary)] shrink-0">
                                                         {p.reviewCount}
                                                     </span>
                                                 </div>
@@ -126,12 +126,12 @@ export function LeaderboardWidget() {
                                         {users.map((u, i) => (
                                             <div
                                                 key={u.id}
-                                                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-[rgba(255,255,255,0.04)] transition-colors"
+                                                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.04)] transition-colors"
                                             >
                                                 <span className="text-[10px] font-bold w-4 text-center text-[#34D399] shrink-0">
                                                     {i + 1}
                                                 </span>
-                                                <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 bg-[rgba(255,255,255,0.1)] flex items-center justify-center">
+                                                <div className="w-5 h-5 rounded-full overflow-hidden shrink-0 bg-gray-200 dark:bg-[rgba(255,255,255,0.1)] flex items-center justify-center">
                                                     {u.image ? (
                                                         <Image src={u.image} alt={u.name} width={20} height={20} className="object-cover" />
                                                     ) : (

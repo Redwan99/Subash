@@ -113,7 +113,7 @@ export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
                     className={`flex flex-col items-center justify-center gap-1 py-3 px-1 rounded-2xl border text-center transition-all duration-200 ${
                       active
                         ? "bg-brand-500/10 border-brand-500/50 shadow-[0_0_14px_rgba(16,185,129,0.25)]"
-                        : "bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
+                        : "bg-gray-100 dark:bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
                     }`}
                   >
                     <span className="text-lg leading-none">{emoji}</span>
@@ -143,7 +143,7 @@ export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
                     className={`flex flex-col items-center justify-center gap-1 py-3 px-3 rounded-2xl border text-center transition-all duration-200 min-w-[120px] ${
                       active
                         ? "bg-brand-500/10 border-brand-500/50 shadow-[0_0_14px_rgba(16,185,129,0.25)]"
-                        : "bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
+                        : "bg-gray-100 dark:bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
                     }`}
                   >
                     <span className="text-2xl leading-none">{emoji}</span>

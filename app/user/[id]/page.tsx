@@ -301,7 +301,7 @@ export default async function UserProfilePage({
                       <Link
                         key={item.id}
                         href={`/perfume/${item.perfume.slug}`}
-                        className="w-20 h-20 shrink-0 bg-white/5 rounded-xl p-2 hover:scale-110 transition-transform border border-white/10 backdrop-blur-lg flex items-center justify-center"
+                        className="w-20 h-20 shrink-0 bg-gray-50 dark:bg-white/5 rounded-xl p-2 hover:scale-110 transition-transform border border-gray-200 dark:border-white/10 backdrop-blur-lg flex items-center justify-center"
                       >
                         {imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element

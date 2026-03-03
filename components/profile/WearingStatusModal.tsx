@@ -433,7 +433,7 @@ export function WearingStatusModal() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="p-2 rounded-full hover:bg-white/10 text-emerald-400 transition-colors"
+        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-emerald-400 transition-colors"
         title="Currently Wearing"
       >
         <Droplet className="w-5 h-5" />

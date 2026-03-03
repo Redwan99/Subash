@@ -71,7 +71,7 @@ export default async function ReviewsPage() {
                         ))}
                     </div>
                 ) : (
-                    <div className="py-40 text-center glass border border-white/5 rounded-3xl">
+                    <div className="py-40 text-center glass border border-gray-200 dark:border-white/5 rounded-3xl">
                         <div className="flex justify-center mb-4 opacity-20">
                             <Sparkles size={60} />
                         </div>

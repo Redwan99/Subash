@@ -41,7 +41,7 @@ export default function ReviewPosterCard({ review }: ReviewCardProps) {
     return (
         <Link 
             href={`/review/${review.id}`}
-            className="block break-inside-avoid gpu-accelerate mb-6 rounded-[2rem] overflow-hidden bg.white dark:bg-[#0f0f0f] border border-gray-200 dark:border-white/10 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500 active:scale-[0.97] group"
+            className="block break-inside-avoid gpu-accelerate mb-6 rounded-[2rem] overflow-hidden bg-white dark:bg-[#0f0f0f] border border-gray-200 dark:border-white/10 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500 active:scale-[0.97] group"
         >
             {/* Top Image Header - Fixed Aspect Ratio for Verticality */}
             <div className="relative w-full aspect-square sm:aspect-[4/5] bg-gray-100 dark:bg-black/50 overflow-hidden">
@@ -50,7 +50,7 @@ export default function ReviewPosterCard({ review }: ReviewCardProps) {
                     alt={review.title || "Review Image"} 
                     fill 
                     className="object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
-                    sizes="(max-width: 768px) 100vw, (max.width: 1200px) 50vw, 33vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
         
                 {/* Subtle Gradient Overlay for contrast if needed */}
@@ -61,21 +61,21 @@ export default function ReviewPosterCard({ review }: ReviewCardProps) {
             <div className="p-5 sm:p-6 flex flex-col">
         
                 {/* Star Rating */}
-                <div className="flex.items-center gap-1 mb-3">
+                <div className="flex items-center gap-1 mb-3">
                     {[...Array(5)].map((_, i) => (
                         <Star 
                             key={i} 
                             className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                                 i < rating 
                                     ? 'fill-amber-400 text-amber-400' 
-                                    : 'fill-gray-200 text-gray-200 dark:fill.white/5 dark:text-white/5'
+                                    : 'fill-gray-200 text-gray-200 dark:fill-white/5 dark:text-white/5'
                             }`} 
                         />
                     ))}
                 </div>
 
                 {/* Perfume Name / Title */}
-                <h3 className="font-bold text-gray-900 dark:text.white text-base sm:text-lg mb-2 line-clamp-1">
+                <h3 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg mb-2 line-clamp-1">
                     {review.title || review.perfume?.name}
                 </h3>
 
@@ -86,7 +86,7 @@ export default function ReviewPosterCard({ review }: ReviewCardProps) {
 
                 {/* Footer: User Profile (Compact) */}
                 <div className="flex items-center gap-3 border-t border-gray-100 dark:border-white/10 pt-4 mt-auto">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-gray-200 dark:bg-white/10 relative shrink-0 border border-white/5">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden bg-gray-200 dark:bg-white/10 relative shrink-0 border border-gray-200 dark:border-white/5">
                         <Image 
                             src={review.user?.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.user?.name || 'user'}`} 
                             alt={review.user?.name || "User"} 

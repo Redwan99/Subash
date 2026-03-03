@@ -44,7 +44,7 @@ const GENDER_COLORS: Record<string, string> = {
 // ── Single perfume card ───────────────────────────────────────────────────────
 function PerfumeCard({ perfume, index }: { perfume: Perfume; index: number }) {
     const genderKey = (perfume.gender ?? "").toLowerCase();
-    const genderColor = GENDER_COLORS[genderKey] ?? "text-[var(--text-muted)] bg-[rgba(255,255,255,0.05)]";
+    const genderColor = GENDER_COLORS[genderKey] ?? "text-[var(--text-muted)] bg-gray-100 dark:bg-[rgba(255,255,255,0.05)]";
 
     return (
         <motion.div
@@ -134,7 +134,7 @@ function FilterPanel({
                             onClick={() => onSetFilter("gender", activeFilters.gender === g ? null : g)}
                             className={`text-left px-3 py-1.5 rounded-xl text-sm font-medium capitalize transition-all ${activeFilters.gender === g
                                 ? "bg-[rgba(139,92,246,0.2)] text-[var(--accent)] border border-[rgba(139,92,246,0.35)]"
-                                : "text-[var(--text-secondary)] hover:bg-[rgba(255,255,255,0.05)]"
+                                : "text-[var(--text-secondary)] hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.05)]"
                                 }`}
                         >
                             {g === "men" ? "👤 Men" : g === "women" ? "💐 Women" : "⚡ Unisex"}
@@ -172,7 +172,7 @@ function FilterPanel({
                             onClick={() => onSetFilter("brand", activeFilters.brand === b ? null : b)}
                             className={`w-full text-left px-2 py-1 rounded-lg text-xs transition-all truncate ${activeFilters.brand === b
                                 ? "text-[var(--accent)] font-semibold bg-[rgba(139,92,246,0.1)]"
-                                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[rgba(255,255,255,0.04)]"
+                                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.04)]"
                                 }`}
                         >
                             {b}
