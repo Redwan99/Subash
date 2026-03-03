@@ -1,5 +1,5 @@
 // app/leaderboards/page.tsx
-// Phase 5 / Phase 6 Gamification � Top Reviewers Leaderboard.
+// Phase 5 / Phase 6 Gamification â€” Top Reviewers Leaderboard.
 // Server component: queries top 50 users by review_count.
 
 import prisma from "@/lib/prisma";
@@ -8,7 +8,7 @@ import { Trophy, Star } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-// Always render at request time � no DB connection available at build time.
+// Always render at request time â€” no DB connection available at build time.
 export const dynamic = 'force-dynamic';
 
 // --- Badge helper --------------------------------------------------------------
@@ -269,6 +269,6 @@ export default async function LeaderboardsPage() {
 }
 
 export const metadata = {
-  title: "Leaderboard � Subash",
+  title: "Leaderboard â€” Subash",
   description: "Top fragrance reviewers in the Subash community.",
 };

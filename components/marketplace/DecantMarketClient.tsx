@@ -1,6 +1,6 @@
 "use client";
 // components/marketplace/DecantMarketClient.tsx
-// Phase 5 — Client wrapper that owns the sort-toggle + empty state for DecantMarket.
+// Phase 5 â€” Client wrapper that owns the sort-toggle + empty state for DecantMarket.
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -17,7 +17,7 @@ export function DecantMarketClient({ listings }: { listings: DecantCardData[] })
 
   const sorted = useMemo(() => {
     if (sort === "newest") return [...listings];
-    // Lowest price 5ml — listings without price_5ml float to bottom
+    // Lowest price 5ml â€” listings without price_5ml float to bottom
     return [...listings].sort((a, b) => {
       if (a.price_5ml == null && b.price_5ml == null) return 0;
       if (a.price_5ml == null) return 1;

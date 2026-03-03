@@ -1,7 +1,11 @@
 node_modules
 .next
+.ts-out
 .git
+.github
 .gitignore
+.gitattributes
+.vscode
 *.md
 .env*
 !.env.example
@@ -9,7 +13,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .DS_Store
+Thumbs.db
 *.tsbuildinfo
+errors.txt
 scraper/__pycache__
 scraper/*.csv
 prisma/migrations
+prisma/*.db
+prisma/*.db-journal
+LICENSE

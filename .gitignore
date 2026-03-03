@@ -29,9 +29,12 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+/.ts-out/
 
 # Prisma
 /prisma/migrations
+/prisma/*.db
+/prisma/*.db-journal
 
 # OS files
 .DS_Store

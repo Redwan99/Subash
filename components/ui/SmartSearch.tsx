@@ -1,6 +1,6 @@
 "use client";
 // components/ui/SmartSearch.tsx
-// Phase 4.1 � Smart Autocomplete Search
+// Phase 4.1 â€” Smart Autocomplete Search
 // Replaces the static SearchBar in TopNavbar.
 // Uses the searchPerfumes server action with debounce + transition.
 
@@ -79,7 +79,7 @@ export function SmartSearch({
   className,
   containerClassName,
   onSelectResult,
-  placeholder = "Search perfumes, brands, notes�",
+  placeholder = "Search perfumes, brands, notesâ€¦",
   autoNavigate = true,
 }: SmartSearchProps) {
   const [query, setQuery] = useState("");
