@@ -84,13 +84,16 @@ export async function registerUser(
   // 3. Hash password — NEVER store plain text
   const hashedPassword = await bcrypt.hash(password, 12);
 
-  // 4. Create the user
+  // 4. Create the user — first user in the DB becomes SUPER_ADMIN
+  const userCount = await prisma.user.count();
+  const assignedRole = userCount === 0 ? "SUPER_ADMIN" : "STANDARD";
+
   await prisma.user.create({
     data: {
       name,
       email,
       password: hashedPassword,
-      role: "STANDARD",
+      role: assignedRole,
       review_count: 0,
       phoneVerified: false,
       authProvider: "CREDENTIALS",

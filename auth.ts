@@ -31,13 +31,17 @@ function SubashPrismaAdapter(): Adapter {
     ...adapter,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     createUser: async (data: any) => {
+      // First user in the DB becomes SUPER_ADMIN automatically
+      const userCount = await prisma.user.count();
+      const assignedRole = userCount === 0 ? "SUPER_ADMIN" : "STANDARD";
+
       const user = await prisma.user.create({
         data: {
           name: data.name ?? null,
           email: data.email,
           emailVerified: data.emailVerified ?? null,
           image: data.image ?? null,
-          role: "STANDARD",
+          role: assignedRole,
           review_count: 0,
           phoneVerified: false,
           authProvider: (data.authProvider ?? "CREDENTIALS") as

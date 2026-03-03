@@ -6,6 +6,7 @@ import { Droplet, Search, X, Sun, Moon, Sunrise, Sunset, Clock, Loader2 } from "
 import { createPortal } from "react-dom";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
 import { setWearingStatus, clearWearingStatus } from "@/lib/actions/status";
+import { getMyWardrobePerfumes, type WardrobeQuickPickItem } from "@/lib/actions/status";
 
 type TimeTag = "morning" | "day" | "evening" | "night" | "anytime" | "all";
 
@@ -16,6 +17,96 @@ const timeOptions: { id: TimeTag; label: string; icon: React.ComponentType<{ cla
   { id: "night", label: "Night", icon: Moon },
   { id: "anytime", label: "Anytime", icon: Clock },
 ];
+
+// ─── Wardrobe Quick-Pick ──────────────────────────────────────────────────────
+
+function WardrobeQuickPick({
+  onSelect,
+  selectedId,
+}: {
+  onSelect: (p: PerfumeSearchResult) => void;
+  selectedId?: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [items, setItems] = useState<WardrobeQuickPickItem[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  async function toggle() {
+    if (!expanded && !loaded) {
+      const data = await getMyWardrobePerfumes();
+      setItems(data);
+      setLoaded(true);
+    }
+    setExpanded((v) => !v);
+  }
+
+  return (
+    <div className="rounded-2xl border border-[var(--bg-glass-border)] overflow-hidden">
+      <button
+        type="button"
+        onClick={toggle}
+        className="w-full flex items-center justify-between px-4 py-3 text-xs text-[var(--text-secondary)] hover:bg-[var(--bg-glass)] transition-colors"
+      >
+        <span className="font-semibold">Show my wardrobe</span>
+        <span className="text-[10px] text-[var(--text-muted)]">
+          {expanded ? "▲ Hide" : "▼ Expand"}
+        </span>
+      </button>
+      {expanded && (
+        <div className="max-h-40 overflow-y-auto divide-y divide-[var(--border-color)]">
+          {items.length === 0 ? (
+            <p className="px-4 py-3 text-xs text-[var(--text-muted)]">
+              Your wardrobe is empty. Add perfumes from their detail pages first.
+            </p>
+          ) : (
+            items.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() =>
+                  onSelect({
+                    id: p.id,
+                    name: p.name,
+                    brand: p.brand,
+                    image_url: p.image_url,
+                  })
+                }
+                className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
+                  selectedId === p.id
+                    ? "bg-[var(--accent)]/15"
+                    : "hover:bg-[var(--bg-glass)]"
+                }`}
+              >
+                <div className="w-8 h-8 rounded-lg bg-[var(--bg-surface)] flex items-center justify-center text-xs font-semibold text-[var(--accent)] overflow-hidden">
+                  {p.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={p.image_url}
+                      alt={p.name}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    p.brand[0]?.toUpperCase() ?? "🧴"
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[var(--text-primary)] truncate">
+                    {p.name}
+                  </p>
+                  <p className="text-[10px] text-[var(--text-muted)] truncate">
+                    {p.brand}
+                  </p>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Modal ───────────────────────────────────────────────────────────────
 
 export function WearingStatusModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -102,17 +193,17 @@ export function WearingStatusModal() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl flex flex-col md:flex-row">
+            <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto no-scrollbar bg-[var(--bg-base)] border border-[var(--border-color)] rounded-2xl shadow-2xl flex flex-col md:flex-row">
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition-colors"
+                className="absolute top-4 right-4 z-50 p-2 bg-[var(--bg-surface)] hover:bg-[var(--bg-glass)] rounded-full text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
                 aria-label="Close currently wearing modal"
               >
                 <X className="w-5 h-5" />
               </button>
 
               {/* Left Column: Form */}
-              <div className="flex-1 p-6 md:p-8 border-b md:border-b-0 md:border-r border-white/10">
+              <div className="flex-1 p-6 md:p-8 border-b md:border-b-0 md:border-r border-[var(--border-color)]">
                 <div className="mb-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     Currently Wearing
@@ -144,7 +235,7 @@ export function WearingStatusModal() {
                       )}
                     </div>
                     {searchResults.length > 0 && (
-                      <div className="mt-2 rounded-2xl border border-[var(--bg-glass-border)] bg-black/30 backdrop-blur-lg max-h-48 overflow-y-auto divide-y divide-white/5">
+                      <div className="mt-2 rounded-2xl border border-[var(--bg-glass-border)] bg-[var(--bg-surface)] backdrop-blur-lg max-h-48 overflow-y-auto divide-y divide-[var(--border-color)]">
                         {searchResults.map((p) => (
                           <button
                             key={p.id}
@@ -156,7 +247,7 @@ export function WearingStatusModal() {
                             className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm transition-colors ${
                               selectedPerfume?.id === p.id
                                 ? "bg-[var(--accent)]/15"
-                                : "hover:bg-white/10"
+                                : "hover:bg-[var(--bg-glass)]"
                             }`}
                           >
                             <div className="w-8 h-8 rounded-lg bg-[var(--bg-surface)] flex items-center justify-center text-xs font-semibold text-[var(--accent)]">
@@ -185,13 +276,14 @@ export function WearingStatusModal() {
                     )}
                   </div>
 
-                  {/* Wardrobe accordion placeholder */}
-                  <div className="rounded-2xl border border-dashed border-[var(--bg-glass-border)] px-4 py-3 text-xs text-[var(--text-muted)]">
-                    <div className="font-semibold mb-1 text-[var(--text-secondary)]">
-                      Show my wardrobe
-                    </div>
-                    <p>Coming soon — quickly pick from your own shelves.</p>
-                  </div>
+                  {/* Wardrobe quick-pick */}
+                  <WardrobeQuickPick
+                    onSelect={(p) => {
+                      setSelectedPerfume(p);
+                      setCustomName("");
+                    }}
+                    selectedId={selectedPerfume?.id}
+                  />
 
                   {/* Custom name divider */}
                   <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
@@ -231,7 +323,7 @@ export function WearingStatusModal() {
                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-all ${
                               isActive
                                 ? "bg-brand-500/10 border-brand-500 text-brand-500"
-                                : "border-white/10 text-gray-400 hover:text-gray-200 hover:border-white/20"
+                                : "border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] hover:border-[var(--text-muted)]"
                             }`}
                           >
                             <Icon className="w-4 h-4" />
@@ -274,17 +366,17 @@ export function WearingStatusModal() {
               </div>
 
               {/* Right Column: Preview */}
-              <div className="w-full md:w-80 bg-white/5 p-6 md:p-8 flex flex-col items-center justify-center text-center">
+              <div className="w-full md:w-80 bg-[var(--bg-surface)] p-6 md:p-8 flex flex-col items-center justify-center text-center">
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-red-400/50 text-red-200 bg-red-500/10 hover:bg-red-500/20 transition-colors mb-4"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border border-red-400/50 text-red-500 dark:text-red-200 bg-red-500/10 hover:bg-red-500/20 transition-colors mb-4"
                 >
                   <X size={14} />
                   Nothing right now
                 </button>
 
-                <div className="w-full rounded-2xl p-4 bg-black/40 border border-white/10 shadow-[0_18px_55px_rgba(0,0,0,0.6)] flex flex-col gap-4">
+                <div className="w-full rounded-2xl p-4 bg-[var(--bg-glass)] border border-[var(--border-color)] shadow-lg flex flex-col gap-4">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
                     Preview
                   </p>

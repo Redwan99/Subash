@@ -204,7 +204,9 @@ function AvatarMenu() {
               { href: "/profile", icon: User, label: "My Profile" },
               { href: "/wardrobe", icon: Briefcase, label: "Wardrobe" },
               { href: "/profile/edit", icon: Settings, label: "Settings" },
-              { href: "/admin", icon: Shield, label: "Admin Panel" },
+              ...(session.user?.role === "SUPER_ADMIN"
+                ? [{ href: "/admin", icon: Shield, label: "Admin Panel" }]
+                : []),
             ].map(({ href, icon: Icon, label }) => (
               <Link key={href} href={href} onClick={() => setOpen(false)}>
                 <motion.div
