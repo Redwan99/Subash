@@ -80,7 +80,7 @@ function ActivityCard({ item, index, shouldReduceMotion }: { item: ActivityItem;
   );
 }
 
-// Right Sidebar � fetches live data from /api/sidebar
+// Right Sidebar — fetches live data from /api/sidebar
 export function RightSidebar() {
   const shouldReduceMotion = useReducedMotion();
   const [data, setData] = useState<SidebarData | null>(null);
@@ -173,10 +173,10 @@ export function RightSidebar() {
                 </div>
               </Link>
             ))
-            : ["�", "�", "�"].map((_, i) => (
+            : ["…", "…", "…"].map((_, i) => (
               <div key={i} className="flex items-center gap-2">
                 <span className="text-[10px] font-bold w-4 text-right text-[var(--accent)]">{i + 1}</span>
-                <span className="text-xs text-[var(--text-muted)]">Loading�</span>
+                <span className="text-xs text-[var(--text-muted)]">Loading…</span>
               </div>
             ))}
         </div>

@@ -1,6 +1,6 @@
 "use client";
 // app/decants/create/page.tsx
-// Phase 5 � Create Decant Listing form.
+// Phase 5 — Create Decant Listing form.
 // Route is guarded by middleware: requires signed-in, phone verified, 50+ reviews.
 // Uses react-hook-form + zod. SmartSearch-style perfume picker to get a perfumeId.
 
@@ -143,7 +143,7 @@ function PerfumePicker({
               type="text"
               value={query}
               onChange={(e) => search(e.target.value)}
-              placeholder="Search perfume name or brand�"
+              placeholder="Search perfume name or brand..."
               className="flex-1 bg-transparent text-sm outline-none text-[var(--text-primary)] caret-[var(--accent)]"
             />
           </div>
@@ -275,7 +275,7 @@ export default function CreateDecantPage() {
             Listing Created!
           </h2>
           <p className="text-sm text-[var(--text-muted)]">
-            Redirecting to the marketplace�
+            Redirecting to the marketplace…
           </p>
         </motion.div>
       </div>
@@ -328,7 +328,7 @@ export default function CreateDecantPage() {
           {/* Batch Code */}
           <Field
             label="Batch Code"
-            hint="e.g. B24Q3 � used for authenticity tracing"
+            hint="e.g. B24Q3 — used for authenticity tracing"
             error={errors.batch_code?.message}
             icon={Hash}
           >
@@ -345,7 +345,7 @@ export default function CreateDecantPage() {
           {/* Prices */}
           <div className="grid grid-cols-2 gap-4">
             <Field
-              label="Price � 5ml (BDT)"
+              label="Price – 5ml (BDT)"
               hint="Leave 0 if not offered"
               error={errors.price_5ml?.message}
               icon={DollarSign}
@@ -363,7 +363,7 @@ export default function CreateDecantPage() {
             </Field>
 
             <Field
-              label="Price � 10ml (BDT)"
+              label="Price – 10ml (BDT)"
               hint="Leave 0 if not offered"
               error={errors.price_10ml?.message}
               icon={DollarSign}
@@ -391,7 +391,7 @@ export default function CreateDecantPage() {
             <input
               {...register("proof_image_url")}
               type="url"
-              placeholder="https://i.imgur.com/�"
+              placeholder="https://i.imgur.com/..."
               className={cn(
                 "w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-[var(--bg-surface)] text-[var(--text-primary)] caret-[var(--accent)] border",
                 errors.proof_image_url ? "border-[#EF4444]" : "border-[var(--border-color)]"
@@ -431,7 +431,7 @@ export default function CreateDecantPage() {
             {isPending ? (
               <>
                 <Loader2 size={15} className="animate-spin" />
-                Publishing�
+                Publishing…
               </>
             ) : (
               <>

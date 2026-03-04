@@ -1,10 +1,10 @@
 "use client";
 // components/perfume/ScentProfile.tsx
-// Phase 4.3 � Interactive Scent Profile
-//   � Expanding Note Pyramid (whileInView stagger)
-//   � Performance Radar (aggregated longevity + sillage bar display)
-//   � Description expand/collapse toggle
-//   � Accord pills with accent glow on hover
+// Phase 4.3 — Interactive Scent Profile
+//   • Expanding Note Pyramid (whileInView stagger)
+//   • Performance Radar (aggregated longevity + sillage bar display)
+//   • Description expand/collapse toggle
+//   • Accord pills with accent glow on hover
 
 import { useState } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
@@ -19,8 +19,8 @@ export type ScentProfileProps = {
   heart_notes:  string[];
   base_notes:   string[];
   /** Aggregated from all reviews */
-  avgLongevity: number; // 1�5
-  avgSillage:   number; // 1�5
+  avgLongevity: number; // 1–5
+  avgSillage:   number; // 1–5
   reviewCount:  number;
   // Kaggle-imported enrichment fields
   description:  string | null;
@@ -149,12 +149,12 @@ function RadarBar({
   shouldReduceMotion,
 }: {
   label: string;
-  value: number; // 1�5
+  value: number; // 1–5
   valueClass: string;
   barClass: string;
   shouldReduceMotion: boolean | null;
 }) {
-  const pct = ((value - 1) / 4) * 100; // map 1�5 ? 0�100%
+  const pct = ((value - 1) / 4) * 100; // map 1–5 → 0–100%
 
   return (
     <div>
@@ -212,7 +212,7 @@ export function ScentProfile({
   return (
     <div className="space-y-10">
 
-      {/* -- Encyclopedia Header � Description, Perfumer, Accords ----- */}
+      {/* -- Encyclopedia Header — Description, Perfumer, Accords ----- */}
       {(description || perfumer || accords.length > 0) && (
         <section className="rounded-2xl p-6 bg-[var(--bg-glass)] backdrop-blur-[10px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] space-y-5">
 
@@ -344,7 +344,7 @@ export function ScentProfile({
 
         {reviewCount === 0 ? (
           <p className="text-sm text-center py-4 text-[var(--text-muted)]">
-            No reviews yet � be the first!
+            No reviews yet — be the first!
           </p>
         ) : (
           <div className="space-y-5">

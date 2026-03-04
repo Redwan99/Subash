@@ -1,6 +1,6 @@
 "use client";
 // components/marketplace/DecantCard.tsx
-// Phase 4 � Decant Marketplace
+// Phase 4 — Decant Marketplace
 // Displays a single peer-to-peer decant offer. Action button opens WhatsApp.
 
 import Image from "next/image";

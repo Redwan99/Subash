@@ -1,8 +1,8 @@
 "use client";
 // components/layout/TopNavbar.tsx
-// Phase 3 (Pivot) � Sticky Top Navigation Bar
+// Phase 3 (Pivot) — Sticky Top Navigation Bar
 // Pro Max: glassmorphism, spring-animated search bar, avatar dropdown.
-// Contains: Logo � Search (center) � Nav links + ThemeToggle + Bell + Avatar (right)
+// Contains: Logo | Search (center) | Nav links + ThemeToggle + Bell + Avatar (right)
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -305,7 +305,7 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
 
       {/* -- Right: Nav Links + Theme + Avatar ------------------ */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* Nav links � hidden on very small screens */}
+        {/* Nav links — hidden on very small screens */}
         <nav className="hidden sm:flex items-center gap-0.5">
           {NAV_LINKS.filter(l => {
             if (l.label === "Encyclopedia" && featureToggles?.ENABLE_ENCYCLOPEDIA === false) return false;

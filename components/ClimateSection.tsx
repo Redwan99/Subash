@@ -102,7 +102,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
     setGeoStatus("requesting");
 
     const timeout = setTimeout(() => {
-      // Geolocation timed out � try IP fallback
+      // Geolocation timed out — try IP fallback
       setGeoStatus("ip");
       void fetchIpWeather();
     }, 6000);
@@ -134,7 +134,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
       },
       () => {
         clearTimeout(timeout);
-        // Browser geo denied � try IP-based fallback
+        // Browser geo denied — try IP-based fallback
         setGeoStatus("ip");
         void fetchIpWeather();
       },
@@ -145,7 +145,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
 
   async function fetchIpWeather() {
     try {
-      // /api/weather with no params � server reads client IP
+      // /api/weather with no params — server reads client IP
       const res = await fetch("/api/weather?source=ip");
       if (!res.ok) return;
       const data = await res.json() as {
@@ -216,7 +216,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-semibold leading-tight text-[var(--text-primary)]">
                   {weather ? (
                     <>
-                      It&apos;s {Math.round(weather.temp)}�C in {weather.city}
+                      It&apos;s {Math.round(weather.temp)}°C in {weather.city}
                       {weather.country ? `, ${weather.country}` : ""}.
                     </>
                   ) : (
@@ -240,7 +240,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
           )}
         </div>
 
-        {/* Geo permission prompt � only shown once before a decision */}
+        {/* Geo permission prompt — only shown once before a decision */}
         {geoStatus === "idle" && (
           <motion.p
             initial={{ opacity: 0 }}
@@ -256,7 +256,7 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
       <div className="w-full lg:max-w-sm mx-auto lg:mx-0 shrink-0">
         {picks.length === 0 ? (
           <p className="text-sm text-center py-6 text-[var(--text-muted)]">
-            No climate-matched reviews yet � add a review to help build picks.
+            No climate-matched reviews yet — add a review to help build picks.
           </p>
         ) : (
           <AnimatePresence mode="wait">

@@ -1,6 +1,6 @@
 "use client";
 // app/admin/AdminDashboardClient.tsx
-// Phase 9 � Pro Max Glassmorphism Admin Dashboard Client Component
+// Phase 9 — Pro Max Glassmorphism Admin Dashboard Client Component
 
 import { useState, useTransition } from "react";
 import Image from "next/image";
@@ -109,7 +109,7 @@ function ReviewsTable({ reviews }: { reviews: Review[] }) {
                 <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by reviewer, perfume, or text�"
+                    placeholder="Search by reviewer, perfume, or text..."
                     className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(232,67,147,0.4)]"
                 />
             </div>
@@ -155,7 +155,7 @@ function ReviewsTable({ reviews }: { reviews: Review[] }) {
                                             <p className="text-white font-medium text-[13px] leading-tight line-clamp-1">{review.perfume.name}</p>
                                             <p className="text-[10px] text-[rgba(255,255,255,0.35)]">{review.perfume.brand}</p>
                                         </div>
-                                    ) : <span className="text-[rgba(255,255,255,0.25)]">�</span>}
+                                    ) : <span className="text-[rgba(255,255,255,0.25)]">—</span>}
                                 </td>
                                 {/* Rating */}
                                 <td className="px-4 py-3">
@@ -238,7 +238,7 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                 <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search by name or email�"
+                    placeholder="Search by name or email..."
                     className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(232,67,147,0.4)]"
                 />
             </div>
@@ -270,7 +270,7 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                                         <p className="text-white font-medium text-[13px] line-clamp-1">{user.name ?? "Anonymous"}</p>
                                     </div>
                                 </td>
-                                <td className="px-4 py-3 text-[rgba(255,255,255,0.45)] text-[12px]">{user.email ?? "�"}</td>
+                                <td className="px-4 py-3 text-[rgba(255,255,255,0.45)] text-[12px]">{user.email ?? "—"}</td>
                                 <td className="px-4 py-3">
                                     <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full border ${ROLE_DISPLAY[user.role].color}`}>
                                         {ROLE_DISPLAY[user.role].label}
@@ -327,7 +327,7 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
                 <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search logs by User ID, Action, or Details�"
+                    placeholder="Search logs by User ID, Action, or Details..."
                     className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(232,67,147,0.4)]"
                 />
             </div>
@@ -362,7 +362,7 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
                                     {log.userId}
                                 </td>
                                 <td className="px-4 py-3 text-[12px] text-[rgba(255,255,255,0.65)] line-clamp-2">
-                                    {log.details || "�"}
+                                    {log.details || "—"}
                                 </td>
                             </tr>
                         ))}
@@ -438,7 +438,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                         </div>
                         <div>
                             <h1 className="text-2xl font-black tracking-tight text-white">God Mode</h1>
-                            <p className="text-xs text-[rgba(255,255,255,0.35)] font-medium">Admin Dashboard � Subash Platform</p>
+                            <p className="text-xs text-[rgba(255,255,255,0.35)] font-medium">Admin Dashboard — Subash Platform</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[rgba(247,131,172,0.25)] bg-[rgba(247,131,172,0.08)]">

@@ -1,6 +1,6 @@
 "use client";
 // components/wardrobe/WardrobePanel.tsx
-// Phase 5 � Client component: 4 shelf tabs + add-to-wardrobe modal (owner only).
+// Phase 5 — Client component: 4 shelf tabs + add-to-wardrobe modal (owner only).
 
 import { useState, useTransition, useCallback, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
@@ -85,7 +85,7 @@ function BottleCard({
         </div>
       </Link>
 
-      {/* Remove button � owner only, appears on hover */}
+      {/* Remove button — owner only, appears on hover */}
       {isOwner && (
         <button
           onClick={handleRemove}
@@ -195,7 +195,7 @@ function AddModal({
                   type="text"
                   value={query}
                   onChange={(e) => search(e.target.value)}
-                  placeholder="Sauvage, Oud Wood�"
+                  placeholder="Sauvage, Oud Wood..."
                   className="flex-1 bg-transparent text-sm outline-none text-[var(--text-primary)] caret-[var(--accent)]"
                   autoFocus
                 />
@@ -277,7 +277,7 @@ function AddModal({
               )}
             >
               {isPending ? (
-                <><Loader2 size={14} className="animate-spin" /> Saving�</>
+                <><Loader2 size={14} className="animate-spin" /> Saving…</>
               ) : (
                 <><Plus size={14} /> Add to Wardrobe</>
               )}
