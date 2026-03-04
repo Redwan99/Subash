@@ -7,7 +7,6 @@ import { auth } from "@/auth";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createNotification } from "./notifications";
-import { verifyTurnstile } from "@/lib/turnstile";
 
 export async function getPerfumesPage(page: number, filters: { brand?: string; gender?: string; accord?: string }) {
   const PAGE_SIZE = 60;
@@ -76,7 +75,6 @@ const ReviewSchema = z.object({
   occasion: z.string().trim().max(50).optional().nullable(),
   valueRating: z.number().int().min(1).max(3).optional(),
   blindBuySafe: z.boolean().optional(),
-  turnstileToken: z.string().min(1, "Please complete the security check"),
 });
 
 export type ReviewFormState = {
@@ -102,13 +100,8 @@ export async function submitReview(
     };
   }
 
-  const { perfumeId, text, overall_rating, longevity_score, sillage_score, time_tags, weather_tags, genderLeaning, occasion, valueRating, blindBuySafe, turnstileToken } =
+  const { perfumeId, text, overall_rating, longevity_score, sillage_score, time_tags, weather_tags, genderLeaning, occasion, valueRating, blindBuySafe } =
     parsed.data;
-
-  const isHuman = await verifyTurnstile(turnstileToken);
-  if (!isHuman) {
-    return { success: false, error: "Bot detected. Security check failed." };
-  }
 
   try {
     await prisma.$transaction([

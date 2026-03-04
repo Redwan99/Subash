@@ -42,7 +42,7 @@ export default async function ReviewsPage() {
     const reviews = await getAllReviews();
 
     return (
-        <main className="min-h-screen pt-24 pb-20 px-4 md:px-8">
+        <main className="min-h-[60vh] pb-10">
             {/* Editorial Header */}
             <section className="max-w-7xl mx-auto mb-12 text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start gap-2 mb-3">

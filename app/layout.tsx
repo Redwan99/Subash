@@ -2,7 +2,7 @@
 import { Inter, Playfair_Display } from "next/font/google";
 import { Providers } from "./providers";
 import { TopNavbar } from "@/components/layout/TopNavbar";
-import { ChatWidget } from "@/components/chat/ChatWidget";
+import { ConditionalChatWidget } from "@/components/chat/ConditionalChatWidget";
 import "./globals.css";
 
 const inter = Inter({
@@ -90,16 +90,16 @@ export default async function RootLayout({
         className={`${inter.variable} ${playfair.variable} bg-ambient-dynamic text-gray-900 dark:text-gray-100 min-h-screen antialiased flex flex-col scrollbar-thin overflow-x-hidden`}
         suppressHydrationWarning
       >
-        <Providers>
-          <TopNavbar featureToggles={featureToggles} />
+        <Providers featureToggles={featureToggles}>
+          <TopNavbar />
           <div className="flex flex-col flex-1 relative">
             {/* Global padding to prevent TopNavbar overlap */}
             <div className="flex-grow pt-[var(--topnav-height,60px)]">
               {children}
             </div>
           </div>
-          {/* Floating Chat Widget — shown globally */}
-          {featureToggles.ENABLE_AI_BOT !== false && <ChatWidget />}
+          {/* Floating Chat Widget — real-time toggle via context */}
+          <ConditionalChatWidget />
         </Providers>
       </body>
     </html>

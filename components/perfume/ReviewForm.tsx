@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { submitReview, type ReviewFormState } from "@/lib/actions/perfume";
-import { BotShield } from "@/components/ui/BotShield";
 
 // --- Types --------------------------------------------------------------------
 
@@ -261,7 +260,6 @@ export function ReviewForm({
   const [occasion, setOccasion] = useState<string>("");
   const [valueRating, setValueRating] = useState<number>(2);
   const [blindBuySafe, setBlindBuySafe] = useState<boolean>(true);
-  const [turnstileToken, setTurnstileToken] = useState("");
   const [state, setState] = useState<ReviewFormState | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -292,13 +290,12 @@ export function ReviewForm({
       occasion: occasion || null,
       valueRating,
       blindBuySafe,
-      turnstileToken,
     });
     setState(result);
     setLoading(false);
     if (result.success) {
       setText(""); setRating(3); setLongevity(5); setSillage(5);
-      setWeatherTags([]); setTimes([]); setTurnstileToken("");
+      setWeatherTags([]); setTimes([]);
       onSubmitted?.();
     }
   };
@@ -526,14 +523,13 @@ export function ReviewForm({
         </div>
 
         <div className="mt-6 space-y-4">
-        <BotShield onVerify={setTurnstileToken} />
 
         {/* Submit */}
         <motion.button
           type="submit"
-          disabled={!turnstileToken || loading || text.trim().length < 10}
-          whileHover={shouldReduceMotion || !turnstileToken || loading ? {} : { scale: 1.02 }}
-          whileTap={shouldReduceMotion || !turnstileToken || loading ? {} : { scale: 0.97 }}
+          disabled={loading || text.trim().length < 10}
+          whileHover={shouldReduceMotion || loading ? {} : { scale: 1.02 }}
+          whileTap={shouldReduceMotion || loading ? {} : { scale: 0.97 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
           className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-colors ${loading
             ? "bg-[var(--border-color)] text-[var(--text-muted)] cursor-not-allowed"
@@ -544,9 +540,7 @@ export function ReviewForm({
           {loading ? "Submitting..." : "Submit Review"}
         </motion.button>
         <p className="text-center text-[11px] text-[var(--text-muted)]">
-          {!turnstileToken
-            ? "Complete the bot check above to enable submit."
-            : text.trim().length < 10
+          {text.trim().length < 10
             ? "Write at least 10 characters to share a helpful review."
             : "Thank you for sharing an honest, helpful review."}
         </p>

@@ -16,10 +16,13 @@ export type AdminReview = {
 export type AdminUser = {
     id: string;
     name: string | null;
+    username: string | null;
     email: string | null;
     image: string | null;
     role: Role;
     review_count: number;
+    isBanned: boolean;
+    banReason: string | null;
     createdAt: Date;
 };
 

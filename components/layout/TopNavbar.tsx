@@ -19,13 +19,13 @@ import {
   User,
   Settings,
   Shield,
-  BookOpen,
   Users2,
   Store,
   Droplet,
   type LucideIcon,
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { useFeatureToggles } from "@/components/providers/FeatureToggleProvider";
 import dynamic from "next/dynamic";
 
 // GlobalSearch and NotificationBell use useRouter(); render them client-only to
@@ -238,7 +238,8 @@ function AvatarMenu() {
 
 // --- Top Navbar ---------------------------------------------------------------
 
-export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, boolean> }) {
+export function TopNavbar() {
+  const { features: featureToggles } = useFeatureToggles();
   const rawPathname = usePathname();
   const pathname = typeof rawPathname === "string" ? rawPathname : "";
   const shouldReduceMotion = useReducedMotion();
@@ -308,13 +309,13 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
         {/* Nav links — hidden on very small screens */}
         <nav className="hidden sm:flex items-center gap-0.5">
           {NAV_LINKS.filter(l => {
-            if (l.label === "Perfumes" && featureToggles?.ENABLE_ENCYCLOPEDIA === false) return false;
-            if (l.label === "Creators" && featureToggles?.ENABLE_CREATORS === false) return false;
-            if (l.label === "Boutiques" && featureToggles?.ENABLE_SHOPS === false) return false;
-            if (l.label === "Decants" && featureToggles?.ENABLE_DECANTS === false) return false;
-            if (l.label === "Leaderboards" && featureToggles?.ENABLE_LEADERBOARDS === false) return false;
-            if (l.label === "Fragram" && featureToggles?.ENABLE_FRAGRAM === false) return false;
-            if (l.label === "Wardrobe" && featureToggles?.ENABLE_WARDROBE === false) return false;
+            if (l.label === "Perfumes" && featureToggles.ENABLE_ENCYCLOPEDIA === false) return false;
+            if (l.label === "Creators" && featureToggles.ENABLE_CREATORS === false) return false;
+            if (l.label === "Boutiques" && featureToggles.ENABLE_SHOPS === false) return false;
+            if (l.label === "Decants" && featureToggles.ENABLE_DECANTS === false) return false;
+            if (l.label === "Leaderboards" && featureToggles.ENABLE_LEADERBOARDS === false) return false;
+            if (l.label === "Fragram" && featureToggles.ENABLE_FRAGRAM === false) return false;
+            if (l.label === "Wardrobe" && featureToggles.ENABLE_WARDROBE === false) return false;
             return true;
           }).map(({ href, icon, label }) => {
             const current = pathname || "";

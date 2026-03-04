@@ -180,8 +180,8 @@ export default async function PerfumePage({
   const baseNotes = parsePrismaArray(perfume.base_notes);
 
   return (
-    <main className="min-h-screen px-4 md:px-6 pt-20 md:pt-24 pb-20">
-      <div className="max-w-6xl mx-auto space-y-10">
+    <main className="min-h-screen pb-20">
+      <div className="w-full space-y-10">
         <ViewTracker perfumeId={perfume.id} />
         <PerfumeHero
           perfume={{

@@ -79,6 +79,7 @@ export default async function UserProfilePage({
       select: {
         id: true,
         name: true,
+        username: true,
         image: true,
         bio: true,
         role: true,
@@ -134,12 +135,6 @@ export default async function UserProfilePage({
       shelf: listType,
     });
   }
-
-  const wardrobeByType: Record<"HAVE" | "WANT" | "HAD", typeof wardrobeItems> = {
-    HAVE: wardrobeItems.filter((item) => item.shelf === "HAVE"),
-    WANT: wardrobeItems.filter((item) => item.shelf === "WANT"),
-    HAD: wardrobeItems.filter((item) => item.shelf === "HAD"),
-  };
 
   const badge = getBadge(user.review_count);
   const totalWardrobe = Object.values(grouped).reduce((s, a) => s + a.length, 0);
@@ -220,6 +215,9 @@ export default async function UserProfilePage({
                   <h1 className="text-xl font-bold text-[var(--text-primary)]">
                     {user.name ?? "Anonymous"}
                   </h1>
+                  {user.username && (
+                    <p className="text-sm text-[var(--text-muted)] font-medium">@{user.username}</p>
+                  )}
                   <div className="flex items-center gap-2 mt-1">
                     <span className={cn("text-sm font-bold flex items-center gap-1", badge.color)}>
                       <badge.icon className="w-4 h-4" /> {badge.label}
@@ -275,53 +273,6 @@ export default async function UserProfilePage({
         </div>
 
         {/* ─── Wardrobe ──────────────────────────────────────── */}
-        <section className="rounded-2xl p-5 bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] space-y-4">
-          <div>
-            <h2 className="text-base font-bold text-[var(--text-primary)]">Fragrance Wardrobe</h2>
-            <p className="text-xs text-[var(--text-muted)]">Your scent shelves at a glance.</p>
-          </div>
-
-          {([
-            ["HAVE", "I Have It"],
-            ["WANT", "I Want It"],
-            ["HAD", "I Had It"],
-          ] as const).map(([listType, title]) => (
-            <div key={listType} className="space-y-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-                {title} ({wardrobeByType[listType].length})
-              </h3>
-
-              {wardrobeByType[listType].length === 0 ? (
-                <div className="text-xs text-[var(--text-muted)]">No perfumes yet.</div>
-              ) : (
-                <div className="flex gap-3 overflow-x-auto pb-1">
-                  {wardrobeByType[listType].map((item) => {
-                    const imageUrl = item.perfume.transparentImageUrl || item.perfume.image_url;
-                    return (
-                      <Link
-                        key={item.id}
-                        href={`/perfume/${item.perfume.slug}`}
-                        className="w-20 h-20 shrink-0 bg-gray-50 dark:bg-white/5 rounded-xl p-2 hover:scale-110 transition-transform border border-gray-200 dark:border-white/10 backdrop-blur-lg flex items-center justify-center"
-                      >
-                        {imageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={imageUrl}
-                            alt={item.perfume.name}
-                            className="w-full h-full object-contain"
-                          />
-                        ) : (
-                          <Droplets className="w-6 h-6 text-[var(--text-muted)]" />
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
-        </section>
-
         <section>
           <WardrobePanel grouped={grouped} isOwner={isOwner} userId={id} />
         </section>

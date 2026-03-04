@@ -9,6 +9,7 @@ import { ClimateSection } from "@/components/ClimateSection";
 import { LiveReviewFeed, type LiveReview } from "@/components/feed/LiveReviewFeed";
 import { SmartSearch } from "@/components/ui/SmartSearch";
 import ReviewPosterCard from "@/components/reviews/ReviewPosterCard";
+import { NewsletterFooter } from "@/components/layout/NewsletterFooter";
 import { Sparkles } from "lucide-react";
 
 // ISR: revalidate cached payloads every 60 seconds for homepage freshness
@@ -280,6 +281,9 @@ export default async function HomePage() {
           <LiveReviewFeed initialReviews={feedInitialReviews} />
         </div>
       </section>
+
+      {/* Newsletter Footer — homepage only */}
+      <NewsletterFooter />
     </main>
   );
 }

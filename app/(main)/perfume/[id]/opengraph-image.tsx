@@ -8,12 +8,17 @@ export const contentType = "image/png";
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anyPrisma = prisma as any;
-  const perfume = await anyPrisma.perfume.findUnique({
-    where: { slug: id },
-    select: { name: true, brand: true, image_url: true },
-  });
+  let perfume: { name: string; brand: string; image_url: string | null } | null = null;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyPrisma = prisma as any;
+    perfume = await anyPrisma.perfume.findUnique({
+      where: { slug: id },
+      select: { name: true, brand: true, image_url: true },
+    });
+  } catch {
+    // DB error — return a safe fallback
+  }
 
   if (!perfume) {
     return new ImageResponse(
@@ -42,6 +47,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     imageUrl = `https://fimgs.net${imageUrl}`;
   }
 
+  try {
   return new ImageResponse(
     (
       <div
@@ -105,4 +111,16 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     ),
     { ...size }
   );
+  } catch {
+    // Image fetch or render failed — return text-only fallback
+    return new ImageResponse(
+      (
+        <div style={{ background: "#09090b", color: "white", width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ fontSize: 64, fontWeight: 800 }}>{perfume.name}</div>
+          <div style={{ fontSize: 36, color: "#a1a1aa", marginTop: 10 }}>{perfume.brand}</div>
+        </div>
+      ),
+      { ...size }
+    );
+  }
 }

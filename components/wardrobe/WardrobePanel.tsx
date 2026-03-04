@@ -23,10 +23,10 @@ import type { WardrobePerfume, WardrobeShelf as WardrobeShelfType } from "@/type
 type Shelf = WardrobeShelfType;
 
 const SHELVES: { key: Shelf; label: string; emoji: string; desc: string }[] = [
-  { key: "HAVE", label: "Have", emoji: "?", desc: "Owns it" },
-  { key: "HAD", label: "Had", emoji: "??", desc: "Owned before" },
-  { key: "WANT", label: "Want", emoji: "??", desc: "On the wish list" },
-  { key: "SIGNATURE", label: "Signature", emoji: "??", desc: "Go-to scent" },
+  { key: "HAVE", label: "Have", emoji: "💧", desc: "Owns it" },
+  { key: "HAD", label: "Had", emoji: "📦", desc: "Owned before" },
+  { key: "WANT", label: "Want", emoji: "✨", desc: "On the wish list" },
+  { key: "SIGNATURE", label: "Signature", emoji: "👑", desc: "Go-to scent" },
 ];
 
 // --- Bottle card ---------------------------------------------------------------
@@ -71,7 +71,7 @@ function BottleCard({
                 className="h-full object-contain p-1 transition-transform duration-200 group-hover:scale-105"
               />
             ) : (
-              <span className="text-[32px]">??</span>
+              <span className="text-[32px]">🧴</span>
             )}
           </div>
 

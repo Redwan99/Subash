@@ -62,6 +62,7 @@ enum ReviewStatus {
 model User {
   id            String       @id @default(cuid())
   name          String?
+  username      String?      @unique  // unique handle e.g. @scentlord — set by user from profile settings
   email         String?      @unique
   emailVerified DateTime?
   phone         String?      @unique
@@ -70,6 +71,8 @@ model User {
   bio           String?
   password      String?  // nullable — OAuth users have no password; bcryptjs hash for manual auth
   role            String       @default("STANDARD")
+  isBanned        Boolean      @default(false)
+  banReason       String?
   review_count    Int          @default(0)
   reputationScore Int          @default(0)   // Reputation Engine: +2 per review, +1 per HAVE item
   authProvider    String       @default("CREDENTIALS")
@@ -496,6 +499,23 @@ model FeatureToggle {
   updatedAt DateTime @updatedAt
 
   @@map("feature_toggles")
+}
+
+// =============================================
+//  Environment Variables (encrypted storage)
+// =============================================
+
+model EnvVariable {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   // AES-256-GCM encrypted
+  iv        String   // Initialization vector for decryption
+  tag       String   // GCM auth tag
+  masked    Boolean  @default(true) // Show as *** in UI
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@map("env_variables")
 }
 
 // =============================================

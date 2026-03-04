@@ -60,7 +60,7 @@ function LeaderRow({
   user,
   rank,
 }: {
-  user: { id: string; name: string | null; image: string | null; review_count: number; role: string };
+  user: { id: string; name: string | null; username: string | null; image: string | null; review_count: number; role: string };
   rank: number;
 }) {
   const badge   = getBadge(user.review_count);
@@ -102,7 +102,7 @@ function LeaderRow({
             rankTextClass[rank] ?? "text-[var(--text-muted)]"
           )}
         >
-          {rank <= 3 ? ["??","??","??"][rank - 1] : `#${rank}`}
+          {rank <= 3 ? ["🥇","🥈","🥉"][rank - 1] : `#${rank}`}
         </div>
 
         {/* Avatar */}
@@ -139,6 +139,9 @@ function LeaderRow({
             >
               {user.name ?? "Anonymous"}
             </span>
+            {user.username && (
+              <span className="text-[11px] text-[var(--text-muted)] font-medium shrink-0">@{user.username}</span>
+            )}
             {/* Badge label */}
             <span
               className={cn(
@@ -189,6 +192,7 @@ export default async function LeaderboardsPage() {
     select: {
       id:           true,
       name:         true,
+      username:     true,
       image:        true,
       review_count: true,
       role:         true,
@@ -196,15 +200,15 @@ export default async function LeaderboardsPage() {
   });
 
   const tiers = [
-    { label: "VIP Nose",    emoji: "??", min: 150, gradientClass: "bg-[linear-gradient(135deg,#E84393,#F783AC)]" },
-    { label: "Collector",   emoji: "??", min: 50,  gradientClass: "bg-[linear-gradient(135deg,#8E9CB5,#C2CAD8)]" },
-    { label: "Enthusiast",  emoji: "??", min: 11,  gradientClass: "bg-[linear-gradient(135deg,#A0684A,#C8875E)]" },
-    { label: "Novice",      emoji: "??", min: 0,   gradientClass: "" },
+    { label: "VIP Nose",    emoji: "👑", min: 150, gradientClass: "bg-[linear-gradient(135deg,#E84393,#F783AC)]" },
+    { label: "Collector",   emoji: "💎", min: 50,  gradientClass: "bg-[linear-gradient(135deg,#8E9CB5,#C2CAD8)]" },
+    { label: "Enthusiast",  emoji: "🌟", min: 11,  gradientClass: "bg-[linear-gradient(135deg,#A0684A,#C8875E)]" },
+    { label: "Novice",      emoji: "🌱", min: 0,   gradientClass: "" },
   ];
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)]">
-      <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
         {/* Hero */}
         <div
           className="relative overflow-hidden rounded-2xl mb-8 px-6 py-8 bg-[linear-gradient(135deg,rgba(232,67,147,0.12)_0%,rgba(194,37,92,0.06)_60%,transparent_100%)] border border-[#E84393]/25"

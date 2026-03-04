@@ -41,10 +41,13 @@ async function getAdminData() {
         select: {
           id: true,
           name: true,
+          username: true,
           email: true,
           image: true,
           role: true,
           review_count: true,
+          isBanned: true,
+          banReason: true,
           createdAt: true,
         },
       }),

@@ -9,6 +9,7 @@ import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import bcrypt from "bcryptjs";
 
 // Workaround: ReviewStatus not in Prisma client until `npx prisma db push` runs on the server.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -308,5 +309,83 @@ export async function importBulkPerfumes(jsonData: string) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("Bulk Import Error:", error);
     return { success: false, error: message };
+  }
+}
+
+// ── Ban / Unban User ──────────────────────────────────────────────────────────
+export async function toggleBanUser(
+  userId: string,
+  ban: boolean,
+  reason?: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const adminId = await requireAdmin();
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isBanned: ban, banReason: ban ? (reason || null) : null },
+    });
+
+    await logAdminAction(adminId, ban ? "BAN_USER" : "UNBAN_USER", `User: ${userId}${reason ? ` — ${reason}` : ""}`);
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
+// ── Admin Reset User Password ─────────────────────────────────────────────────
+export async function adminResetUserPassword(
+  userId: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const adminId = await requireAdmin();
+
+    if (newPassword.length < 8) {
+      return { success: false, error: "Password must be at least 8 characters." };
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { password: true, email: true },
+    });
+    if (!user) return { success: false, error: "User not found." };
+    if (!user.password) return { success: false, error: "OAuth user — no password to reset." };
+
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashed },
+    });
+
+    await logAdminAction(adminId, "RESET_PASSWORD", `User: ${userId} (${user.email})`);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
+// ── Admin Delete User ─────────────────────────────────────────────────────────
+export async function adminDeleteUser(
+  userId: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const adminId = await requireAdmin();
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, role: true },
+    });
+    if (!user) return { success: false, error: "User not found." };
+    if (user.role === "SUPER_ADMIN") return { success: false, error: "Cannot delete a Super Admin." };
+
+    await prisma.user.delete({ where: { id: userId } });
+
+    await logAdminAction(adminId, "DELETE_USER", `Deleted user: ${userId} (${user.email})`);
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }

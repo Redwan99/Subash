@@ -8,9 +8,10 @@ import {
     Users, Star, Sparkles, ShieldAlert, Trash2, Crown,
     BarChart3, ShieldCheck, AlertTriangle, CheckCircle2,
     ChevronDown, Search, RefreshCw, Settings2, Power, Store, Droplet, Users2, Activity,
-    Briefcase, Database, Globe, Camera, Trophy, Layers, MessageCircle, ShoppingBag
+    Briefcase, Database, Globe, Camera, Trophy, Layers, MessageCircle, ShoppingBag, Key, Plus, Eye, EyeOff, Loader2, Save
 } from "lucide-react";
-import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus } from "@/lib/actions/admin";
+import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus, toggleBanUser, adminResetUserPassword, adminDeleteUser } from "@/lib/actions/admin";
+import { getEnvVariables, upsertEnvVariable, deleteEnvVariable, getEnvVariableDecrypted, type EnvVarItem } from "@/lib/actions/envvars";
 import type { Role, FeatureToggle } from "@prisma/client";
 import { CsvImporter } from "@/components/admin/CsvImporter";
 import BulkImporter from "@/components/admin/BulkImporter";
@@ -217,6 +218,16 @@ function UsersTable({ users }: { users: AdminUser[] }) {
     const [query, setQuery] = useState("");
     const [items, setItems] = useState(users);
     const [pending, startTransition] = useTransition();
+    // Ban modal
+    const [banModal, setBanModal] = useState<{ userId: string; ban: boolean } | null>(null);
+    const [banReason, setBanReason] = useState("");
+    // Reset password modal
+    const [resetModal, setResetModal] = useState<string | null>(null);
+    const [newPassword, setNewPassword] = useState("");
+    // Delete modal
+    const [deleteModal, setDeleteModal] = useState<string | null>(null);
+    // Feedback
+    const [feedback, setFeedback] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
 
     const filtered = items.filter((u) =>
         !query ||
@@ -231,8 +242,56 @@ function UsersTable({ users }: { users: AdminUser[] }) {
         });
     };
 
+    const handleBan = () => {
+        if (!banModal) return;
+        startTransition(async () => {
+            const res = await toggleBanUser(banModal.userId, banModal.ban, banReason || undefined);
+            if (res.error) { setFeedback({ type: "err", msg: res.error }); }
+            else {
+                setFeedback({ type: "ok", msg: banModal.ban ? "User banned" : "User unbanned" });
+                setItems((prev) => prev.map((u) => u.id === banModal.userId ? { ...u, isBanned: banModal.ban, banReason: banModal.ban ? (banReason || null) : null } : u));
+            }
+            setBanModal(null); setBanReason("");
+            setTimeout(() => setFeedback(null), 3000);
+        });
+    };
+
+    const handleResetPassword = () => {
+        if (!resetModal || !newPassword) return;
+        startTransition(async () => {
+            const res = await adminResetUserPassword(resetModal, newPassword);
+            if (res.error) { setFeedback({ type: "err", msg: res.error }); }
+            else { setFeedback({ type: "ok", msg: "Password reset successfully" }); }
+            setResetModal(null); setNewPassword("");
+            setTimeout(() => setFeedback(null), 3000);
+        });
+    };
+
+    const handleDelete = () => {
+        if (!deleteModal) return;
+        startTransition(async () => {
+            const res = await adminDeleteUser(deleteModal);
+            if (res.error) { setFeedback({ type: "err", msg: res.error }); }
+            else {
+                setFeedback({ type: "ok", msg: "User deleted" });
+                setItems((prev) => prev.filter((u) => u.id !== deleteModal));
+            }
+            setDeleteModal(null);
+            setTimeout(() => setFeedback(null), 3000);
+        });
+    };
+
+    const userName = (id: string) => { const u = items.find((u) => u.id === id); return u?.name || u?.email || "this user"; };
+
     return (
         <div>
+            {/* Feedback toast */}
+            {feedback && (
+                <div className={`mb-3 px-4 py-2.5 rounded-xl text-sm font-medium border ${
+                    feedback.type === "ok" ? "bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.3)] text-emerald-400" : "bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.3)] text-red-400"
+                }`}>{feedback.msg}</div>
+            )}
+
             <div className="relative mb-4">
                 <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.3)]" />
                 <input
@@ -247,7 +306,7 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                 <table className="w-full text-sm">
                     <thead>
                         <tr className="border-b border-[rgba(255,255,255,0.06)]" style={{ background: "rgba(255,255,255,0.03)" }}>
-                            {["User", "Email", "Role", "Reviews", "Joined", "Change Role"].map((h) => (
+                            {["User", "Email", "Role", "Status", "Reviews", "Joined", "Actions"].map((h) => (
                                 <th key={h} className="px-4 py-3 text-left text-[10px] font-bold tracking-widest uppercase text-[rgba(255,255,255,0.3)]">
                                     {h}
                                 </th>
@@ -257,7 +316,7 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                     <tbody>
                         {filtered.map((user) => (
                             <tr key={user.id}
-                                className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.025)] transition-colors">
+                                className={`border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.025)] transition-colors ${user.isBanned ? "opacity-60" : ""}`}>
                                 <td className="px-4 py-3">
                                     <div className="flex items-center gap-2.5">
                                         {user.image ? (
@@ -267,7 +326,10 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                                                 {user.name?.[0] ?? "?"}
                                             </div>
                                         )}
-                                        <p className="text-white font-medium text-[13px] line-clamp-1">{user.name ?? "Anonymous"}</p>
+                                        <div className="min-w-0">
+                                            <p className="text-white font-medium text-[13px] line-clamp-1">{user.name ?? "Anonymous"}</p>
+                                            {user.username && <p className="text-[11px] text-[rgba(255,255,255,0.4)] line-clamp-1">@{user.username}</p>}
+                                        </div>
                                     </div>
                                 </td>
                                 <td className="px-4 py-3 text-[rgba(255,255,255,0.45)] text-[12px]">{user.email ?? "—"}</td>
@@ -276,24 +338,66 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                                         {ROLE_DISPLAY[user.role].label}
                                     </span>
                                 </td>
+                                <td className="px-4 py-3">
+                                    {user.isBanned ? (
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border bg-[rgba(239,68,68,0.12)] border-[rgba(239,68,68,0.3)] text-red-400" title={user.banReason || "Banned"}>
+                                            <ShieldAlert size={10} /> Banned
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border bg-[rgba(16,185,129,0.08)] border-[rgba(16,185,129,0.25)] text-emerald-400">
+                                            <CheckCircle2 size={10} /> Active
+                                        </span>
+                                    )}
+                                </td>
                                 <td className="px-4 py-3 text-white font-bold">{user.review_count}</td>
                                 <td className="px-4 py-3 text-[rgba(255,255,255,0.3)] text-[11px] whitespace-nowrap">
                                     {new Date(user.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "2-digit" })}
                                 </td>
                                 <td className="px-4 py-3">
-                                    <div className="relative">
-                                        <select
-                                            value={user.role}
+                                    <div className="flex items-center gap-1.5">
+                                        {/* Role change */}
+                                        <div className="relative">
+                                            <select
+                                                value={user.role}
+                                                disabled={pending}
+                                                aria-label={`Change role for ${user.name ?? user.email}`}
+                                                onChange={(e) => handleRoleChange(user.id, e.target.value as Role)}
+                                                className="appearance-none text-[11px] font-semibold px-2 py-1 pr-6 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] text-white outline-none cursor-pointer hover:border-[rgba(232,67,147,0.4)] disabled:opacity-40 transition-all"
+                                            >
+                                                {Object.entries(ROLE_DISPLAY).map(([role, { label }]) => (
+                                                    <option key={role} value={role} className="bg-[#0D0A1E]">{label}</option>
+                                                ))}
+                                            </select>
+                                            <ChevronDown size={10} className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.4)] pointer-events-none" />
+                                        </div>
+                                        {/* Ban / Unban */}
+                                        <button
+                                            onClick={() => setBanModal({ userId: user.id, ban: !user.isBanned })}
+                                            disabled={pending || user.role === "SUPER_ADMIN"}
+                                            title={user.isBanned ? "Unban user" : "Ban user"}
+                                            className={`p-1.5 rounded-lg border transition-all disabled:opacity-30 ${
+                                                user.isBanned
+                                                    ? "border-[rgba(16,185,129,0.3)] text-emerald-400 hover:bg-[rgba(16,185,129,0.1)]"
+                                                    : "border-[rgba(239,68,68,0.3)] text-red-400 hover:bg-[rgba(239,68,68,0.1)]"
+                                            }`}>
+                                            <ShieldAlert size={13} />
+                                        </button>
+                                        {/* Reset Password */}
+                                        <button
+                                            onClick={() => setResetModal(user.id)}
                                             disabled={pending}
-                                            aria-label={`Change role for ${user.name ?? user.email}`}
-                                            onChange={(e) => handleRoleChange(user.id, e.target.value as Role)}
-                                            className="appearance-none text-xs font-semibold px-3 py-1.5 pr-7 rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.05)] text-white outline-none cursor-pointer hover:border-[rgba(232,67,147,0.4)] disabled:opacity-40 transition-all"
-                                        >
-                                            {Object.entries(ROLE_DISPLAY).map(([role, { label }]) => (
-                                                <option key={role} value={role} className="bg-[#0D0A1E]">{label}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronDown size={11} className="absolute right-2 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.4)] pointer-events-none" />
+                                            title="Reset password"
+                                            className="p-1.5 rounded-lg border border-[rgba(245,158,11,0.3)] text-amber-400 hover:bg-[rgba(245,158,11,0.1)] transition-all disabled:opacity-30">
+                                            <Key size={13} />
+                                        </button>
+                                        {/* Delete */}
+                                        <button
+                                            onClick={() => setDeleteModal(user.id)}
+                                            disabled={pending || user.role === "SUPER_ADMIN"}
+                                            title="Delete user"
+                                            className="p-1.5 rounded-lg border border-[rgba(239,68,68,0.3)] text-red-400 hover:bg-[rgba(239,68,68,0.15)] transition-all disabled:opacity-30">
+                                            <Trash2 size={13} />
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -304,6 +408,68 @@ function UsersTable({ users }: { users: AdminUser[] }) {
                     <p className="text-center py-10 text-[rgba(255,255,255,0.25)] text-sm">No users found.</p>
                 )}
             </div>
+
+            {/* Ban/Unban Modal */}
+            {banModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setBanModal(null)}>
+                    <div className="bg-[#1A1530] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-white font-bold text-lg mb-1">{banModal.ban ? "Ban User" : "Unban User"}</h3>
+                        <p className="text-[rgba(255,255,255,0.5)] text-sm mb-4">
+                            {banModal.ban ? `Ban ${userName(banModal.userId)}? They won't be able to log in.` : `Unban ${userName(banModal.userId)}?`}
+                        </p>
+                        {banModal.ban && (
+                            <textarea
+                                value={banReason}
+                                onChange={(e) => setBanReason(e.target.value)}
+                                placeholder="Reason for ban (optional)..."
+                                className="w-full mb-4 p-3 rounded-xl text-sm bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none resize-none h-20"
+                            />
+                        )}
+                        <div className="flex gap-2 justify-end">
+                            <button onClick={() => { setBanModal(null); setBanReason(""); }} className="px-4 py-2 text-sm rounded-xl border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] transition-all">Cancel</button>
+                            <button onClick={handleBan} disabled={pending} className={`px-4 py-2 text-sm rounded-xl font-semibold transition-all disabled:opacity-50 ${
+                                banModal.ban ? "bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30" : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30"
+                            }`}>{pending ? "..." : banModal.ban ? "Ban" : "Unban"}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reset Password Modal */}
+            {resetModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setResetModal(null); setNewPassword(""); }}>
+                    <div className="bg-[#1A1530] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-white font-bold text-lg mb-1">Reset Password</h3>
+                        <p className="text-[rgba(255,255,255,0.5)] text-sm mb-4">Set a new password for {userName(resetModal)}</p>
+                        <input
+                            type="text"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="New password (min 8 characters)..."
+                            className="w-full mb-4 p-3 rounded-xl text-sm bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none"
+                        />
+                        <div className="flex gap-2 justify-end">
+                            <button onClick={() => { setResetModal(null); setNewPassword(""); }} className="px-4 py-2 text-sm rounded-xl border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] transition-all">Cancel</button>
+                            <button onClick={handleResetPassword} disabled={pending || newPassword.length < 8} className="px-4 py-2 text-sm rounded-xl font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30 transition-all disabled:opacity-50">{pending ? "..." : "Reset"}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete User Modal */}
+            {deleteModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setDeleteModal(null)}>
+                    <div className="bg-[#1A1530] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <h3 className="text-white font-bold text-lg mb-1">Delete User</h3>
+                        <p className="text-[rgba(255,255,255,0.5)] text-sm mb-2">Permanently delete <strong className="text-red-400">{userName(deleteModal)}</strong>?</p>
+                        <p className="text-[rgba(255,255,255,0.35)] text-xs mb-4">This action cannot be undone. All reviews and data will remain but become orphaned.</p>
+                        <div className="flex gap-2 justify-end">
+                            <button onClick={() => setDeleteModal(null)} className="px-4 py-2 text-sm rounded-xl border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] transition-all">Cancel</button>
+                            <button onClick={handleDelete} disabled={pending} className="px-4 py-2 text-sm rounded-xl font-semibold bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-all disabled:opacity-50">{pending ? "..." : "Delete"}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -378,7 +544,7 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
 
 // -- Main Dashboard -------------------------------------------------------------
 
-type Tab = "overview" | "reviews" | "users" | "system" | "audit" | "claims" | "import";
+type Tab = "overview" | "reviews" | "users" | "system" | "env" | "audit" | "claims" | "import";
 
 export default function AdminDashboardClient({ totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, recentReviews, users, featureToggles, auditLogs, brandClaims }: Props) {
     const [tab, setTab] = useState<Tab>("overview");
@@ -388,6 +554,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
         { id: "reviews", label: "Reviews", icon: <Star size={15} /> },
         { id: "users", label: "Users", icon: <Users size={15} /> },
         { id: "system", label: "System Features", icon: <Settings2 size={15} /> },
+        { id: "env", label: "Env Variables", icon: <Key size={15} /> },
         { id: "audit", label: "Audit Logs", icon: <Activity size={15} /> },
         { id: "claims", label: "B2B Claims", icon: <Briefcase size={15} /> },
         { id: "import", label: "Import Data", icon: <Database size={15} /> },
@@ -650,6 +817,9 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                         <BulkImporter />
                     </div>
                 )}
+
+                {/* -- Env Variables Tab -- */}
+                {tab === "env" && <EnvVariablesPanel />}
             </div>
         </div>
     );
@@ -721,6 +891,234 @@ function BrandClaimsTable({ claims }: { claims: BrandClaim[] }) {
                     )}
                 </tbody>
             </table>
+        </div>
+    );
+}
+
+// -- Env Variables Panel --------------------------------------------------------
+
+function EnvVariablesPanel() {
+    const [vars, setVars] = useState<EnvVarItem[]>([]);
+    const [loaded, setLoaded] = useState(false);
+    const [showAdd, setShowAdd] = useState(false);
+    const [newKey, setNewKey] = useState("");
+    const [newValue, setNewValue] = useState("");
+    const [newMasked, setNewMasked] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [feedback, setFeedback] = useState<{ success: boolean; message: string } | null>(null);
+    const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
+    const [revealedValues, setRevealedValues] = useState<Record<string, string>>({});
+
+    // Load on mount
+    const loadVars = async () => {
+        try {
+            const data = await getEnvVariables();
+            setVars(data);
+            setLoaded(true);
+        } catch {
+            setLoaded(true);
+        }
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useState(() => { loadVars(); });
+
+    const handleReveal = async (id: string) => {
+        if (revealedIds.has(id)) {
+            setRevealedIds(prev => { const next = new Set(prev); next.delete(id); return next; });
+            return;
+        }
+        const val = await getEnvVariableDecrypted(id);
+        if (val !== null) {
+            setRevealedValues(prev => ({ ...prev, [id]: val }));
+            setRevealedIds(prev => new Set(prev).add(id));
+        }
+    };
+
+    const handleSave = async () => {
+        setSaving(true);
+        setFeedback(null);
+        const result = await upsertEnvVariable(newKey, newValue, newMasked);
+        setSaving(false);
+        if (result.success) {
+            setFeedback({ success: true, message: `${newKey} saved successfully.` });
+            setNewKey("");
+            setNewValue("");
+            setNewMasked(true);
+            setShowAdd(false);
+            await loadVars();
+        } else {
+            setFeedback({ success: false, message: result.error || "Failed to save." });
+        }
+    };
+
+    const handleDelete = async (id: string, key: string) => {
+        if (!confirm(`Delete ${key}? This cannot be undone.`)) return;
+        const result = await deleteEnvVariable(id);
+        if (result.success) {
+            setVars(prev => prev.filter(v => v.id !== id));
+            setFeedback({ success: true, message: `${key} deleted.` });
+        } else {
+            setFeedback({ success: false, message: result.error || "Failed to delete." });
+        }
+    };
+
+    if (!loaded) {
+        return (
+            <div className="flex items-center justify-center py-20">
+                <Loader2 size={24} className="animate-spin text-brand-500" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="max-w-3xl mx-auto space-y-6">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <Key size={18} className="text-[#F59E0B]" />
+                    <h2 className="text-lg font-bold text-white">Environment Variables</h2>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => loadVars()}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.5)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                    >
+                        <RefreshCw size={12} className="inline mr-1" /> Refresh
+                    </button>
+                    <button
+                        onClick={() => setShowAdd(!showAdd)}
+                        className="px-3 py-1.5 text-xs font-bold rounded-lg bg-brand-500/20 border border-brand-500/30 text-brand-500 hover:bg-brand-500/30 transition-colors"
+                    >
+                        <Plus size={12} className="inline mr-1" /> Add Variable
+                    </button>
+                </div>
+            </div>
+
+            <p className="text-[13px] text-[rgba(255,255,255,0.4)]">
+                Manage environment variables stored with AES-256-GCM encryption. Changes take effect immediately on the server runtime. Variables persist across restarts.
+            </p>
+
+            {/* Feedback */}
+            {feedback && (
+                <div className={`flex items-center gap-2 p-3 rounded-xl text-sm border ${
+                    feedback.success
+                        ? "bg-[rgba(247,131,172,0.1)] border-[rgba(247,131,172,0.25)] text-[#F783AC]"
+                        : "bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.25)] text-[#EF4444]"
+                }`}>
+                    {feedback.success ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+                    <span>{feedback.message}</span>
+                </div>
+            )}
+
+            {/* Add Form */}
+            {showAdd && (
+                <div className="rounded-2xl p-5 space-y-4 border border-[rgba(255,255,255,0.08)]" style={{ background: "rgba(255,255,255,0.03)" }}>
+                    <div>
+                        <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Variable Key</label>
+                        <input
+                            type="text"
+                            value={newKey}
+                            onChange={(e) => setNewKey(e.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, ""))}
+                            placeholder="NEXT_PUBLIC_MY_KEY"
+                            className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-brand-500/50 font-mono"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Value</label>
+                        <textarea
+                            value={newValue}
+                            onChange={(e) => setNewValue(e.target.value)}
+                            placeholder="sk-xxxx..."
+                            rows={2}
+                            className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-brand-500/50 font-mono resize-none"
+                        />
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <label className="flex items-center gap-2 text-sm text-[rgba(255,255,255,0.5)] cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={newMasked}
+                                onChange={(e) => setNewMasked(e.target.checked)}
+                                className="rounded accent-brand-500"
+                            />
+                            Mask value in UI (secrets)
+                        </label>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setShowAdd(false)}
+                                className="px-3 py-1.5 text-xs rounded-lg border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.4)] hover:text-white transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                disabled={saving || !newKey || !newValue}
+                                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+                                    saving || !newKey || !newValue
+                                        ? "bg-[rgba(255,255,255,0.05)] text-[rgba(255,255,255,0.2)] cursor-not-allowed"
+                                        : "bg-brand-500/20 border border-brand-500/30 text-brand-500 hover:bg-brand-500/30"
+                                }`}
+                            >
+                                {saving ? <Loader2 size={12} className="inline animate-spin mr-1" /> : <Save size={12} className="inline mr-1" />}
+                                {saving ? "Saving..." : "Save"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Variables List */}
+            <div className="space-y-2">
+                {vars.length === 0 ? (
+                    <div className="rounded-2xl p-10 text-center border border-dashed border-[rgba(255,255,255,0.1)]" style={{ background: "rgba(255,255,255,0.02)" }}>
+                        <Key size={24} className="mx-auto mb-3 text-[rgba(255,255,255,0.15)]" />
+                        <p className="text-sm text-[rgba(255,255,255,0.3)]">No environment variables configured yet.</p>
+                        <p className="text-xs text-[rgba(255,255,255,0.2)] mt-1">Click &quot;Add Variable&quot; to get started.</p>
+                    </div>
+                ) : (
+                    vars.map((v) => (
+                        <div
+                            key={v.id}
+                            className="flex items-center justify-between gap-4 px-4 py-3 rounded-xl border border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)] transition-colors"
+                            style={{ background: "rgba(255,255,255,0.02)" }}
+                        >
+                            <div className="min-w-0 flex-1">
+                                <p className="text-sm font-mono font-bold text-[#F59E0B] truncate">{v.key}</p>
+                                <p className="text-xs font-mono text-[rgba(255,255,255,0.3)] truncate mt-0.5">
+                                    {revealedIds.has(v.id) ? revealedValues[v.id] : v.value}
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                                {v.masked && (
+                                    <button
+                                        onClick={() => handleReveal(v.id)}
+                                        className="p-1.5 rounded-lg text-[rgba(255,255,255,0.3)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                                        title={revealedIds.has(v.id) ? "Hide" : "Reveal"}
+                                    >
+                                        {revealedIds.has(v.id) ? <EyeOff size={13} /> : <Eye size={13} />}
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => handleDelete(v.id, v.key)}
+                                    className="p-1.5 rounded-lg text-[rgba(255,255,255,0.3)] hover:text-[#EF4444] hover:bg-[rgba(239,68,68,0.1)] transition-colors"
+                                    title="Delete"
+                                >
+                                    <Trash2 size={13} />
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Help Text */}
+            <div className="rounded-xl p-4 border border-[rgba(255,255,255,0.06)]" style={{ background: "rgba(255,255,255,0.02)" }}>
+                <p className="text-xs text-[rgba(255,255,255,0.35)] leading-relaxed">
+                    <strong className="text-[rgba(255,255,255,0.5)]">Common variables:</strong>{" "}
+                    NEXT_PUBLIC_TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+                    AUTH_SECRET, NEXT_PUBLIC_SITE_URL, OPENAI_API_KEY, ENV_ENCRYPTION_KEY
+                </p>
+            </div>
         </div>
     );
 }

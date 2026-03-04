@@ -6,8 +6,10 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { ProfileEditForm } from "./ProfileEditForm";
+import { ChangePasswordForm } from "./ChangePasswordForm";
+import { UsernameForm } from "./UsernameForm";
 import Link from "next/link";
-import { ArrowLeft, Phone, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Phone, CheckCircle, XCircle, Lock, AtSign } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Edit Profile" };
@@ -18,7 +20,7 @@ export default async function ProfileEditPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, bio: true, phone: true, phoneVerified: true, email: true, image: true, role: true, review_count: true },
+    select: { name: true, username: true, bio: true, phone: true, phoneVerified: true, email: true, image: true, role: true, review_count: true, password: true },
   });
 
   if (!user) redirect("/");
@@ -44,6 +46,9 @@ export default async function ProfileEditPage() {
           </div>
           <div>
             <p className="font-bold text-[var(--text-primary)]">{user.name ?? "Unnamed"}</p>
+            {user.username && (
+              <p className="text-xs text-[var(--accent)] font-medium">@{user.username}</p>
+            )}
             <p className="text-xs text-[var(--text-muted)]">{user.email ?? "No email"}</p>
             <p className="text-[11px] font-medium mt-0.5 text-[var(--accent)]">
               {user.role.replace("_", " ")} · {user.review_count} reviews
@@ -61,6 +66,24 @@ export default async function ProfileEditPage() {
             initialBio={user.bio ?? ""}
           />
         </section>
+
+        {/* ─── Username ──────────────────────────────────────── */}
+        <section>
+          <h2 className="text-xs font-bold uppercase tracking-widest mb-4 text-[var(--text-muted)] flex items-center gap-2">
+            <AtSign size={13} /> Username
+          </h2>
+          <UsernameForm initialUsername={user.username ?? ""} />
+        </section>
+
+        {/* ─── Change Password (credentials users only) ──────── */}
+        {user.password && (
+          <section>
+            <h2 className="text-xs font-bold uppercase tracking-widest mb-4 text-[var(--text-muted)] flex items-center gap-2">
+              <Lock size={13} /> Change Password
+            </h2>
+            <ChangePasswordForm />
+          </section>
+        )}
 
         {/* ─── Phone verification status ─────────────────────────── */}
         <section>
