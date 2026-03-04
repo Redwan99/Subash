@@ -4,25 +4,27 @@
 // Placeholder percentages until the voting backend is wired.
 
 import { motion, useReducedMotion } from "framer-motion";
+import { Flower2, Sun, Leaf, Snowflake, Sunrise, SunMedium, Sunset, Moon, Zap } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 
 type ConsensusProps = {
   reviewCount: number;
   avgRating: number; // 1–5 scale from ReviewForm
 };
 
-const SEASONS = [
-  { key: "spring", label: "Spring", emoji: "🌸" },
-  { key: "summer", label: "Summer", emoji: "☀️" },
-  { key: "autumn", label: "Autumn", emoji: "🍂" },
-  { key: "winter", label: "Winter", emoji: "❄️" },
+const SEASONS: { key: string; label: string; icon: LucideIcon }[] = [
+  { key: "spring", label: "Spring", icon: Flower2 },
+  { key: "summer", label: "Summer", icon: Sun },
+  { key: "autumn", label: "Autumn", icon: Leaf },
+  { key: "winter", label: "Winter", icon: Snowflake },
 ];
 
-const TIMES = [
-  { key: "morning", label: "Morning", emoji: "🌅" },
-  { key: "day",      label: "Day",      emoji: "🌤️" },
-  { key: "evening",  label: "Evening",  emoji: "🌇" },
-  { key: "night",    label: "Night",    emoji: "🌙" },
-  { key: "anytime",  label: "Anytime",  emoji: "⚡" },
+const TIMES: { key: string; label: string; icon: LucideIcon }[] = [
+  { key: "morning", label: "Morning", icon: Sunrise },
+  { key: "day",      label: "Day",      icon: SunMedium },
+  { key: "evening",  label: "Evening",  icon: Sunset },
+  { key: "night",    label: "Night",    icon: Moon },
+  { key: "anytime",  label: "Anytime",  icon: Zap },
 ];
 
 // Derive rough community verdict from avg rating
@@ -105,7 +107,7 @@ export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
               Best Season
             </p>
             <div className="grid grid-cols-4 gap-2">
-              {SEASONS.map(({ key, label, emoji }) => {
+              {SEASONS.map(({ key, label, icon: Icon }) => {
                 const active = ACTIVE_SEASONS.includes(key);
                 return (
                   <div
@@ -116,7 +118,7 @@ export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
                         : "bg-gray-100 dark:bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
                     }`}
                   >
-                    <span className="text-lg leading-none">{emoji}</span>
+                    <Icon className={`w-5 h-5 ${active ? "text-brand-400" : "text-[var(--text-muted)]"}`} />
                     <span
                       className={`text-[9px] font-bold uppercase tracking-wider leading-none ${
                         active ? "text-brand-400" : "text-[var(--text-muted)]"
@@ -135,7 +137,7 @@ export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
               Best Time of Day
             </p>
             <div className="flex flex-wrap gap-2">
-              {TIMES.map(({ key, label, emoji }) => {
+              {TIMES.map(({ key, label, icon: Icon }) => {
                 const active = ACTIVE_TIMES.includes(key);
                 return (
                   <div
@@ -146,7 +148,7 @@ export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
                         : "bg-gray-100 dark:bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
                     }`}
                   >
-                    <span className="text-2xl leading-none">{emoji}</span>
+                    <Icon className={`w-6 h-6 ${active ? "text-brand-400" : "text-[var(--text-muted)]"}`} />
                     <span
                       className={`text-[10px] font-bold uppercase tracking-wider ${
                         active ? "text-brand-400" : "text-[var(--text-muted)]"

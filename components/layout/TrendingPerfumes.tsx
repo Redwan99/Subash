@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Flame, TrendingUp } from "lucide-react";
+import { Flame, TrendingUp, Droplets } from "lucide-react";
 import { getCachedTrendingPerfumes } from "@/lib/actions/search";
 
 // Rank badge colours: gold → silver → bronze → normal → normal
@@ -60,8 +60,8 @@ export async function TrendingPerfumes() {
                                             unoptimized
                                         />
                                     ) : (
-                                        <span className="absolute inset-0 flex items-center justify-center text-sm">
-                                            🧴
+                                        <span className="absolute inset-0 flex items-center justify-center">
+                                            <Droplets className="w-4 h-4 text-[var(--text-muted)]" />
                                         </span>
                                     )}
                                 </div>

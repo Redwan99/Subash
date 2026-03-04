@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { BookOpen, ChevronLeft } from "lucide-react";
+import { BookOpen, ChevronLeft, Droplets } from "lucide-react";
 import { parsePrismaArray } from "@/lib/utils";
 
 type Props = { params: Promise<{ name: string }> };
@@ -72,7 +72,7 @@ export default async function CreatorByNamePage({ params }: Props) {
                                     <Image src={p.image_url} alt={p.name} fill sizes="200px"
                                         className="object-contain p-3 transition-transform duration-500 group-hover:scale-105" unoptimized />
                                 ) : (
-                                    <span className="text-4xl opacity-25">🧴</span>
+                                    <Droplets className="w-8 h-8 text-[var(--text-muted)] opacity-25" />
                                 )}
                             </div>
                             <div className="p-3">

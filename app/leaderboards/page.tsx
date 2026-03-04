@@ -4,9 +4,10 @@
 
 import prisma from "@/lib/prisma";
 import Image from "next/image";
-import { Trophy, Star } from "lucide-react";
+import { Trophy, Star, Award, Sprout } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { type LucideIcon } from "lucide-react";
 
 // Always render at request time â€” no DB connection available at build time.
 export const dynamic = 'force-dynamic';
@@ -14,7 +15,7 @@ export const dynamic = 'force-dynamic';
 // --- Badge helper --------------------------------------------------------------
 
 type BadgeTier = {
-  emoji: string;
+  icon: LucideIcon;
   label: string;
   gradientClass: string;
   shadowClass: string;
@@ -23,7 +24,7 @@ type BadgeTier = {
 function getBadge(count: number): BadgeTier {
   if (count >= 150) {
     return {
-      emoji: "??",
+      icon: Award,
       label: "VIP Nose",
       gradientClass: "bg-[linear-gradient(135deg,#E84393,#F783AC,#C2255C)]",
       shadowClass: "shadow-[0_0_12px_rgba(232,67,147,0.45)]",
@@ -31,7 +32,7 @@ function getBadge(count: number): BadgeTier {
   }
   if (count >= 50) {
     return {
-      emoji: "??",
+      icon: Trophy,
       label: "Collector",
       gradientClass: "bg-[linear-gradient(135deg,#8E9CB5,#C2CAD8,#6B7A8D)]",
       shadowClass: "shadow-[0_0_10px_rgba(142,156,181,0.35)]",
@@ -39,14 +40,14 @@ function getBadge(count: number): BadgeTier {
   }
   if (count >= 11) {
     return {
-      emoji: "??",
+      icon: Star,
       label: "Enthusiast",
       gradientClass: "bg-[linear-gradient(135deg,#A0684A,#C8875E,#7A4F38)]",
       shadowClass: "shadow-[0_0_10px_rgba(160,104,74,0.3)]",
     };
   }
   return {
-    emoji: "??",
+    icon: Sprout,
     label: "Novice",
     gradientClass: "",
     shadowClass: "",
@@ -151,7 +152,7 @@ function LeaderRow({
                   : "text-[var(--text-muted)] border border-[var(--border-color)]"
               )}
             >
-              {badge.emoji} {badge.label}
+              <badge.icon className="w-3.5 h-3.5 inline mr-0.5" /> {badge.label}
             </span>
           </div>
           {/* Role chip */}

@@ -2,6 +2,7 @@
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
 import { useRef } from "react";
 import { useTheme } from "next-themes";
+import { AlertTriangle } from "lucide-react";
 
 interface BotShieldProps {
     onVerify: (token: string) => void;
@@ -17,7 +18,7 @@ export function BotShield({ onVerify }: BotShieldProps) {
         if (process.env.NODE_ENV === "development") {
             return (
                 <div className="text-xs text-yellow-500 border border-yellow-500/20 bg-yellow-500/10 p-2 rounded">
-                    ⚠️ Turnstile missing site key.
+                    <AlertTriangle className="w-4 h-4 inline mr-1" /> Turnstile missing site key.
                 </div>
             );
         }

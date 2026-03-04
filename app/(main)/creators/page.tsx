@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
-import { Users, Sparkles } from "lucide-react";
+import { Users, Sparkles, Droplets } from "lucide-react";
 import { getFeatureMap } from "@/lib/features";
 import { notFound } from "next/navigation";
 
@@ -120,7 +120,7 @@ export default async function CreatorsPage() {
 
             {allCreators.length === 0 && (
                 <div className="flex flex-col items-center py-24 text-[var(--text-muted)]">
-                    <span className="text-4xl mb-3">👃</span>
+                    <Droplets className="w-10 h-10 text-[var(--text-muted)] mb-3" />
                     <p className="font-semibold">No creators found yet.</p>
                     <p className="text-sm mt-1">Perfumers from the catalogue will appear here once the database is synced.</p>
                 </div>

@@ -38,7 +38,7 @@ export function WriteReviewModal({ perfumeId }: { perfumeId: string }) {
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="relative max-w-lg w-full max-h-[85vh] overflow-hidden rounded-2xl bg-[var(--bg-elevated)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]"
+              className="relative max-w-4xl w-full max-h-[90vh] overflow-hidden rounded-2xl bg-[var(--bg-elevated)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]"
               initial={{ scale: 0.9, opacity: 0, y: 12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 12 }}
@@ -62,7 +62,7 @@ export function WriteReviewModal({ perfumeId }: { perfumeId: string }) {
                   <X size={14} />
                 </button>
               </div>
-              <div className="p-4 sm:p-5 overflow-y-auto max-h-[calc(85vh-52px)]">
+              <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-52px)]">
                 <ReviewForm
                   perfumeId={perfumeId}
                   onSubmitted={() => setOpen(false)}

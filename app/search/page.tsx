@@ -6,7 +6,7 @@
 import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Search, Droplets } from "lucide-react";
 import type { Metadata } from "next";
 import { SearchInput } from "./SearchInput";
 
@@ -78,7 +78,7 @@ function ResultCard({ p }: { p: PerfumeResult }) {
               className="object-contain w-full h-full p-1"
             />
           ) : (
-            <span className="text-2xl">🧴</span>
+            <Droplets className="w-5 h-5 text-[var(--text-muted)]" />
           )}
         </div>
 
@@ -144,7 +144,7 @@ export default async function SearchPage({
             </>
           ) : (
             <div className="rounded-2xl p-10 text-center bg-[var(--bg-glass)] border border-dashed border-[var(--border-color)]">
-              <p className="text-4xl mb-3">🔍</p>
+              <Search className="w-10 h-10 text-[var(--text-muted)] mb-3" />
               <p className="text-sm font-semibold mb-1 text-[var(--text-primary)]">
                 No results for &ldquo;{q}&rdquo;
               </p>
@@ -155,7 +155,7 @@ export default async function SearchPage({
           )
         ) : (
           <div className="rounded-2xl p-10 text-center bg-[var(--bg-glass)] border border-dashed border-[var(--border-color)]">
-            <p className="text-4xl mb-3">🧴</p>
+            <Droplets className="w-10 h-10 text-[var(--text-muted)] mb-3" />
             <p className="text-sm text-[var(--text-muted)]">
               Type at least 2 characters to search perfumes by name, brand, or notes.
             </p>

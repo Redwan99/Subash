@@ -7,7 +7,7 @@ import useSWR from "swr";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, Clock, Wind, Thermometer, Zap } from "lucide-react";
+import { Star, Clock, Wind, Thermometer, Zap, Droplets } from "lucide-react";
 import { fetcher } from "@/lib/fetcher";
 import { VerifiedNoseBadge } from "@/components/ui/VerifiedNoseBadge";
 import { parsePrismaArray } from "@/lib/utils";
@@ -101,7 +101,7 @@ function ReviewCard({ review, isNew }: { review: LiveReview; isNew: boolean }) {
                                 unoptimized
                             />
                         ) : (
-                            <span className="absolute inset-0 flex items-center justify-center text-xl opacity-20">🧴</span>
+                            <span className="absolute inset-0 flex items-center justify-center opacity-20"><Droplets className="w-5 h-5 text-[var(--text-muted)]" /></span>
                         )}
                     </div>
                 </Link>

@@ -1,16 +1,22 @@
 "use client";
 // components/perfume/ReviewForm.tsx
-// Phase 4.4 � Review Submission Form
-//   � Session-gated (shows CTA if not signed in)
-//   � Framer Motion sliders for Longevity + Sillage
-//   � Toggle chips for Season + Time
-//   � Calls submitReview server action
+// Phase 4.4 — Review Submission Form
+//   - Session-gated (shows CTA if not signed in)
+//   - Framer Motion sliders for Longevity + Sillage
+//   - Toggle chips for Season + Time
+//   - Calls submitReview server action
 
-import { useState, useRef, useCallback } from "react";
-import { motion, useReducedMotion, PanInfo } from "framer-motion";
+import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Send, Star, LogIn, CheckCircle, AlertCircle, Briefcase, GlassWater, Heart, Coffee, ShieldCheck, Gem, Frown } from "lucide-react";
+import {
+  Send, Star, LogIn, CheckCircle, AlertCircle, Briefcase, GlassWater,
+  Heart, Coffee, ShieldCheck, Gem, Frown,
+  Sun, Cloud, Snowflake, Droplets, Wind, CloudRain,
+  Sunrise, SunMedium, Sunset, Moon, Zap,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { submitReview, type ReviewFormState } from "@/lib/actions/perfume";
 import { BotShield } from "@/components/ui/BotShield";
 
@@ -19,21 +25,21 @@ import { BotShield } from "@/components/ui/BotShield";
 type WeatherTag = "HOT" | "MILD" | "COLD" | "HUMID" | "DRY" | "RAINY";
 type TimeTag = "morning" | "day" | "evening" | "night" | "anytime" | "both";
 
-const WEATHER_CONDITIONS: { value: WeatherTag; label: string; emoji: string; desc: string }[] = [
-  { value: "HOT", label: "Hot", emoji: "??", desc: "> 28�C" },
-  { value: "MILD", label: "Mild", emoji: "?", desc: "15�28�C" },
-  { value: "COLD", label: "Cold", emoji: "??", desc: "< 15�C" },
-  { value: "HUMID", label: "Humid", emoji: "??", desc: "Humidity > 70%" },
-  { value: "DRY", label: "Dry", emoji: "???", desc: "Humidity < 40%" },
-  { value: "RAINY", label: "Rainy", emoji: "???", desc: "Rain / Drizzle" },
+const WEATHER_CONDITIONS: { value: WeatherTag; label: string; icon: LucideIcon; desc: string }[] = [
+  { value: "HOT", label: "Hot", icon: Sun, desc: "> 28\u00B0C" },
+  { value: "MILD", label: "Mild", icon: Cloud, desc: "15\u201328\u00B0C" },
+  { value: "COLD", label: "Cold", icon: Snowflake, desc: "< 15\u00B0C" },
+  { value: "HUMID", label: "Humid", icon: Droplets, desc: "Humidity > 70%" },
+  { value: "DRY", label: "Dry", icon: Wind, desc: "Humidity < 40%" },
+  { value: "RAINY", label: "Rainy", icon: CloudRain, desc: "Rain / Drizzle" },
 ];
 
-const TIME_OPTIONS: { value: TimeTag; label: string; emoji: string }[] = [
-  { value: "morning", label: "Morning", emoji: "??" },
-  { value: "day", label: "Day", emoji: "???" },
-  { value: "evening", label: "Evening", emoji: "??" },
-  { value: "night", label: "Night", emoji: "??" },
-  { value: "anytime", label: "Anytime", emoji: "?" },
+const TIME_OPTIONS: { value: TimeTag; label: string; icon: LucideIcon }[] = [
+  { value: "morning", label: "Morning", icon: Sunrise },
+  { value: "day", label: "Day", icon: SunMedium },
+  { value: "evening", label: "Evening", icon: Sunset },
+  { value: "night", label: "Night", icon: Moon },
+  { value: "anytime", label: "Anytime", icon: Zap },
 ];
 
 const LONGEVITY_LABELS = ["", "Fades in mins", "Under 2h", "2-3h", "3-4h", "4-5h", "5-6h", "6-8h", "8-12h", "12h+", "Eternal"];
@@ -77,43 +83,50 @@ function StarRating({
   );
 }
 
-// --- Liquid Slider ------------------------------------------------------------
+// --- Range Slider ------------------------------------------------------------
 
-function LiquidSlider({
+const rangeThumbStyles = [
+  "[&::-webkit-slider-thumb]:appearance-none",
+  "[&::-webkit-slider-thumb]:w-5",
+  "[&::-webkit-slider-thumb]:h-5",
+  "[&::-webkit-slider-thumb]:rounded-full",
+  "[&::-webkit-slider-thumb]:border-2",
+  "[&::-webkit-slider-thumb]:border-white",
+  "[&::-webkit-slider-thumb]:shadow-md",
+  "[&::-webkit-slider-thumb]:cursor-grab",
+  "[&::-webkit-slider-thumb]:active:cursor-grabbing",
+  "[&::-webkit-slider-thumb]:transition-shadow",
+  "[&::-webkit-slider-thumb]:hover:shadow-lg",
+  "[&::-moz-range-thumb]:w-5",
+  "[&::-moz-range-thumb]:h-5",
+  "[&::-moz-range-thumb]:rounded-full",
+  "[&::-moz-range-thumb]:border-2",
+  "[&::-moz-range-thumb]:border-white",
+  "[&::-moz-range-thumb]:shadow-md",
+  "[&::-moz-range-thumb]:cursor-grab",
+  "[&::-moz-range-thumb]:active:cursor-grabbing",
+].join(" ");
+
+function RangeSlider({
   label,
   sublabel,
   value,
   onChange,
+  min = 1,
+  max = 10,
   labelMap,
-  valueClass,
-  barClass,
-  knobClass,
+  accentColor = "#E84393",
 }: {
   label: string;
   sublabel: string;
-  value: number; // 1�10
+  value: number;
   onChange: (v: number) => void;
+  min?: number;
+  max?: number;
   labelMap: string[];
-  valueClass: string;
-  barClass: string;
-  knobClass: string;
+  accentColor?: string;
 }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const shouldReduceMotion = useReducedMotion();
-
-  const calcValue = useCallback((clientX: number) => {
-    if (!trackRef.current) return;
-    const rect = trackRef.current.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const newVal = Math.round(pct * 9) + 1; // maps 0..1 ? 1..10
-    onChange(newVal);
-  }, [onChange]);
-
-  const handleDrag = (_: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
-    calcValue(info.point.x);
-  };
-
-  const pct = ((value - 1) / 9) * 100;
+  const pct = ((value - min) / (max - min)) * 100;
 
   return (
     <div>
@@ -126,47 +139,38 @@ function LiquidSlider({
             {sublabel}
           </span>
         </div>
-        <span className={`text-sm font-bold ${valueClass}`}>
-          {value}/10 � {labelMap[value]}
+        <span className="text-sm font-bold" style={{ color: accentColor }}>
+          {value}/{max} · {labelMap[value]}
         </span>
       </div>
 
-      {/* Track */}
-      <div
-        ref={trackRef}
-        className="relative h-4 rounded-full cursor-pointer select-none bg-[var(--border-color)] overflow-hidden"
-        onClick={(e) => calcValue(e.clientX)}
-      >
-        {/* Fill */}
-        <motion.div
-          animate={{ width: `${pct}%` }}
-          transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 26 }}
-          className={`absolute left-0 top-0 h-full rounded-full min-w-4 ${barClass}`}
-        />
-
-        {/* Draggable knob */}
-        <motion.div
-          drag="x"
-          dragConstraints={trackRef}
-          dragElastic={0}
-          dragMomentum={false}
-          onDrag={handleDrag}
-          animate={{ left: `calc(${pct}% - 10px)` }}
-          transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 26 }}
-          whileDrag={{ scale: 1.25 }}
-          className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing border-2 border-white ${knobClass}`}
+      {/* Native range input with gradient fill */}
+      <div className="relative">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={1}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
           aria-label={`${label}: ${value}`}
-          role="slider"
-          aria-valuenow={value}
-          aria-valuemin={1}
-          aria-valuemax={10}
+          className={`w-full h-3 rounded-full appearance-none cursor-pointer outline-none transition-shadow review-range-slider ${rangeThumbStyles}`}
+          style={{
+            background: `linear-gradient(to right, ${accentColor} 0%, ${accentColor} ${pct}%, var(--border-color) ${pct}%, var(--border-color) 100%)`,
+            ["--slider-accent" as string]: accentColor,
+          }}
         />
       </div>
 
       {/* Step markers */}
-      <div className="flex justify-between mt-1 px-1">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((s) => (
-          <span key={s} className="text-[9px] text-[var(--text-muted)]">
+      <div className="flex justify-between mt-1 px-0.5">
+        {Array.from({ length: max - min + 1 }, (_, i) => i + min).map((s) => (
+          <span
+            key={s}
+            className={`text-[9px] transition-colors ${
+              s <= value ? "text-[var(--text-secondary)]" : "text-[var(--text-muted)]"
+            }`}
+          >
             {s}
           </span>
         ))}
@@ -179,13 +183,13 @@ function LiquidSlider({
 
 function ToggleChip({
   label,
-  emoji,
+  icon: Icon,
   active,
   onToggle,
   shouldReduceMotion,
 }: {
   label: string;
-  emoji: string;
+  icon: LucideIcon;
   active: boolean;
   onToggle: () => void;
   shouldReduceMotion: boolean | null;
@@ -202,7 +206,7 @@ function ToggleChip({
         }`}
       aria-pressed={active}
     >
-      <span>{emoji}</span>
+      <Icon className="w-4 h-4" />
       {label}
     </motion.button>
   );
@@ -320,7 +324,9 @@ export function ReviewForm({
         </motion.div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+        <div className="space-y-6">
         {/* Overall rating */}
         <div>
           <label className="text-sm font-semibold block mb-2 text-[var(--text-secondary)]">
@@ -340,7 +346,7 @@ export function ReviewForm({
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Describe the fragrance, how it wore on your skin, occasions you'd suggest it for�"
+            placeholder="Describe the fragrance, how it wore on your skin, occasions you'd suggest it for..."
             rows={4}
             className="w-full rounded-xl px-4 py-3 text-sm resize-none outline-none bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-primary)] caret-[var(--accent)] transition-colors focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20"
             required
@@ -360,36 +366,34 @@ export function ReviewForm({
         </div>
 
         {/* Longevity slider */}
-        <LiquidSlider
+        <RangeSlider
           label="Longevity"
           sublabel="How long does it last?"
           value={longevity}
           onChange={setLongevity}
           labelMap={LONGEVITY_LABELS}
-          valueClass="text-brand-500"
-          barClass="bg-[linear-gradient(90deg,rgba(232,67,147,0.5),#E84393)] shadow-[0_0_10px_rgba(232,67,147,0.35)]"
-          knobClass="bg-brand-500 shadow-[0_2px_8px_rgba(232,67,147,0.55)]"
+          accentColor="#E84393"
         />
 
         {/* Sillage slider */}
-        <LiquidSlider
+        <RangeSlider
           label="Sillage"
           sublabel="How far does it project?"
           value={sillage}
           onChange={setSillage}
           labelMap={SILLAGE_LABELS}
-          valueClass="text-brand-400"
-          barClass="bg-[linear-gradient(90deg,rgba(247,131,172,0.5),#F783AC)] shadow-[0_0_10px_rgba(247,131,172,0.35)]"
-          knobClass="bg-brand-400 shadow-[0_2px_8px_rgba(247,131,172,0.55)]"
+          accentColor="#F783AC"
         />
+        </div>
 
+        <div className="space-y-6">
         {/* Weather chips */}
         <div>
           <label className="text-sm font-semibold block mb-2 text-[var(--text-secondary)]">
             Best Weather to Wear
           </label>
           <div className="flex flex-wrap gap-2">
-            {WEATHER_CONDITIONS.map(({ value, label, emoji, desc }) => (
+            {WEATHER_CONDITIONS.map(({ value, label, icon: Icon, desc }) => (
               <motion.button
                 key={value}
                 type="button"
@@ -403,7 +407,7 @@ export function ReviewForm({
                   }`}
                 aria-pressed={weatherTags.includes(value)}
               >
-                <span>{emoji}</span>
+                <Icon className="w-4 h-4" />
                 {label}
                 <span className="text-[10px] opacity-60 ml-0.5">{desc}</span>
               </motion.button>
@@ -417,11 +421,11 @@ export function ReviewForm({
             Best Time of Day
           </label>
           <div className="flex flex-wrap gap-2">
-            {TIME_OPTIONS.map(({ value, label, emoji }) => (
+            {TIME_OPTIONS.map(({ value, label, icon }) => (
               <ToggleChip
                 key={value}
                 label={label}
-                emoji={emoji}
+                icon={icon}
                 active={times.includes(value)}
                 onToggle={() => toggleTime(value)}
                 shouldReduceMotion={shouldReduceMotion}
@@ -431,26 +435,20 @@ export function ReviewForm({
         </div>
 
         {/* 1. Gender Leaning */}
-        <div className="mt-6">
-          <label className="text-sm font-semibold text-gray-900 dark:text-white flex justify-between">
-            <span>Gender Leaning</span>
-            <span className="text-brand-500">{["Very Masculine", "Leans Masculine", "True Unisex", "Leans Feminine", "Very Feminine"][genderLeaning - 1]}</span>
-          </label>
-          <p className="text-xs text-gray-500 mb-2">How does it actually smell?</p>
-          <input
-            type="range"
-            min="1"
-            max="5"
-            step="1"
-            value={genderLeaning}
-            onChange={(e) => setGenderLeaning(Number(e.target.value))}
-            className="w-full accent-brand-500 cursor-pointer h-2 bg-gray-200 dark:bg-white/10 rounded-lg appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:bg-brand-500 [&::-webkit-slider-thumb]:rounded-full"
-          />
-        </div>
+        <RangeSlider
+          label="Gender Leaning"
+          sublabel="How does it actually smell?"
+          value={genderLeaning}
+          onChange={setGenderLeaning}
+          min={1}
+          max={5}
+          labelMap={["", "Very Masculine", "Leans Masculine", "True Unisex", "Leans Feminine", "Very Feminine"]}
+          accentColor="#E84393"
+        />
 
         {/* 2. Occasion Pills */}
-        <div className="mt-6">
-          <label className="text-sm font-semibold text-gray-900 dark:text-white">Best Occasion</label>
+        <div>
+          <label className="text-sm font-semibold text-[var(--text-secondary)]">Best Occasion</label>
           <div className="flex flex-wrap gap-2 mt-2">
             {[
               { id: "office", label: "Office/Work", icon: Briefcase },
@@ -465,7 +463,7 @@ export function ReviewForm({
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-all ${
                   occasion === opt.id
                     ? "bg-brand-500/10 border-brand-500 text-brand-500"
-                    : "border-gray-200 dark:border-white/10 text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                    : "border-[var(--border-color)] text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 <opt.icon className="w-4 h-4" /> {opt.label}
@@ -475,10 +473,10 @@ export function ReviewForm({
         </div>
 
         {/* 3. Value & Blind Buy */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-semibold text-gray-900 dark:text-white">Value for Money</label>
-            <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-xl mt-2 border border-gray-200 dark:border-white/10">
+            <label className="text-sm font-semibold text-[var(--text-secondary)]">Value for Money</label>
+            <div className="flex bg-[var(--bg-surface)] p-1 rounded-xl mt-2 border border-[var(--border-color)]">
               {[
                 { val: 1, label: "Overpriced", icon: Frown },
                 { val: 2, label: "Fair", icon: ShieldCheck },
@@ -491,7 +489,7 @@ export function ReviewForm({
                   className={`flex-1 flex flex-col items-center py-2 rounded-lg text-xs font-medium transition-all ${
                     valueRating === opt.val
                       ? "bg-brand-500 text-white shadow-md"
-                      : "text-gray-500 hover:text-gray-900 dark:hover:text-white"
+                      : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   }`}
                 >
                   <opt.icon className="w-4 h-4 mb-1" /> {opt.label}
@@ -501,13 +499,13 @@ export function ReviewForm({
           </div>
 
           <div>
-            <label className="text-sm font-semibold text-gray-900 dark:text-white">Blind Buy Safe?</label>
-            <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-xl mt-2 border border-gray-200 dark:border-white/10">
+            <label className="text-sm font-semibold text-[var(--text-secondary)]">Blind Buy Safe?</label>
+            <div className="flex bg-[var(--bg-surface)] p-1 rounded-xl mt-2 border border-[var(--border-color)]">
               <button
                 type="button"
                 onClick={() => setBlindBuySafe(true)}
                 className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${
-                  blindBuySafe ? "bg-brand-500 text-white shadow-md" : "text-gray-500"
+                  blindBuySafe ? "bg-brand-500 text-white shadow-md" : "text-[var(--text-muted)]"
                 }`}
               >
                 Yes, safe
@@ -516,7 +514,7 @@ export function ReviewForm({
                 type="button"
                 onClick={() => setBlindBuySafe(false)}
                 className={`flex-1 py-3 rounded-lg text-sm font-medium transition-all ${
-                  !blindBuySafe ? "bg-red-500 text-white shadow-md" : "text-gray-500"
+                  !blindBuySafe ? "bg-red-500 text-white shadow-md" : "text-[var(--text-muted)]"
                 }`}
               >
                 No, sample first
@@ -524,7 +522,10 @@ export function ReviewForm({
             </div>
           </div>
         </div>
+        </div>
+        </div>
 
+        <div className="mt-6 space-y-4">
         <BotShield onVerify={setTurnstileToken} />
 
         {/* Submit */}
@@ -540,15 +541,16 @@ export function ReviewForm({
             }`}
         >
           <Send size={15} />
-          {loading ? "Submitting�" : "Submit Review"}
+          {loading ? "Submitting..." : "Submit Review"}
         </motion.button>
-        <p className="mt-2 text-center text-[11px] text-[var(--text-muted)]">
+        <p className="text-center text-[11px] text-[var(--text-muted)]">
           {!turnstileToken
             ? "Complete the bot check above to enable submit."
             : text.trim().length < 10
             ? "Write at least 10 characters to share a helpful review."
             : "Thank you for sharing an honest, helpful review."}
         </p>
+        </div>
       </form>
     </div>
   );

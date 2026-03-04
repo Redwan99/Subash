@@ -78,7 +78,7 @@ const getCachedSidebarData = unstable_cache(
     const trendingBrands = brandGroups.map((g, i) => ({
       brand: g.brand,
       count: g._count.brand,
-      badge: ["🔥", "📈", "⭐", "🏆", "💎"][i],
+      badge: ["#1", "#2", "#3", "#4", "#5"][i],
     }));
 
     // ── 3. Trending Perfumes (7‑day search activity) ────
@@ -124,7 +124,7 @@ const getCachedSidebarData = unstable_cache(
         user: r.user.name ?? "Anon",
         action: "reviewed",
         subject: `${r.perfume.name} by ${r.perfume.brand}`,
-        detail: `⭐ ${r.overall_rating.toFixed(1)} — ${r.text.slice(0, 50)}…`,
+        detail: `${r.overall_rating.toFixed(1)}/5 — ${r.text.slice(0, 50)}…`,
         time: timeAgo(r.createdAt),
         href: `/perfume/${r.perfume.slug}`,
       })),
@@ -134,7 +134,7 @@ const getCachedSidebarData = unstable_cache(
         user: p.user.name ?? "Anon",
         action: "posted to Fragram",
         subject: p.perfume?.name ?? "a scent",
-        detail: p.caption ? p.caption.slice(0, 50) : `❤️ ${p.likes} likes`,
+        detail: p.caption ? p.caption.slice(0, 50) : `${p.likes} likes`,
         time: timeAgo(p.createdAt),
         href: "/fragram",
       })),

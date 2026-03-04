@@ -1,4 +1,5 @@
 import { PartnerFormClient } from "./PartnerFormClient";
+import { Trophy, Megaphone, BarChart3 } from "lucide-react";
 
 export const metadata = {
     title: "Subash Partners | Claim Your Brand",
@@ -44,17 +45,17 @@ export default function PartnersPage() {
             <section className="py-20 px-6 max-w-7xl mx-auto border-t border-[var(--border-color)]">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div className="p-6 rounded-2xl bg-gray-50 dark:bg-[rgba(255,255,255,0.02)] border border-gray-200 dark:border-[rgba(255,255,255,0.05)]">
-                        <div className="w-12 h-12 rounded-xl bg-[rgba(56,189,248,0.1)] text-[#38BDF8] flex items-center justify-center font-bold text-2xl mb-4">🏆</div>
+                        <div className="w-12 h-12 rounded-xl bg-[rgba(56,189,248,0.1)] text-[#38BDF8] flex items-center justify-center font-bold text-2xl mb-4"><Trophy className="w-6 h-6" /></div>
                         <h3 className="text-xl font-bold mb-2 text-[var(--text-primary)]">Brand Highlight</h3>
                         <p className="text-[var(--text-secondary)] text-sm leading-relaxed">Stand out with verified badges. Pin your flagship scents to the top of category pages and drive organic interest.</p>
                     </div>
                     <div className="p-6 rounded-2xl bg-gray-50 dark:bg-[rgba(255,255,255,0.02)] border border-gray-200 dark:border-[rgba(255,255,255,0.05)]">
-                        <div className="w-12 h-12 rounded-xl bg-[rgba(247,131,172,0.1)] text-[#F783AC] flex items-center justify-center font-bold text-2xl mb-4">🗣️</div>
+                        <div className="w-12 h-12 rounded-xl bg-[rgba(247,131,172,0.1)] text-[#F783AC] flex items-center justify-center font-bold text-2xl mb-4"><Megaphone className="w-6 h-6" /></div>
                         <h3 className="text-xl font-bold mb-2 text-[var(--text-primary)]">Community Engagement</h3>
                         <p className="text-[var(--text-secondary)] text-sm leading-relaxed">Respond authentically to consumer reviews. Build lasting loyalty by directly addressing the community.</p>
                     </div>
                     <div className="p-6 rounded-2xl bg-gray-50 dark:bg-[rgba(255,255,255,0.02)] border border-gray-200 dark:border-[rgba(255,255,255,0.05)]">
-                        <div className="w-12 h-12 rounded-xl bg-[rgba(247,131,172,0.1)] text-[#F783AC] flex items-center justify-center font-bold text-2xl mb-4">📊</div>
+                        <div className="w-12 h-12 rounded-xl bg-[rgba(247,131,172,0.1)] text-[#F783AC] flex items-center justify-center font-bold text-2xl mb-4"><BarChart3 className="w-6 h-6" /></div>
                         <h3 className="text-xl font-bold mb-2 text-[var(--text-primary)]">Market Analytics</h3>
                         <p className="text-[var(--text-secondary)] text-sm leading-relaxed">Access real-time telemetry on demographics, trending seasons, and comparative clone analysis.</p>
                     </div>

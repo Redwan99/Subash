@@ -1,6 +1,7 @@
 import { LeftSidebar } from "@/components/layout/LeftSidebar";
 import { RightSidebar } from "@/components/layout/RightSidebar";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import { NewsletterFooter } from "@/components/layout/NewsletterFooter";
 
 export default function MainLayout({
     children,
@@ -23,6 +24,7 @@ export default function MainLayout({
                     <RightSidebar />
                 </div>
             </div>
+            <NewsletterFooter />
             <MobileBottomNav />
         </>
     );

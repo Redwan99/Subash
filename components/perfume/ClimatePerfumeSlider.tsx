@@ -13,7 +13,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Droplets } from "lucide-react";
 
 export interface SliderPerfume {
   id: string;
@@ -83,7 +83,7 @@ function FloatingBottle({
           />
         </div>
       ) : (
-        <span className={`select-none ${active ? "text-[80px]" : "text-[52px]"}`}>🧴</span>
+        <Droplets className={`select-none ${active ? "w-16 h-16" : "w-10 h-10"} text-[var(--text-muted)]`} />
       )}
       {/* Elliptical ground shadow */}
       <motion.div

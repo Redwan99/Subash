@@ -2,6 +2,7 @@
 // Auth error page — displayed when NextAuth encounters an OAuth error.
 
 import Link from "next/link";
+import { AlertTriangle } from "lucide-react";
 
 export const metadata = { title: "Auth Error" };
 
@@ -19,7 +20,7 @@ export default async function AuthErrorPage({
       <div
         className="w-full max-w-md rounded-2xl p-8 text-center space-y-6 bg-[var(--bg-glass)] backdrop-blur-[var(--blur-glass)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]"
       >
-        <div className="text-5xl">⚠️</div>
+        <div className="text-5xl"><AlertTriangle className="w-12 h-12 text-amber-400 mx-auto" /></div>
         <h1
           className="font-display text-2xl font-bold text-[var(--text-primary)]"
         >

@@ -52,8 +52,8 @@
   --accent-glow: rgba(232, 67, 147, 0.3);
   --bg-glow-color: rgba(232, 67, 147, 0.18);
 
-  --sidebar-width: 220px;
-  --sidebar-right-width: 260px;
+  --sidebar-width: 260px;
+  --sidebar-right-width: 300px;
   --topnav-height: 60px;
   --topbar-height: 60px;
   --bottom-nav-height: 64px;
@@ -377,4 +377,15 @@ body::-webkit-scrollbar { display: none; }
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* =============================================
+   Review Form Range Slider — dynamic accent
+   ============================================= */
+.review-range-slider::-webkit-slider-thumb {
+  background: var(--slider-accent, #E84393);
+}
+.review-range-slider::-moz-range-thumb {
+  background: var(--slider-accent, #E84393);
+  border: 2px solid white;
 }

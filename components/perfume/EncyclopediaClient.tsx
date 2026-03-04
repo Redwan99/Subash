@@ -8,7 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useInView } from "react-intersection-observer";
-import { Search, SlidersHorizontal, X, BookOpen, Filter } from "lucide-react";
+import { Search, SlidersHorizontal, X, BookOpen, Filter, Droplets, User, Flower2, Zap, SearchIcon } from "lucide-react";
 import { getPerfumesPage } from "@/lib/actions/perfume";
 import { parsePrismaArray } from "@/lib/utils";
 
@@ -67,7 +67,7 @@ function PerfumeCard({ perfume, index }: { perfume: Perfume; index: number }) {
                                 unoptimized
                             />
                         ) : (
-                            <span className="text-5xl opacity-30">🧴</span>
+                            <Droplets className="w-10 h-10 text-[var(--text-muted)] opacity-30" />
                         )}
                         {/* Gender badge */}
                         {perfume.gender && (
@@ -137,7 +137,7 @@ function FilterPanel({
                                 : "text-[var(--text-secondary)] hover:bg-gray-100 dark:hover:bg-[rgba(255,255,255,0.05)]"
                                 }`}
                         >
-                            {g === "men" ? "👤 Men" : g === "women" ? "💐 Women" : "⚡ Unisex"}
+                            {g === "men" ? <><User className="w-3.5 h-3.5 inline mr-1" />Men</> : g === "women" ? <><Flower2 className="w-3.5 h-3.5 inline mr-1" />Women</> : <><Zap className="w-3.5 h-3.5 inline mr-1" />Unisex</>}
                         </button>
                     ))}
                 </div>
@@ -310,7 +310,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                         }`}
                 >
                     <SlidersHorizontal size={14} />
-                    {hasFilters ? "Filters ✦" : "Filter"}
+                    {hasFilters ? "Filters " : "Filter"}
                 </button>
             </div>
 
@@ -365,7 +365,7 @@ export function EncyclopediaClient({ perfumes, brands, accords, totalCount, tota
                 <main className="flex-1 min-w-0">
                     {filtered.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-24 text-[var(--text-muted)]">
-                            <span className="text-4xl mb-3">🔍</span>
+                            <SearchIcon className="w-10 h-10 text-[var(--text-muted)] mb-3" />
                             <p className="font-semibold">No perfumes found</p>
                             <p className="text-sm mt-1">Try a different search or clear your filters.</p>
                         </div>

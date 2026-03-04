@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Droplet, Search, X, Sun, Moon, Sunrise, Sunset, Clock, Loader2 } from "lucide-react";
+import { Droplet, Search, X, Sun, Moon, Sunrise, Sunset, Clock, Loader2, Droplets, Heart } from "lucide-react";
 import { createPortal } from "react-dom";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
 import { setWearingStatus, clearWearingStatus } from "@/lib/actions/status";
@@ -87,7 +87,7 @@ function WardrobeQuickPick({
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (
-                    p.brand[0]?.toUpperCase() ?? "🧴"
+                    p.brand[0]?.toUpperCase() ?? "P"
                   )}
                 </div>
                 <div className="min-w-0">
@@ -260,7 +260,7 @@ export function WearingStatusModal() {
                                   className="w-full h-full object-cover rounded-lg"
                                 />
                               ) : (
-                                p.brand[0]?.toUpperCase() ?? "🧴"
+                                p.brand[0]?.toUpperCase() ?? "P"
                               )}
                             </div>
                             <div className="min-w-0">
@@ -391,9 +391,9 @@ export function WearingStatusModal() {
                           className="w-full h-full object-cover"
                         />
                       ) : selectedPerfume ? (
-                        "🧴"
+                        <Droplets className="w-6 h-6 text-[var(--text-muted)]" />
                       ) : (
-                        <span className="text-4xl opacity-60">🩶</span>
+                        <Heart className="w-8 h-8 text-[var(--text-muted)] opacity-60" />
                       )}
                     </div>
                     <div className="min-w-0 text-left">

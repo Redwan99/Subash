@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useReducedMotion, motion, AnimatePresence } from "framer-motion";
-import { Bell } from "lucide-react";
+import { Bell, Star, ThumbsUp, Heart, MessageCircle } from "lucide-react";
 import { markAllNotificationsRead, markNotificationRead } from "@/lib/actions/notifications";
 
 type NotificationItem = {
@@ -79,11 +79,11 @@ export function NotificationBellClient() {
     });
   }
 
-  const ICON_FOR_TYPE: Record<string, string> = {
-    REVIEW_UPVOTE: "⭐",
-    DUPE_VOTE: "👍",
-    FRAGRAM_LIKE: "❤️",
-    REVIEW_REPLY: "💬",
+  const ICON_FOR_TYPE: Record<string, React.ReactNode> = {
+    REVIEW_UPVOTE: <Star className="w-4 h-4 text-amber-400" />,
+    DUPE_VOTE: <ThumbsUp className="w-4 h-4 text-blue-400" />,
+    FRAGRAM_LIKE: <Heart className="w-4 h-4 text-rose-400" />,
+    REVIEW_REPLY: <MessageCircle className="w-4 h-4 text-emerald-400" />,
   };
 
   return (
@@ -149,7 +149,7 @@ export function NotificationBellClient() {
                     className={`w-full flex items-start gap-2 px-3 py-2.5 text-left text-xs transition-colors hover:bg-[var(--surface-2)] ${n.isRead ? "opacity-70" : "bg-[var(--surface-2)]/60"}`}
                   >
                     <div className="mt-0.5 text-base">
-                      {ICON_FOR_TYPE[n.type] ?? "🔔"}
+                      {ICON_FOR_TYPE[n.type] ?? <Bell className="w-4 h-4 text-[var(--text-muted)]" />}
                     </div>
                     <div className="flex-1 space-y-0.5">
                       <div className="font-semibold text-[11px] leading-tight text-[var(--text-primary)]">

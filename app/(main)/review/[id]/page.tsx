@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Star, MessageCircle, Calendar, ArrowLeft } from "lucide-react";
+import { Star, MessageCircle, Calendar, ArrowLeft, Droplets } from "lucide-react";
 import { CommentSection } from "@/components/reviews/CommentSection";
 
 // Force dynamic since we have comments and user sessions
@@ -50,8 +50,8 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
                         unoptimized
                     />
                 ) : (
-                    <div className="absolute inset-0 bg-slate-900 flex items-center justify-center text-6xl">
-                        🧴
+                    <div className="absolute inset-0 bg-slate-900 flex items-center justify-center">
+                        <Droplets className="w-14 h-14 text-slate-600" />
                     </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
@@ -140,7 +140,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
                             {review.perfume.image_url ? (
                                 <Image src={review.perfume.image_url} alt={review.perfume.name} fill className="object-contain p-2" unoptimized />
                             ) : (
-                                <span className="flex items-center justify-center h-full text-4xl">🧴</span>
+                                <Droplets className="w-10 h-10 text-[var(--text-muted)]" />
                             )}
                         </div>
                         <div className="flex-1 text-center md:text-left">

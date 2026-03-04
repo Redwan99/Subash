@@ -15,6 +15,7 @@ import {
 import { firebaseAuth } from "@/lib/firebase";
 import { saveVerifiedPhone } from "@/lib/actions/phone";
 import Link from "next/link";
+import { Smartphone } from "lucide-react";
 
 // ─── Steps ────────────────────────────────────────────────────────────────────
 type Step = "phone" | "otp" | "success";
@@ -164,7 +165,7 @@ export default function VerifyPhonePage() {
       >
         {/* Header */}
         <div className="text-center space-y-1">
-          <div className="text-4xl mb-3">📱</div>
+          <div className="text-4xl mb-3"><Smartphone className="w-10 h-10 text-[var(--accent)] mx-auto" /></div>
           <h1 className="text-xl font-semibold text-[var(--text-primary)]">
             {step === "success" ? "Phone Verified!" : "Verify Your Phone"}
           </h1>

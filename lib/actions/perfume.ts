@@ -209,7 +209,7 @@ export async function castDupeVote(
       await createNotification({
         userId: dupe.submittedBy,
         type: "DUPE_VOTE",
-        message: `${actorName} agreed with your dupe suggestion for ${perfumeName}! 👍`,
+        message: `${actorName} agreed with your dupe suggestion for ${perfumeName}!`,
         link: `/perfume/${perfumeId}`,
       });
     }
@@ -256,7 +256,7 @@ export async function upvoteReview(
     await createNotification({
       userId: review.userId,
       type: "REVIEW_UPVOTE",
-      message: `${actorName} found your review of ${perfumeName} helpful! ⭐`,
+      message: `${actorName} found your review of ${perfumeName} helpful!`,
       link: `/perfume/${review.perfume?.id ?? ""}`,
     });
 

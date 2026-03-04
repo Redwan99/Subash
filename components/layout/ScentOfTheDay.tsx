@@ -1,5 +1,5 @@
 // components/layout/ScentOfTheDay.tsx
-import { Sparkles } from "lucide-react";
+import { Sparkles, Droplets } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { getScentOfTheDay } from "@/lib/actions/sotd";
@@ -30,12 +30,12 @@ export async function ScentOfTheDay() {
                             unoptimized
                         />
                     ) : (
-                        <span className="absolute inset-0 flex items-center justify-center text-4xl">🧴</span>
+                        <span className="absolute inset-0 flex items-center justify-center"><Droplets className="w-8 h-8 text-[var(--text-muted)]" /></span>
                     )}
 
                     <div className="absolute top-2 left-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm text-[10px] font-semibold text-gray-900 dark:text-white">
                         <Sparkles size={11} className="text-brand-400" />
-                        <span>✨ Scent of the Day</span>
+                        <span>Scent of the Day</span>
                     </div>
                 </div>
 

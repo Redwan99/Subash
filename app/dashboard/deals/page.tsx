@@ -6,7 +6,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
-import { Tag, ExternalLink, Plus } from "lucide-react";
+import { Tag, ExternalLink, Plus, Star } from "lucide-react";
 import { DealForm } from "./DealForm";
 import { DealActions } from "./DealActions";
 import type { Metadata } from "next";
@@ -108,7 +108,7 @@ export default async function DealsPage() {
                       <span className="text-[11px] font-bold text-[#F783AC]">৳{deal.price.toLocaleString()}</span>
                       {deal.is_featured && (
                         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/30">
-                          ⭐ Featured
+                          <Star className="w-3 h-3 inline mr-0.5" /> Featured
                         </span>
                       )}
                     </div>

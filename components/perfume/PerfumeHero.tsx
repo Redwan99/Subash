@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, Droplets } from "lucide-react";
 
 interface PerfumeHeroProps {
   perfume: {
@@ -98,7 +98,7 @@ export function PerfumeHero({
             </div>
           ) : (
             <div className="relative w-full max-w-xs aspect-[4/5] rounded-[2.5rem] bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300 flex items-center justify-center shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] border border-white/20">
-              <span className="text-7xl">🧴</span>
+              <span className="text-7xl text-[var(--text-muted)]"><Droplets className="w-16 h-16" /></span>
             </div>
           )}
         </motion.div>

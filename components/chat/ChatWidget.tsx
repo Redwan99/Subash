@@ -8,7 +8,7 @@ import { useState, useRef, useEffect, useTransition } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   X, Send, ExternalLink, ChevronDown,
-  Sparkles, Loader2,
+  Sparkles, Loader2, Droplets,
 } from "lucide-react";
 import Link from "next/link";
 import { cn, parsePrismaArray } from "@/lib/utils";
@@ -36,16 +36,16 @@ function now() {
 const AI_WELCOME: Message = {
   role: "bot",
   time: now(),
-  text: "👋 Hi! I'm Subash AI — your elite fragrance expert and platform assistant. Ask me for recommendations (e.g., 'woody summer scent') or about platform rules (e.g., 'how to sell decants').",
+  text: "Hi! I'm Subash AI — your elite fragrance expert and platform assistant. Ask me for recommendations (e.g., 'woody summer scent') or about platform rules (e.g., 'how to sell decants').",
 };
 
 const AI_CHIPS = [
-  "Fresh citrus for summer 🍋",
-  "Woody date-night for him 🌲",
-  "How to sell decants? 💸",
-  "Report a fake listing 🚩",
-  "How are badges earned? 🏆",
-  "Office-safe unisex 🏢",
+  "Fresh citrus for summer",
+  "Woody date-night for him",
+  "How to sell decants?",
+  "Report a fake listing",
+  "How are badges earned?",
+  "Office-safe unisex",
 ];
 
 const MODERATOR_WHATSAPP =
@@ -67,7 +67,7 @@ function PerfumeCard({ p }: { p: BotPerfume }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={p.image_url} alt={p.name} className="w-full h-full object-contain p-0.5" />
         ) : (
-          <span className="text-base">🧴</span>
+          <span className="text-base"><Droplets className="w-4 h-4" /></span>
         )}
       </div>
       <div className="min-w-0 flex-1">

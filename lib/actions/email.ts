@@ -46,7 +46,7 @@ export async function sendWelcomeEmail(userEmail: string, userName: string) {
                   <td style="padding:40px 36px 32px;">
                     <p style="margin:0 0 8px;font-size:13px;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;color:#E84393;">Welcome to the Fold</p>
                     <h1 style="margin:0 0 20px;font-size:32px;font-weight:900;color:#F9FAFB;line-height:1.2;">
-                      Hello, ${firstName}. 👋
+                      Hello, ${firstName}.
                     </h1>
                     <p style="margin:0 0 24px;font-size:15px;color:#9CA3AF;line-height:1.7;">
                       Your account is ready on <strong style="color:#E5E7EB;">Subash</strong> — Bangladesh's first premium fragrance platform. 
@@ -56,10 +56,10 @@ export async function sendWelcomeEmail(userEmail: string, userName: string) {
                     <!-- Feature bullets -->
                     <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
                       ${[
-            ["🗂️", "Fragrance Encyclopedia", "10,000+ perfumes with accord maps"],
-            ["⭐", "Community Reviews", "Rate longevity, sillage, and more"],
-            ["🧴", "Your Wardrobe", "Track what you have, had, and want"],
-            ["🤖", "Nose AI", "Get personalized scent recommendations"],
+            ["&#128218;", "Fragrance Encyclopedia", "10,000+ perfumes with accord maps"],
+            ["&#11088;", "Community Reviews", "Rate longevity, sillage, and more"],
+            ["&#128196;", "Your Wardrobe", "Track what you have, had, and want"],
+            ["&#129302;", "Nose AI", "Get personalized scent recommendations"],
         ].map(([emoji, title, desc]) => `
                       <tr>
                         <td style="padding:8px 0;">
@@ -121,7 +121,7 @@ export async function sendWelcomeEmail(userEmail: string, userName: string) {
         const { data, error } = await resend.emails.send({
             from: "Subash <welcome@subash.app>",
             to: [userEmail],
-            subject: `Welcome to Subash, ${firstName}! 🌸`,
+            subject: `Welcome to Subash, ${firstName}!`,
             html,
         });
 
@@ -149,7 +149,7 @@ export async function sendNewsletterConfirmation(email: string) {
         <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;">
           <tr>
             <td style="background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:36px;text-align:center;">
-              <p style="margin:0 0 16px;font-size:40px;">💌</p>
+              <p style="margin:0 0 16px;font-size:40px;">&#9993;</p>
               <h1 style="margin:0 0 12px;font-size:24px;font-weight:900;color:#F9FAFB;">You&apos;re subscribed!</h1>
               <p style="margin:0 0 24px;font-size:14px;color:#9CA3AF;line-height:1.7;">
                 Welcome to the Subash newsletter. You&apos;ll be among the first to know about new drops, 
@@ -177,7 +177,7 @@ export async function sendNewsletterConfirmation(email: string) {
         const { data, error } = await resend.emails.send({
             from: "Subash <newsletter@subash.app>",
             to: [email],
-            subject: "You're subscribed to Subash 💌",
+            subject: "You're subscribed to Subash",
             html,
         });
         if (error) return { success: false, error: error.message };

@@ -7,7 +7,7 @@ import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Star, Edit, Trophy, Calendar, Sunrise, Sun, Sunset, Moon, Clock, Users } from "lucide-react";
+import { Star, Edit, Trophy, Calendar, Sunrise, Sun, Sunset, Moon, Clock, Users, Award, Droplets, Sprout } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { WardrobePanel } from "@/components/wardrobe/WardrobePanel";
 import { FollowButton } from "@/components/ui/FollowButton";
@@ -32,10 +32,10 @@ export async function generateMetadata({
 // ─── Badge helper ─────────────────────────────────────────────────────────────
 
 function getBadge(count: number) {
-  if (count >= 150) return { emoji: "🥇", label: "VIP Nose", color: "text-[#E84393]" };
-  if (count >= 50) return { emoji: "🥈", label: "Collector", color: "text-[#9CA3AF]" };
-  if (count >= 11) return { emoji: "🥉", label: "Enthusiast", color: "text-[#A0684A]" };
-  return { emoji: "🌱", label: "Novice", color: "text-[#F783AC]" };
+  if (count >= 150) return { icon: Award, label: "VIP Nose", color: "text-[#E84393]" };
+  if (count >= 50) return { icon: Trophy, label: "Collector", color: "text-[#9CA3AF]" };
+  if (count >= 11) return { icon: Star, label: "Enthusiast", color: "text-[#A0684A]" };
+  return { icon: Sprout, label: "Novice", color: "text-[#F783AC]" };
 }
 
 const timeDisplay = (tag: string | null) => {
@@ -167,7 +167,7 @@ export default async function UserProfilePage({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-3xl">🧴</span>
+                  <Droplets className="w-8 h-8 text-[var(--text-muted)]" />
                 )}
               </div>
               <div className="min-w-0 flex-1">
@@ -221,8 +221,8 @@ export default async function UserProfilePage({
                     {user.name ?? "Anonymous"}
                   </h1>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={cn("text-sm font-bold", badge.color)}>
-                      {badge.emoji} {badge.label}
+                    <span className={cn("text-sm font-bold flex items-center gap-1", badge.color)}>
+                      <badge.icon className="w-4 h-4" /> {badge.label}
                     </span>
                     {user.role !== "STANDARD" && (
                       <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#E84393]/15 text-[var(--accent)] border border-[#E84393]/30">
@@ -311,7 +311,7 @@ export default async function UserProfilePage({
                             className="w-full h-full object-contain"
                           />
                         ) : (
-                          <span className="text-2xl">🧴</span>
+                          <Droplets className="w-6 h-6 text-[var(--text-muted)]" />
                         )}
                       </Link>
                     );

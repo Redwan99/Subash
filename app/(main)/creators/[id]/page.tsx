@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Globe, BookOpen, ChevronLeft } from "lucide-react";
+import { Globe, BookOpen, ChevronLeft, Droplets } from "lucide-react";
 import { parsePrismaArray } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -109,7 +109,7 @@ export default async function CreatorProfilePage({ params }: Props) {
 
             {hydratedPerfumes.length === 0 ? (
                 <div className="text-center py-16 text-[var(--text-muted)]">
-                    <span className="text-3xl block mb-2">🧴</span>
+                    <Droplets className="w-8 h-8 text-[var(--text-muted)]" />
                     No perfumes linked to this creator yet.
                 </div>
             ) : (
@@ -122,7 +122,7 @@ export default async function CreatorProfilePage({ params }: Props) {
                                         <Image src={p.image_url} alt={p.name} fill sizes="200px"
                                             className="object-contain p-3 transition-transform duration-500 group-hover:scale-105" unoptimized />
                                     ) : (
-                                        <span className="text-4xl opacity-25">🧴</span>
+                                        <Droplets className="w-8 h-8 text-[var(--text-muted)] opacity-25" />
                                     )}
                                 </div>
                                 <div className="p-3">

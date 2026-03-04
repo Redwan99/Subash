@@ -4,7 +4,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Sparkles, ArrowRight, Quote } from "lucide-react";
+import { Sparkles, ArrowRight, Quote, Droplets } from "lucide-react";
 import { type SOTDData } from "@/lib/actions/sotd";
 
 export function ScentOfTheDay({ data }: { data: SOTDData | null }) {
@@ -34,7 +34,7 @@ export function ScentOfTheDay({ data }: { data: SOTDData | null }) {
                                 unoptimized
                             />
                         ) : (
-                            <span className="text-6xl">🧴</span>
+                            <Droplets className="w-12 h-12 text-[var(--text-muted)]" />
                         )}
 
                         {/* POTD Badge */}
