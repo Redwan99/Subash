@@ -248,8 +248,8 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
 
   return (
     <>
-      {/* ── Desktop: Fixed filter panel overlaying LeftSidebar ── */}
-      <aside className="hidden lg:flex fixed left-0 top-[var(--topnav-height,60px)] h-[calc(100vh-var(--topnav-height,60px))] w-[var(--sidebar-width)] z-[41] flex-col overflow-y-auto bg-[var(--bg-glass)] backdrop-blur-[var(--blur-backdrop)] border-r border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] [scrollbar-width:thin] [-ms-overflow-style:none]">
+      {/* ── Desktop: Fixed filter panel replacing LeftSidebar ── */}
+      <aside className="hidden lg:flex fixed left-0 top-[var(--topnav-height,60px)] h-[calc(100vh-var(--topnav-height,60px))] w-[var(--sidebar-width)] z-[42] flex-col overflow-y-auto bg-[var(--bg-primary)] dark:bg-[#050505] border-r border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] [scrollbar-width:thin] [-ms-overflow-style:none]">
         <div className="p-4 space-y-0 flex-1 pt-5">
           {filterContent}
         </div>

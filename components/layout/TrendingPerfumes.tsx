@@ -76,7 +76,7 @@ export async function TrendingPerfumes() {
                                     </p>
                                 </div>
 
-                                {/* 🔥 Heat indicator (weekly search count) */}
+                                {/* Heat indicator (weekly search count) */}
                                 <div className="flex items-center gap-0.5 text-brand-500 shrink-0">
                                     <Flame size={10} className="fill-current opacity-80" />
                                     <span className="text-[9px] font-bold tabular-nums">

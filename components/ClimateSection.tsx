@@ -8,7 +8,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Loader2, CloudRain, Sun, Flame, Snowflake, Wind, Droplets } from "lucide-react";
+import { MapPin, Loader2, CloudRain, Sun, Moon, Flame, Snowflake, Wind, Droplets } from "lucide-react";
 import { ClimatePerfumeSlider, type SliderPerfume } from "@/components/perfume/ClimatePerfumeSlider";
 
 export interface InitialWeatherData {
@@ -37,7 +37,7 @@ function WeatherIcon({ condition, isNight, size = 20 }: { condition: string; isN
   }
   if (condition === "Snow") return <Snowflake size={size} className="text-[#AECDE0]" />;
   if (condition === "Clouds") return <Wind size={size} className="text-[var(--text-muted)]" />;
-  if (isNight) return <span style={{ fontSize: size }}>??</span>;
+  if (isNight) return <Moon size={size} className="text-[#C9A84C]" />;
   return <Sun size={size} className="text-[#C9A84C]" />;
 }
 

@@ -110,14 +110,14 @@ function loadCsv(
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  console.log("\n🚀  fra_perfumes.csv Importer starting…\n");
+  console.log("\n[START] fra_perfumes.csv Importer starting...\n");
 
   const filePath = path.join(CSV_DIR, "fra_perfumes.csv");
   const limitLabel = LIMIT === undefined ? "all" : String(LIMIT);
-  console.log(`📂 Reading fra_perfumes.csv (limit: ${limitLabel} rows)…\n`);
+  console.log(`[FILE] Reading fra_perfumes.csv (limit: ${limitLabel} rows)...\n`);
 
   const rawRows = await loadCsv(filePath, ",", LIMIT);
-  console.log(`  📄 ${rawRows.length} rows collected\n`);
+  console.log(`  [INFO] ${rawRows.length} rows collected\n`);
 
   const batch: {
     name: string;
@@ -155,7 +155,7 @@ async function main(): Promise<void> {
 
     totalInserted += toInsert.length;
     console.log(
-      `  📦 Batch → ${toInsert.length} processed (running total: ${totalInserted})`
+      `  [BATCH] Batch -> ${toInsert.length} processed (running total: ${totalInserted})`
     );
   }
 
@@ -206,10 +206,10 @@ async function main(): Promise<void> {
   await flushBatch();
 
   console.log(`\n${"─".repeat(60)}`);
-  console.log(`  ✅  Import complete!`);
-  console.log(`  📊  Rows processed : ${rawRows.length}`);
-  console.log(`  💾  Rows upserted  : ${totalInserted} (existing records untouched)`);
-  if (errorCount > 0) console.log(`  ❌  Skipped (bad data) : ${errorCount}`);
+  console.log(`  [DONE] Import complete!`);
+  console.log(`  [STAT] Rows processed : ${rawRows.length}`);
+  console.log(`  [STAT] Rows upserted  : ${totalInserted} (existing records untouched)`);
+  if (errorCount > 0) console.log(`  [WARN] Skipped (bad data) : ${errorCount}`);
   console.log(`${"─".repeat(60)}\n`);
 
   await prisma.$disconnect();
@@ -217,6 +217,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  console.error("\n💥 Fatal error:", err);
+  console.error("\n[FATAL] Fatal error:", err);
   process.exit(1);
 });

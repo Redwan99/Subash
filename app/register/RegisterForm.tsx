@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { BotShield } from "@/components/ui/BotShield";
+import { Check } from "lucide-react";
 
 // ─── Submit Button (reads pending state from nearest form) ─────────────────
 
@@ -118,7 +119,7 @@ export function RegisterForm() {
         <div
           className="rounded-xl px-4 py-3 text-sm text-center bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#4ade80]"
         >
-          ✓ Account created! Redirecting to sign in…
+          <Check size={14} className="inline mr-1" /> Account created! Redirecting to sign in…
         </div>
       )}
 

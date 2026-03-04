@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { CredentialsForm } from "./CredentialsForm";
 import Link from "next/link";
+import { Check } from "lucide-react";
 
 export const metadata = {
   title: "Sign In",
@@ -76,7 +77,7 @@ export default async function SignInPage({
           <div
             className="rounded-xl px-4 py-3 text-sm text-center bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#4ade80]"
           >
-            ✓ Account created! Sign in below.
+            <Check size={14} className="inline mr-1" /> Account created! Sign in below.
           </div>
         )}
 

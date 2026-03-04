@@ -183,7 +183,7 @@ async function getClimatePicks(climateTags: string[]) {
 export default async function HomePage() {
   const city = process.env.NEXT_PUBLIC_DEFAULT_CITY ?? "Dhaka";
 
-  // ⚡ Fan out: weather + trending + reviews all start at the same time.
+  // Fan out: weather + trending + reviews all start at the same time.
   // climatePicks depends on weather tags — it starts after weather resolves,
   // but by then trending and reviews are already in flight.
 

@@ -52,7 +52,7 @@ function cuid(): string {
 async function main() {
     const client = new Client({ connectionString: DB_URL });
     await client.connect();
-    console.log("✓ Connected to Postgres");
+    console.log("[OK] Connected to Postgres");
 
     const csvPath = path.join(__dirname, "fra_cleaned.csv");
     const raw = fs.readFileSync(csvPath, "utf-8");
@@ -129,14 +129,14 @@ async function main() {
                 imported++;
             } catch (e: unknown) {
                 skipped++;
-                if (skipped <= 3) console.warn("  ⚠", (e as Error).message?.slice(0, 100));
+                if (skipped <= 3) console.warn("  [WARN]", (e as Error).message?.slice(0, 100));
             }
         }
 
         process.stdout.write(`\r  → ${imported} imported, ${skipped} skipped  (${Math.min(i + BATCH, dataLines.length)}/${dataLines.length})`);
     }
 
-    console.log(`\n\n✅ Done — ${imported} perfumes imported, ${skipped} skipped.`);
+    console.log(`\n\n[DONE] Done -- ${imported} perfumes imported, ${skipped} skipped.`);
     await client.end();
 }
 

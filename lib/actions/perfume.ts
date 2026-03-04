@@ -66,9 +66,9 @@ export async function searchPerfumes(query: string): Promise<PerfumeSearchResult
 const ReviewSchema = z.object({
   perfumeId: z.string().min(1),
   text: z.string().min(10, "Review must be at least 10 characters"),
-  overall_rating: z.number().min(1).max(5),
-  longevity_score: z.number().int().min(1).max(5),
-  sillage_score: z.number().int().min(1).max(5),
+  overall_rating: z.number().min(1).max(10),
+  longevity_score: z.number().int().min(1).max(10),
+  sillage_score: z.number().int().min(1).max(10),
   time_tags: z.array(z.enum(["MORNING", "DAY", "EVENING", "NIGHT", "ANYTIME", "BOTH"])),
   weather_tags: z.array(z.enum(["HOT", "MILD", "COLD", "HUMID", "DRY", "RAINY"])),
   genderLeaning: z.number().int().min(1).max(5).optional(),

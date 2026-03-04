@@ -7,35 +7,35 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🗑  Deleting reviews…");
+  console.log("[DEL] Deleting reviews...");
   const { count: rc } = await prisma.review.deleteMany({});
   console.log(`   ↳ ${rc} reviews deleted`);
 
-  console.log("🗑  Deleting review upvotes…");
+  console.log("[DEL] Deleting review upvotes...");
   const { count: ru } = await prisma.reviewUpvote.deleteMany({});
   console.log(`   ↳ ${ru} review upvotes deleted`);
 
-  console.log("🗑  Deleting dupe votes…");
+  console.log("[DEL] Deleting dupe votes...");
   const { count: dv } = await prisma.dupeVote.deleteMany({});
   console.log(`   ↳ ${dv} dupe votes deleted`);
 
-  console.log("🗑  Deleting wardrobe items…");
+  console.log("[DEL] Deleting wardrobe items...");
   const { count: wi } = await prisma.wardrobeItem.deleteMany({});
   console.log(`   ↳ ${wi} wardrobe items deleted`);
 
-  console.log("🗑  Deleting Fragram posts…");
+  console.log("[DEL] Deleting Fragram posts...");
   const { count: fp } = await prisma.fragramPost.deleteMany({});
   console.log(`   ↳ ${fp} fragram posts deleted`);
 
-  console.log("🗑  Deleting decant listings…");
+  console.log("[DEL] Deleting decant listings...");
   const { count: dl } = await prisma.decantListing.deleteMany({});
   console.log(`   ↳ ${dl} decant listings deleted`);
 
-  console.log("🗑  Deleting perfumes…");
+  console.log("[DEL] Deleting perfumes...");
   const { count: pc } = await prisma.perfume.deleteMany({});
   console.log(`   ↳ ${pc} perfumes deleted`);
 
-  console.log("\n✅  Database wiped clean! Ready for: npm run import-csv");
+  console.log("\n[DONE] Database wiped clean! Ready for: npm run import-csv");
 }
 
 main()

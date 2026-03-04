@@ -147,7 +147,7 @@ async function buildDescriptionMap(): Promise<
   Map<string, { description: string; perfumer: string }>
 > {
   const filePath = path.join(CSV_DIR, "fra_perfumes.csv");
-  console.log(`📂 Loading fra_perfumes.csv from ${filePath}…`);
+  console.log(`[FILE] Loading fra_perfumes.csv from ${filePath}...`);
 
   const rows = await loadCsv(filePath, ",");
   const map = new Map<string, { description: string; perfumer: string }>();
@@ -162,7 +162,7 @@ async function buildDescriptionMap(): Promise<
     });
   }
 
-  console.log(`  ✅ ${map.size} descriptions indexed from fra_perfumes.csv\n`);
+  console.log(`  [OK] ${map.size} descriptions indexed from fra_perfumes.csv\n`);
   return map;
 }
 
@@ -173,11 +173,11 @@ async function importCleaned(
 ): Promise<void> {
   const filePath = path.join(CSV_DIR, "fra_cleaned.csv");
   const limitLabel = LIMIT === undefined ? "all" : String(LIMIT);
-  console.log(`📂 Reading fra_cleaned.csv (limit: ${limitLabel} rows)…\n`);
+  console.log(`[FILE] Reading fra_cleaned.csv (limit: ${limitLabel} rows)...\n`);
 
   // Collect rows safely into memory (up to LIMIT) before async work.
   const rawRows = await loadCsv(filePath, ";", LIMIT);
-  console.log(`  📄 ${rawRows.length} rows collected from fra_cleaned.csv\n`);
+  console.log(`  [INFO] ${rawRows.length} rows collected from fra_cleaned.csv\n`);
 
   const batch: PerfumeRow[] = [];
   let totalInserted = 0;
@@ -192,7 +192,7 @@ async function importCleaned(
     });
     totalInserted += result.count;
     console.log(
-      `  📦 Flushed batch → ${result.count} inserted (running total: ${totalInserted})`
+      `  [BATCH] Flushed batch -> ${result.count} inserted (running total: ${totalInserted})`
     );
   }
 
@@ -216,7 +216,7 @@ async function importCleaned(
       mergeHits++;
       if (mergeHits <= 3 || i % 100 === 0) {
         console.log(
-          `  🔗 [${i + 1}] Merged: "${capitalize(nameRaw)}" by ${capitalize(brandRaw)} — desc ${description.length} chars`
+          `  [MERGE] [${i + 1}] Merged: "${capitalize(nameRaw)}" by ${capitalize(brandRaw)} -- desc ${description.length} chars`
         );
       }
     } else {
@@ -232,7 +232,7 @@ async function importCleaned(
       mergeMisses++;
       if (mergeMisses <= 3) {
         console.log(
-          `  ⚠️  [${i + 1}] No description for: …/${url.split("/").slice(-1)[0]} — using fallback`
+          `  [WARN] [${i + 1}] No description for: .../${url.split("/").slice(-1)[0]} -- using fallback`
         );
       }
     }
@@ -271,18 +271,18 @@ async function importCleaned(
   await flushBatch();
 
   console.log(`\n${"─".repeat(60)}`);
-  console.log(`  ✅  Import complete!`);
-  console.log(`  📊  Rows processed : ${rawRows.length}`);
-  console.log(`  💾  Rows inserted  : ${totalInserted}`);
-  console.log(`  🔗  Merge hits     : ${mergeHits}  (description from fra_perfumes.csv)`);
-  console.log(`  ⚠️   Merge misses   : ${mergeMisses} (fallback description used)`);
+  console.log(`  [DONE] Import complete!`);
+  console.log(`  [STAT] Rows processed : ${rawRows.length}`);
+  console.log(`  [STAT] Rows inserted  : ${totalInserted}`);
+  console.log(`  [STAT] Merge hits     : ${mergeHits}  (description from fra_perfumes.csv)`);
+  console.log(`  [STAT] Merge misses   : ${mergeMisses} (fallback description used)`);
   console.log(`${"─".repeat(60)}\n`);
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
-  console.log("\n🚀  Subash Dual-CSV Importer starting…\n");
+  console.log("\n[START] Subash Dual-CSV Importer starting...\n");
 
   try {
     const descMap = await buildDescriptionMap();
@@ -295,6 +295,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((err) => {
-  console.error("\n💥 Fatal error:", err);
+  console.error("\n[FATAL] Fatal error:", err);
   process.exit(1);
 });

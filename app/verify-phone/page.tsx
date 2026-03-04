@@ -15,7 +15,7 @@ import {
 import { firebaseAuth } from "@/lib/firebase";
 import { saveVerifiedPhone } from "@/lib/actions/phone";
 import Link from "next/link";
-import { Smartphone } from "lucide-react";
+import { Smartphone, Check } from "lucide-react";
 
 // ─── Steps ────────────────────────────────────────────────────────────────────
 type Step = "phone" | "otp" | "success";
@@ -252,7 +252,7 @@ export default function VerifyPhonePage() {
             <div
               className="mx-auto w-16 h-16 rounded-full flex items-center justify-center text-2xl bg-[#22C55E]/15 border-2 border-[#22C55E]/40"
             >
-              ✓
+              <Check size={28} />
             </div>
             <p className="text-sm text-[var(--text-secondary)]">
               <span className="text-[var(--accent)] font-semibold">{phone}</span>

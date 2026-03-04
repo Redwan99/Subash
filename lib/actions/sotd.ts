@@ -118,7 +118,7 @@ export async function getScentOfTheDay(): Promise<SOTDData | null> {
                 return race as unknown as SOTDData;
             }
             } catch (error) {
-                console.warn("⚠️ Build Phase: DB unreachable for SOTD. Using fallback.", error);
+                console.warn("[WARN] Build Phase: DB unreachable for SOTD. Using fallback.", error);
                 return null;
             }
         },
@@ -127,7 +127,7 @@ export async function getScentOfTheDay(): Promise<SOTDData | null> {
         { revalidate: 86400, tags: ["sotd"] }
     )();
     } catch (error) {
-        console.warn("⚠️ Build Phase: SOTD cache wrapper failed. Using fallback.", error);
+        console.warn("[WARN] Build Phase: SOTD cache wrapper failed. Using fallback.", error);
         return null;
     }
 }

@@ -9,7 +9,7 @@ import Link from "next/link";
 export const revalidate = 60;
 import { notFound } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
-import { ShoppingCart, ExternalLink, Tag, Store } from "lucide-react";
+import { ShoppingCart, ExternalLink, Tag, Store, Check, Star } from "lucide-react";
 import NextDynamic from "next/dynamic";
 import { DecantCard, type DecantCardData } from "@/components/marketplace/DecantCard";
 import { auth } from "@/auth";
@@ -249,10 +249,10 @@ export default async function PerfumePage({
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <p className="text-sm font-bold text-[var(--text-primary)]">{shopName}</p>
                           {deal.shop?.isVerified && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[rgba(232,67,147,0.15)] text-[#E84393]">✓ VERIFIED</span>
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[rgba(232,67,147,0.15)] text-[#E84393] inline-flex items-center gap-0.5"><Check size={8} /> VERIFIED</span>
                           )}
                           {deal.is_featured && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[rgba(245,158,11,0.15)] text-[#F59E0B]">★ FEATURED</span>
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[rgba(245,158,11,0.15)] text-[#F59E0B] inline-flex items-center gap-0.5"><Star size={8} className="fill-current" /> FEATURED</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">

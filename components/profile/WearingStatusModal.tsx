@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Droplet, Search, X, Sun, Moon, Sunrise, Sunset, Clock, Loader2, Droplets, Heart } from "lucide-react";
+import { Droplet, Search, X, Sun, Moon, Sunrise, Sunset, Clock, Loader2, Droplets, Heart, ChevronUp, ChevronDown } from "lucide-react";
 import { createPortal } from "react-dom";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
 import { setWearingStatus, clearWearingStatus } from "@/lib/actions/status";
@@ -49,7 +49,7 @@ function WardrobeQuickPick({
       >
         <span className="font-semibold">Show my wardrobe</span>
         <span className="text-[10px] text-[var(--text-muted)]">
-          {expanded ? "▲ Hide" : "▼ Expand"}
+          {expanded ? <><ChevronUp size={10} className="inline" /> Hide</> : <><ChevronDown size={10} className="inline" /> Expand</>}
         </span>
       </button>
       {expanded && (

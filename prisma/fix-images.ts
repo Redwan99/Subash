@@ -11,7 +11,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main(): Promise<void> {
-  console.log("\n🖼  Fixing perfume image URLs…\n");
+  console.log("\n[IMG] Fixing perfume image URLs...\n");
 
   const perfumes = await prisma.perfume.findMany({ select: { id: true } });
   console.log(`  Found ${perfumes.length} perfumes to update.\n`);
@@ -32,15 +32,15 @@ async function main(): Promise<void> {
   for (let i = 0; i < updates.length; i += BATCH) {
     await prisma.$transaction(updates.slice(i, i + BATCH));
     done += Math.min(BATCH, updates.length - i);
-    console.log(`  ✅ ${done}/${updates.length} updated`);
+    console.log(`  [OK] ${done}/${updates.length} updated`);
   }
 
-  console.log("\n🎉  All image URLs updated to picsum.photos placeholders!\n");
+  console.log("\n[DONE] All image URLs updated to picsum.photos placeholders!\n");
 }
 
 main()
   .catch((err) => {
-    console.error("\n💥 Error:", err);
+    console.error("\n[ERROR] Error:", err);
     process.exit(1);
   })
   .finally(() => prisma.$disconnect());
