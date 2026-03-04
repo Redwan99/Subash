@@ -22,9 +22,10 @@ export async function searchEncyclopedia(filters: {
   sort?: string;
 }) {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     const where: any = {};
     const andClauses: any[] = [];
+    /* eslint-enable @typescript-eslint/no-explicit-any */
 
     if (filters.query) {
       where.OR = [

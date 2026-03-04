@@ -1,8 +1,9 @@
 "use client";
 // components/feed/LiveReviewFeed.tsx
-// Phase 13 — Live Review Feed powered by SWR (polls /api/reviews every 5 seconds)
+// Live Review Feed powered by SWR (polls /api/reviews every 5 seconds)
 // New reviews slide in via Framer Motion AnimatePresence without disrupting scroll.
 
+import React from "react";
 import useSWR from "swr";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -180,6 +181,12 @@ function ReviewCard({ review, isNew }: { review: LiveReview; isNew: boolean }) {
 
 // ── Main Live Feed ─────────────────────────────────────────────────────────────
 export function LiveReviewFeed({ initialReviews = [] }: { initialReviews?: LiveReview[] }) {
+    // Track IDs we've already rendered so new arrivals get the "NEW" highlight
+    const seenIdsRef = React.useRef<Set<string>>(
+        new Set(initialReviews.map((r) => r.id))
+    );
+    const [newIds, setNewIds] = React.useState<Set<string>>(new Set());
+
     const { data, error, isLoading } = useSWR<LiveReview[]>(
         "/api/reviews",
         fetcher,
@@ -191,7 +198,20 @@ export function LiveReviewFeed({ initialReviews = [] }: { initialReviews?: LiveR
         }
     );
 
-    const reviews = data ?? [];
+    const reviews = React.useMemo(() => data ?? [], [data]);
+
+    // Detect newly arrived reviews after each SWR poll
+    React.useEffect(() => {
+        const fresh = reviews.filter((r) => !seenIdsRef.current.has(r.id));
+        if (fresh.length > 0) {
+            const freshIds = new Set(fresh.map((r) => r.id));
+            setNewIds(freshIds);
+            fresh.forEach((r) => seenIdsRef.current.add(r.id));
+            // Auto-clear "NEW" flash after 4 seconds
+            const timer = setTimeout(() => setNewIds(new Set()), 4000);
+            return () => clearTimeout(timer);
+        }
+    }, [reviews]);
 
     return (
         <section className="space-y-3">
@@ -225,7 +245,7 @@ export function LiveReviewFeed({ initialReviews = [] }: { initialReviews?: LiveR
                             <ReviewCard
                                 key={review.id}
                                 review={review}
-                                isNew={false}
+                                isNew={newIds.has(review.id)}
                             />
                         ))}
                     </AnimatePresence>

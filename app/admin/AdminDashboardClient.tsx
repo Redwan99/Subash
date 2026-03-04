@@ -13,7 +13,7 @@ import {
 import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus, toggleBanUser, adminResetUserPassword, adminDeleteUser } from "@/lib/actions/admin";
 import { getEnvVariables, upsertEnvVariable, deleteEnvVariable, getEnvVariableDecrypted, type EnvVarItem } from "@/lib/actions/envvars";
 import type { Role, FeatureToggle } from "@prisma/client";
-import { CsvImporter } from "@/components/admin/CsvImporter";
+import { AsyncCsvImporter } from "@/components/admin/AsyncCsvImporter";
 import BulkImporter from "@/components/admin/BulkImporter";
 import type { ReviewStatus, AdminReview as Review, AdminUser, BrandClaim, AuditLog } from "./types";
 
@@ -813,7 +813,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                 {/* -- Import Data Tab -- */}
                 {tab === "import" && (
                     <div className="max-w-3xl mx-auto space-y-8">
-                        <CsvImporter />
+                        <AsyncCsvImporter />
                         <BulkImporter />
                     </div>
                 )}
@@ -920,7 +920,6 @@ function EnvVariablesPanel() {
         }
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useState(() => { loadVars(); });
 
     const handleReveal = async (id: string) => {

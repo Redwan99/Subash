@@ -77,6 +77,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         </div>
 
         {imageUrl && (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={imageUrl}
             alt={perfume.name}
