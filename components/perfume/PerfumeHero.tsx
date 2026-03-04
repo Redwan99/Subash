@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
-import { Star, Droplets } from "lucide-react";
+import { Star, Droplets, Globe } from "lucide-react";
 
 interface PerfumeHeroProps {
   perfume: {
@@ -15,6 +15,10 @@ interface PerfumeHeroProps {
     gender: string | null;
     accords: string[];
     top_notes: string[];
+    country: string | null;
+    source_url: string | null;
+    rating_value: number | null;
+    rating_count: number | null;
   };
   avgRating: number;
   reviewCount: number;
@@ -39,7 +43,7 @@ export function PerfumeHero({
     .replace("women", "For Women")
     .replace("men", "For Men");
 
-  const accords = (perfume.accords || []).slice(0, 4);
+  const accords = (perfume.accords || []).slice(0, 5);
   const topNotes = (perfume.top_notes || []).slice(0, 3);
 
   return (
@@ -115,6 +119,12 @@ export function PerfumeHero({
                   {genderLabel}
                 </span>
               )}
+              {perfume.country && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-white/15 bg-gray-50 dark:bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-100/90 backdrop-blur">
+                  <Globe size={10} />
+                  {perfume.country}
+                </span>
+              )}
             </div>
             <h1 className="font-display text-3xl font-semibold tracking-tight text-[var(--text-primary)] sm:text-4xl">
               {perfume.name}
@@ -125,6 +135,21 @@ export function PerfumeHero({
               </p>
             )}
           </div>
+
+          {/* Fragrantica rating (from scraped data) */}
+          {perfume.rating_value != null && perfume.rating_value > 0 && (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-500/25 px-2.5 py-1 text-amber-700 dark:text-amber-300">
+                <Star size={13} fill="currentColor" />
+                <span className="text-xs font-bold">{perfume.rating_value.toFixed(2)}</span>
+                {perfume.rating_count != null && (
+                  <span className="text-[10px] font-medium text-amber-600/70 dark:text-amber-400/60">
+                    ({perfume.rating_count.toLocaleString()} votes)
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Rating + wardrobe */}
           <div className="flex flex-wrap items-center gap-3">

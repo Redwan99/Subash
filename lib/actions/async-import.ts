@@ -4,7 +4,9 @@
  * Universal CSV import engine for the admin dashboard.
  *
  * Auto-detects CSV format based on header columns:
- *   • fra_cleaned.csv  — semicolon-separated, columns: url;Perfume;Brand;Gender;Year;Top;Middle;Base;...
+ *   • fra_cleaned.csv  — comma-separated (quoted fields), columns: url,Perfume,Brand,Country,Gender,
+ *                         Rating Value,Rating Count,Year,Top,Middle,Base,Perfumer1,Perfumer2,mainaccord1-5
+ *                         Perfume column contains URL slugs; notes are comma-separated inside quotes.
  *   • fra_perfumes.csv — comma-separated, columns: Name,Gender,Main Accords,Perfumers,Description,url
  *   • generic          — comma-separated, columns: name,brand (minimum)
  *
@@ -39,6 +41,10 @@ interface PerfumeRow {
   accords: string;
   slug: string;
   scraped: boolean;
+  source_url: string | null;
+  country: string | null;
+  rating_value: number | null;
+  rating_count: number | null;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -66,6 +72,17 @@ function mapGender(raw: string): string {
   if (g === "men") return "for men";
   if (g === "unisex") return "for women and men";
   return raw?.trim() || "for women and men";
+}
+
+/** Parse European-format rating like "1,42" → 1.42, or plain "3" → 3.0 */
+function parseRating(raw: string): number | null {
+  if (!raw) return null;
+  const cleaned = raw.replace(/"/g, "").trim();
+  if (!cleaned) return null;
+  // European format: "1,42" → "1.42"
+  const normalized = cleaned.replace(",", ".");
+  const n = parseFloat(normalized);
+  return isNaN(n) ? null : n;
 }
 
 function extractFragranticaId(url: string): string | null {
@@ -120,9 +137,17 @@ function extractName(url: string): string {
 function detectFormat(headers: string[], firstLine: string): { format: CsvFormat; separator: string } {
   const headerSet = new Set(headers.map((h) => h.toLowerCase().trim()));
 
-  // fra_cleaned.csv: semicolon-separated, has "Perfume", "Brand", "Top", "Middle", "Base"
+  // fra_cleaned.csv: comma-separated with quoted fields
+  // Headers: url, Perfume, Brand, Country, Gender, Rating Value, Rating Count, Year,
+  //          Top, Middle, Base, Perfumer1, Perfumer2, mainaccord1-5
+  // Notes fields contain commas but are quoted so PapaParse handles them correctly
   if (headerSet.has("perfume") && headerSet.has("top") && headerSet.has("middle") && headerSet.has("base")) {
-    return { format: "fra_cleaned", separator: ";" };
+    // Auto-detect separator: check if semicolons dominate outside quotes
+    const unquoted = firstLine.replace(/"[^"]*"/g, "");
+    const semicolonCount = (unquoted.match(/;/g) || []).length;
+    const commaCount = (unquoted.match(/,/g) || []).length;
+    const separator = semicolonCount > commaCount ? ";" : ",";
+    return { format: "fra_cleaned", separator };
   }
 
   // fra_perfumes.csv: comma-separated, has "Main Accords", "Perfumers", "Description"  
@@ -142,6 +167,7 @@ function detectFormat(headers: string[], firstLine: string): { format: CsvFormat
 
 function mapFraCleanedRow(row: Record<string, string>): PerfumeRow | null {
   const url = row["url"]?.trim() ?? "";
+  // "Perfume" column contains URL slugs like "accento-overdose-pride-edition"
   const nameRaw = row["Perfume"]?.trim() ?? "";
   const brandRaw = row["Brand"]?.trim() ?? "";
   const yearRaw = row["Year"]?.trim() ?? "";
@@ -149,41 +175,71 @@ function mapFraCleanedRow(row: Record<string, string>): PerfumeRow | null {
 
   if (!nameRaw && !brandRaw) return null;
 
+  // capitalize() converts slug-style "accento-overdose-pride-edition" → "Accento Overdose Pride Edition"
   const name = capitalize(nameRaw) || "Unknown";
   const brand = capitalize(brandRaw) || "Unknown";
 
-  // Build description from notes
-  const noteList = [
-    ...splitNotes(row["Top"] ?? "").slice(0, 2),
-    ...splitNotes(row["Middle"] ?? "").slice(0, 1),
+  // Parse notes — PapaParse correctly handles quoted comma-separated values
+  // e.g. "fruity notes, aldehydes, green notes" arrives as a single string
+  const topNotes = splitNotes(row["Top"] ?? "");
+  const heartNotes = splitNotes(row["Middle"] ?? "");
+  const baseNotes = splitNotes(row["Base"] ?? "");
+
+  // Build description from top notes
+  const notePreview = [
+    ...topNotes.slice(0, 2),
+    ...heartNotes.slice(0, 1),
   ].join(", ");
-  const description = noteList
-    ? `${name} by ${brand} is a luxury fragrance featuring ${noteList}.`
+  const description = notePreview
+    ? `${name} by ${brand} is a luxury fragrance featuring ${notePreview}.`
     : `${name} by ${brand} is a distinguished luxury fragrance.`;
 
-  // Build accords from named columns
+  // Build accords from named columns (mainaccord1..mainaccord5)
   const accords = (
     ["mainaccord1", "mainaccord2", "mainaccord3", "mainaccord4", "mainaccord5"] as const
   )
     .map((k) => row[k]?.trim() ?? "")
-    .filter(Boolean);
+    .filter(Boolean)
+    .map(capitalize);
 
-  const perfumer = row["Perfumer1"]?.trim() || row["Perfumer2"]?.trim() || null;
+  // Perfumers — combine Perfumer1 + Perfumer2, filter out "unknown"
+  const p1 = row["Perfumer1"]?.trim() ?? "";
+  const p2 = row["Perfumer2"]?.trim() ?? "";
+  const perfumers = [p1, p2]
+    .filter((p) => p && p.toLowerCase() !== "unknown")
+    .map(capitalize);
+  const perfumer = perfumers.length > 0 ? perfumers.join(", ") : null;
+
+  // Fragrantica ID from URL for image + slug
+  const fragId = url ? extractFragranticaId(url) : null;
+
+  // Country of origin
+  const country = row["Country"]?.trim() || null;
+
+  // Fragrantica rating (European decimal format: "1,42" → 1.42)
+  const ratingValue = parseRating(row["Rating Value"] ?? "");
+  const ratingCount = row["Rating Count"]?.trim()
+    ? parseInt(row["Rating Count"].trim(), 10) || null
+    : null;
 
   return {
     name,
     brand,
     image_url: url ? buildImageUrl(url) : null,
-    top_notes: JSON.stringify(splitNotes(row["Top"] ?? "")),
-    heart_notes: JSON.stringify(splitNotes(row["Middle"] ?? "")),
-    base_notes: JSON.stringify(splitNotes(row["Base"] ?? "")),
+    top_notes: JSON.stringify(topNotes),
+    heart_notes: JSON.stringify(heartNotes),
+    base_notes: JSON.stringify(baseNotes),
     release_year: yearRaw ? parseInt(yearRaw, 10) || null : null,
     perfumer,
     description,
     gender: mapGender(genderRaw),
     accords: JSON.stringify(accords),
-    slug: makeSlug(nameRaw, brandRaw, url ? extractFragranticaId(url) : null),
+    slug: makeSlug(nameRaw, brandRaw, fragId),
     scraped: true,
+    source_url: url || null,
+    country,
+    rating_value: ratingValue,
+    rating_count: ratingCount,
   };
 }
 
@@ -214,6 +270,10 @@ function mapFraPerfumesRow(row: Record<string, string>): PerfumeRow | null {
     accords: JSON.stringify(accords),
     slug: makeSlug(name, brand, extractFragranticaId(url)),
     scraped: true,
+    source_url: url || null,
+    country: null,
+    rating_value: null,
+    rating_count: null,
   };
 }
 
@@ -255,6 +315,12 @@ function mapGenericRow(row: Record<string, string>): PerfumeRow | null {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)+/g, ""),
     scraped: false,
+    source_url: row["url"] || row["source_url"] || null,
+    country: row["country"] || row["Country"] || null,
+    rating_value: parseRating(row["rating_value"] || row["Rating Value"] || ""),
+    rating_count: row["rating_count"] || row["Rating Count"]
+      ? parseInt(row["rating_count"] || row["Rating Count"] || "", 10) || null
+      : null,
   };
 }
 
@@ -445,6 +511,15 @@ async function processImportJob(
                 perfumer: row.perfumer,
                 gender: row.gender,
                 release_year: row.release_year,
+                source_url: row.source_url,
+                country: row.country,
+                rating_value: row.rating_value,
+                rating_count: row.rating_count,
+                accords: row.accords,
+                top_notes: row.top_notes,
+                heart_notes: row.heart_notes,
+                base_notes: row.base_notes,
+                image_url: row.image_url,
               },
               create: row,
               select: { id: true },

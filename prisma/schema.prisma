@@ -167,6 +167,10 @@ model Perfume {
   slug         String   @unique
   scraped      Boolean  @default(false)
   searchCount  Int      @default(0)
+  source_url   String?              // Original Fragrantica URL
+  country      String?              // Brand country of origin (e.g. "France")
+  rating_value Float?               // Fragrantica average rating (e.g. 3.07)
+  rating_count Int?                 // Number of ratings on Fragrantica
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

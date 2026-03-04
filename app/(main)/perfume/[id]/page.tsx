@@ -81,6 +81,10 @@ export default async function PerfumePage({
       top_notes: true,
       heart_notes: true,
       base_notes: true,
+      source_url: true,
+      country: true,
+      rating_value: true,
+      rating_count: true,
       decantListings: {
         where: { status: "AVAILABLE" },
         orderBy: { createdAt: "desc" },
@@ -194,6 +198,10 @@ export default async function PerfumePage({
             gender: perfume.gender,
             accords,
             top_notes: topNotes,
+            country: perfume.country ?? null,
+            source_url: perfume.source_url ?? null,
+            rating_value: perfume.rating_value ?? null,
+            rating_count: perfume.rating_count ?? null,
           }}
           avgRating={avgRating}
           reviewCount={reviewCount}

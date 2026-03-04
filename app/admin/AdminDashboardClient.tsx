@@ -23,6 +23,8 @@ type Props = {
     totalUsers: number;
     totalReviews: number;
     totalPerfumes: number;
+    scrapedPerfumes: number;
+    ratedPerfumes: number;
     pendingReviews: number;
     spamReviews: number;
     recentReviews: Review[];
@@ -546,7 +548,7 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
 
 type Tab = "overview" | "reviews" | "users" | "system" | "env" | "audit" | "claims" | "import";
 
-export default function AdminDashboardClient({ totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, recentReviews, users, featureToggles, auditLogs, brandClaims }: Props) {
+export default function AdminDashboardClient({ totalUsers, totalReviews, totalPerfumes, scrapedPerfumes, ratedPerfumes, pendingReviews, spamReviews, recentReviews, users, featureToggles, auditLogs, brandClaims }: Props) {
     const [tab, setTab] = useState<Tab>("overview");
 
     const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
@@ -641,6 +643,8 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                             <MetricCard label="Total Users" value={totalUsers} icon={<Users size={16} />} accent="text-[#F783AC]" glow="shadow-[0_0_30px_rgba(232,67,147,0.1)]" />
                             <MetricCard label="Total Reviews" value={totalReviews} icon={<Star size={16} />} accent="text-[#F59E0B]" glow="shadow-[0_0_30px_rgba(245,158,11,0.1)]" />
                             <MetricCard label="Total Perfumes" value={totalPerfumes} icon={<Sparkles size={16} />} accent="text-[#F783AC]" glow="shadow-[0_0_30px_rgba(247,131,172,0.1)]" />
+                            <MetricCard label="Imported" value={scrapedPerfumes} icon={<Database size={16} />} accent="text-[#38BDF8]" glow="shadow-[0_0_30px_rgba(56,189,248,0.1)]" />
+                            <MetricCard label="With Ratings" value={ratedPerfumes} icon={<BarChart3 size={16} />} accent="text-[#A78BFA]" glow="shadow-[0_0_30px_rgba(167,139,250,0.1)]" />
                             <MetricCard label="Pending" value={pendingReviews} icon={<AlertTriangle size={16} />} accent="text-[#F59E0B]" glow="shadow-[0_0_30px_rgba(245,158,11,0.1)]" />
                             <MetricCard label="Spam Caught" value={spamReviews} icon={<ShieldCheck size={16} />} accent="text-[#EF4444]" glow="shadow-[0_0_30px_rgba(239,68,68,0.1)]" />
                         </div>

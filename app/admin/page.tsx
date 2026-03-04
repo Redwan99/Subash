@@ -15,13 +15,15 @@ async function getAdminData() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = prisma as any;
 
-  const [totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, recentReviews, users, featureToggles, auditLogs, brandClaims] =
+  const [totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, scrapedPerfumes, ratedPerfumes, recentReviews, users, featureToggles, auditLogs, brandClaims] =
     await Promise.all([
       prisma.user.count(),
       prisma.review.count(),
       prisma.perfume.count(),
       db.review.count({ where: { status: "PENDING" } }),
       db.review.count({ where: { status: "SPAM" } }),
+      db.perfume.count({ where: { scraped: true } }),
+      db.perfume.count({ where: { rating_value: { not: null } } }),
       db.review.findMany({
         take: 50,
         orderBy: { createdAt: "desc" },
@@ -68,6 +70,8 @@ async function getAdminData() {
     totalUsers: totalUsers as number,
     totalReviews: totalReviews as number,
     totalPerfumes: totalPerfumes as number,
+    scrapedPerfumes: scrapedPerfumes as number,
+    ratedPerfumes: ratedPerfumes as number,
     pendingReviews: pendingReviews as number,
     spamReviews: spamReviews as number,
     recentReviews: recentReviews as Review[],
