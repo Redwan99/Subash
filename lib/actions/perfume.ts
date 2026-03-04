@@ -195,7 +195,7 @@ export async function castDupeVote(
           : { downvotes: { increment: 1 } },
     });
 
-    // Notify the dupe submitter on upvote (skip self-notification)
+    // Notify the dupe submitter on upvote
     if (direction === "up" && dupe && dupe.submittedBy !== session.user.id) {
       const actorName = session.user?.name ?? "Someone";
       const perfumeName = dupe.original?.name ?? "a perfume";
@@ -204,6 +204,7 @@ export async function castDupeVote(
         type: "DUPE_VOTE",
         message: `${actorName} agreed with your dupe suggestion for ${perfumeName}!`,
         link: `/perfume/${perfumeId}`,
+        actorId: session.user.id,
       });
     }
 
@@ -251,6 +252,7 @@ export async function upvoteReview(
       type: "REVIEW_UPVOTE",
       message: `${actorName} found your review of ${perfumeName} helpful!`,
       link: `/perfume/${review.perfume?.id ?? ""}`,
+      actorId: session.user.id,
     });
 
     revalidatePath(`/perfume/${review.perfume?.id ?? ""}`);

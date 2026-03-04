@@ -19,6 +19,7 @@ interface UserResult {
   id: string;
   name: string | null;
   image: string | null;
+  username?: string | null;
 }
 
 interface SearchResults {
@@ -145,7 +146,7 @@ export default function GlobalSearch() {
               {results.users.map((user) => (
                 <Link
                   key={user.id}
-                  href={`/user/${user.id}`}
+                  href={`/user/${user.username ?? user.id}`}
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors group"
                 >

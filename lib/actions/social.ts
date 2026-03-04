@@ -4,6 +4,7 @@
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "./notifications";
 
 export async function toggleFollow(targetUserId: string) {
   const session = await auth();
@@ -48,13 +49,12 @@ export async function toggleFollow(targetUserId: string) {
     });
 
     // Send a notification
-    await prisma.notification.create({
-      data: {
-        userId: targetUserId,
-        type: "FOLLOW",
-        message: `${session.user?.name || "Someone"} started following you.`,
-        link: `/user/${currentUserId}`,
-      },
+    await createNotification({
+      userId: targetUserId,
+      type: "FOLLOW",
+      message: `${session.user?.name || "Someone"} started following you.`,
+      link: `/user/${session.user?.username ?? currentUserId}`,
+      actorId: currentUserId,
     });
 
     revalidatePath("/user/[id]");

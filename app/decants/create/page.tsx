@@ -19,6 +19,7 @@ import {
   Hash,
   Link2,
   DollarSign,
+  Droplets,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createDecantListing } from "@/lib/actions/decant";
@@ -110,7 +111,7 @@ function PerfumePicker({
               className="w-8 h-10 object-contain rounded"
             />
           ) : (
-            <span className="text-[22px]">🧴</span>
+            <Droplets size={20} className="text-[var(--accent)]" />
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate text-[var(--text-primary)]">
@@ -171,7 +172,7 @@ function PerfumePicker({
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={r.image_url} alt={r.name} className="w-full h-full object-contain" />
                       ) : (
-                        <span className="text-sm">🧴</span>
+                        <Droplets size={14} className="text-[var(--accent)]" />
                       )}
                     </div>
                     <div className="min-w-0">

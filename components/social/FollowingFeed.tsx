@@ -9,6 +9,7 @@ type FeedUser = {
   id: string;
   name: string | null;
   image: string | null;
+  username?: string | null;
 };
 
 type FeedPerfume = {
@@ -61,7 +62,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
           return (
             <div key={`fragram-${item.id}`} className="flex flex-col gap-3 p-4 rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#111]">
               <div className="flex items-center gap-3">
-                <Link href={`/user/${item.user.id}`} className="shrink-0">
+                <Link href={`/user/${item.user.username ?? item.user.id}`} className="shrink-0">
                   {item.user.image ? (
                     <Image src={item.user.image} alt={item.user.name || "User"} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-white/20" />
                   ) : (
@@ -71,7 +72,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
                   )}
                 </Link>
                 <div className="flex flex-col">
-                  <Link href={`/user/${item.user.id}`} className="text-sm font-bold hover:underline">
+                  <Link href={`/user/${item.user.username ?? item.user.id}`} className="text-sm font-bold hover:underline">
                     {item.user.name || "Anonymous"}
                   </Link>
                   <span className="text-xs text-gray-500">Posted a photo &middot; {timeAgo}</span>
@@ -100,7 +101,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
           return (
             <div key={`review-${item.id}`} className="flex flex-col gap-3 p-4 rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#111]">
                <div className="flex items-center gap-3">
-                <Link href={`/user/${item.user.id}`} className="shrink-0">
+                <Link href={`/user/${item.user.username ?? item.user.id}`} className="shrink-0">
                   {item.user.image ? (
                     <Image src={item.user.image} alt={item.user.name || "User"} width={40} height={40} className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-white/20" />
                   ) : (
@@ -110,7 +111,7 @@ export function FollowingFeed({ timeline }: FollowingFeedProps) {
                   )}
                 </Link>
                 <div className="flex flex-col">
-                  <Link href={`/user/${item.user.id}`} className="text-sm font-bold hover:underline">
+                  <Link href={`/user/${item.user.username ?? item.user.id}`} className="text-sm font-bold hover:underline">
                     {item.user.name || "Anonymous"}
                   </Link>
                   <span className="text-xs text-gray-500">Reviewed a perfume &middot; {timeAgo}</span>

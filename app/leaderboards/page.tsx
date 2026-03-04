@@ -4,7 +4,7 @@
 
 import prisma from "@/lib/prisma";
 import Image from "next/image";
-import { Trophy, Star, Award, Sprout } from "lucide-react";
+import { Trophy, Star, Award, Sprout, Crown, Gem } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { type LucideIcon } from "lucide-react";
@@ -78,7 +78,7 @@ function LeaderRow({
   };
 
   return (
-    <Link href={`/user/${user.id}`} prefetch={false}>
+    <Link href={`/user/${user.username ?? user.id}`} prefetch={false}>
       <div
         className={cn(
           "flex items-center gap-4 px-4 py-3 rounded-2xl transition-all cursor-pointer hover:translate-x-[3px]",
@@ -102,7 +102,14 @@ function LeaderRow({
             rankTextClass[rank] ?? "text-[var(--text-muted)]"
           )}
         >
-          {rank <= 3 ? ["🥇","🥈","🥉"][rank - 1] : `#${rank}`}
+          {rank <= 3 ? (
+            <span className={cn(
+              "inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-black",
+              rank === 1 && "bg-[#FFD700]/20 text-[#FFD700]",
+              rank === 2 && "bg-[#C0C0C0]/20 text-[#A0A8B0]",
+              rank === 3 && "bg-[#CD7F32]/20 text-[#CD7F32]",
+            )}>{rank}</span>
+          ) : `#${rank}`}
         </div>
 
         {/* Avatar */}
@@ -199,11 +206,11 @@ export default async function LeaderboardsPage() {
     },
   });
 
-  const tiers = [
-    { label: "VIP Nose",    emoji: "👑", min: 150, gradientClass: "bg-[linear-gradient(135deg,#E84393,#F783AC)]" },
-    { label: "Collector",   emoji: "💎", min: 50,  gradientClass: "bg-[linear-gradient(135deg,#8E9CB5,#C2CAD8)]" },
-    { label: "Enthusiast",  emoji: "🌟", min: 11,  gradientClass: "bg-[linear-gradient(135deg,#A0684A,#C8875E)]" },
-    { label: "Novice",      emoji: "🌱", min: 0,   gradientClass: "" },
+  const tiers: { label: string; icon: LucideIcon; min: number; gradientClass: string }[] = [
+    { label: "VIP Nose",    icon: Crown,  min: 150, gradientClass: "bg-[linear-gradient(135deg,#E84393,#F783AC)]" },
+    { label: "Collector",   icon: Gem,    min: 50,  gradientClass: "bg-[linear-gradient(135deg,#8E9CB5,#C2CAD8)]" },
+    { label: "Enthusiast",  icon: Star,   min: 11,  gradientClass: "bg-[linear-gradient(135deg,#A0684A,#C8875E)]" },
+    { label: "Novice",      icon: Sprout, min: 0,   gradientClass: "" },
   ];
 
   return (
@@ -233,7 +240,7 @@ export default async function LeaderboardsPage() {
                 key={t.label}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[rgba(0,0,0,0.15)] border border-[var(--border-color)] text-[var(--text-muted)]"
               >
-                <span>{t.emoji}</span>
+                <t.icon size={14} />
                 <span
                   className={cn(
                     t.gradientClass

@@ -19,14 +19,14 @@ export async function getFollowingFeed() {
       where: { userId: { in: followingIds } },
       take: 20,
       orderBy: { createdAt: 'desc' },
-      include: { user: { select: { name: true, image: true, id: true } }, perfume: { select: { name: true, brand: true, slug: true, image_url: true, transparentImageUrl: true } } }
+      include: { user: { select: { name: true, image: true, id: true, username: true } }, perfume: { select: { name: true, brand: true, slug: true, image_url: true, transparentImageUrl: true } } }
     });
 
     const fragramPosts = await prisma.fragramPost.findMany({
       where: { userId: { in: followingIds } },
       take: 20,
       orderBy: { createdAt: 'desc' },
-      include: { user: { select: { name: true, image: true, id: true } }, perfume: { select: { name: true, brand: true, slug: true } } }
+      include: { user: { select: { name: true, image: true, id: true, username: true } }, perfume: { select: { name: true, brand: true, slug: true } } }
     });
 
     const timeline = [

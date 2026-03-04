@@ -191,10 +191,11 @@ export async function getOmnibarResults(query: string) {
           OR: [
             { name: { contains: query } },
             { email: { contains: query } },
+            { username: { contains: query } },
           ],
         },
         take: 3,
-        select: { id: true, name: true, image: true },
+        select: { id: true, name: true, image: true, username: true },
       }),
     ]);
 

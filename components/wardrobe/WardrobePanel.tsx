@@ -11,7 +11,12 @@ import {
   Trash2,
   CheckCircle,
   X,
+  Droplets,
+  Package,
+  Sparkles,
+  Crown,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { upsertWardrobeItem, removeWardrobeItem } from "@/lib/actions/decant";
@@ -22,11 +27,11 @@ import type { WardrobePerfume, WardrobeShelf as WardrobeShelfType } from "@/type
 
 type Shelf = WardrobeShelfType;
 
-const SHELVES: { key: Shelf; label: string; emoji: string; desc: string }[] = [
-  { key: "HAVE", label: "Have", emoji: "💧", desc: "Owns it" },
-  { key: "HAD", label: "Had", emoji: "📦", desc: "Owned before" },
-  { key: "WANT", label: "Want", emoji: "✨", desc: "On the wish list" },
-  { key: "SIGNATURE", label: "Signature", emoji: "👑", desc: "Go-to scent" },
+const SHELVES: { key: Shelf; label: string; icon: LucideIcon; desc: string }[] = [
+  { key: "HAVE", label: "Have", icon: Droplets, desc: "Owns it" },
+  { key: "HAD", label: "Had", icon: Package, desc: "Owned before" },
+  { key: "WANT", label: "Want", icon: Sparkles, desc: "On the wish list" },
+  { key: "SIGNATURE", label: "Signature", icon: Crown, desc: "Go-to scent" },
 ];
 
 // --- Bottle card ---------------------------------------------------------------
@@ -71,7 +76,7 @@ function BottleCard({
                 className="h-full object-contain p-1 transition-transform duration-200 group-hover:scale-105"
               />
             ) : (
-              <span className="text-[32px]">🧴</span>
+              <Droplets size={32} className="text-[var(--accent)]" />
             )}
           </div>
 
@@ -246,7 +251,7 @@ function AddModal({
                 Shelf
               </label>
               <div className="grid grid-cols-4 gap-1.5">
-                {SHELVES.map(({ key, label, emoji }) => (
+                {SHELVES.map(({ key, label, icon: Icon }) => (
                   <button
                     key={key}
                     type="button"
@@ -258,7 +263,7 @@ function AddModal({
                         : "bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-muted)]"
                     )}
                   >
-                    <span className="text-base">{emoji}</span>
+                    <Icon size={16} />
                     <span className="text-[10px] font-semibold">{label}</span>
                   </button>
                 ))}
@@ -357,7 +362,7 @@ export function WardrobePanel({
       <div
         className="flex gap-1 p-1 rounded-xl mb-5 overflow-x-auto bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--bg-glass-border)]"
       >
-        {SHELVES.map(({ key, label, emoji }) => {
+        {SHELVES.map(({ key, label, icon: Icon }) => {
           const count = items[key]?.length ?? 0;
           const isActive = activeShelf === key;
           return (
@@ -376,7 +381,7 @@ export function WardrobePanel({
                   transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-              <span className="relative">{emoji}</span>
+              <span className="relative"><Icon size={14} /></span>
               <span className="relative hidden sm:inline">{label}</span>
               {count > 0 && (
                 <span

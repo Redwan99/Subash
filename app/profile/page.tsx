@@ -1,6 +1,6 @@
 // app/profile/page.tsx
 // "My Profile" — route used by BottomNav.
-// If signed in: redirects to /user/[id]. If not: redirects to sign in.
+// If signed in: redirects to /user/[username or id]. If not: redirects to sign in.
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -14,5 +14,5 @@ export default async function ProfileRedirectPage() {
     redirect("/login?callbackUrl=/profile");
   }
 
-  redirect(`/user/${session.user.id}`);
+  redirect(`/user/${session.user.username ?? session.user.id}`);
 }

@@ -14,6 +14,22 @@ import { FollowButton } from "@/components/ui/FollowButton";
 import type { WardrobePerfume } from "@/types/wardrobe";
 import type { Metadata } from "next";
 
+// ─── Resolve user by username or CUID ──────────────────────────────────────
+
+async function resolveUserId(param: string): Promise<string | null> {
+  // If it looks like a CUID (25-char alphanumeric starting with 'c'), try id first
+  if (/^c[a-z0-9]{24,}$/i.test(param)) {
+    const u = await prisma.user.findUnique({ where: { id: param }, select: { id: true } });
+    if (u) return u.id;
+  }
+  // Otherwise try username
+  const byUsername = await prisma.user.findUnique({ where: { username: param }, select: { id: true } });
+  if (byUsername) return byUsername.id;
+  // Fallback: try id anyway (covers non-CUID id formats)
+  const byId = await prisma.user.findUnique({ where: { id: param }, select: { id: true } });
+  return byId?.id ?? null;
+}
+
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export async function generateMetadata({
@@ -22,7 +38,9 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const user = await prisma.user.findUnique({ where: { id }, select: { name: true } });
+  const userId = await resolveUserId(id);
+  if (!userId) return { title: "User Profile" };
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
   return {
     title: user?.name ? `${user.name}'s Profile` : "User Profile",
     description: "Fragrance profile on Subash community.",
@@ -69,13 +87,15 @@ export default async function UserProfilePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const { id: param } = await params;
   const session = await auth();
-  const isOwner = session?.user?.id === id;
+  const userId = await resolveUserId(param);
+  if (!userId) return notFound();
+  const isOwner = session?.user?.id === userId;
 
   const [user, wardrobeItems] = await Promise.all([
     prisma.user.findUnique({
-      where: { id },
+      where: { id: userId },
       select: {
         id: true,
         name: true,
@@ -110,7 +130,7 @@ export default async function UserProfilePage({
       },
     }),
     prisma.wardrobeItem.findMany({
-      where: { userId: id },
+      where: { userId },
       orderBy: { createdAt: "desc" },
       include: {
         perfume: true,
@@ -274,7 +294,7 @@ export default async function UserProfilePage({
 
         {/* ─── Wardrobe ──────────────────────────────────────── */}
         <section>
-          <WardrobePanel grouped={grouped} isOwner={isOwner} userId={id} />
+          <WardrobePanel grouped={grouped} isOwner={isOwner} userId={userId} />
         </section>
 
         {/* ─── Reviews ───────────────────────────────────────── */}

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useReducedMotion, motion, AnimatePresence } from "framer-motion";
-import { Bell, Star, ThumbsUp, Heart, MessageCircle } from "lucide-react";
+import { Bell, Star, ThumbsUp, Heart, MessageCircle, UserPlus } from "lucide-react";
 import { markAllNotificationsRead, markNotificationRead } from "@/lib/actions/notifications";
 
 type NotificationItem = {
@@ -84,6 +84,8 @@ export function NotificationBellClient() {
     DUPE_VOTE: <ThumbsUp className="w-4 h-4 text-blue-400" />,
     FRAGRAM_LIKE: <Heart className="w-4 h-4 text-rose-400" />,
     REVIEW_REPLY: <MessageCircle className="w-4 h-4 text-emerald-400" />,
+    COMMENT: <MessageCircle className="w-4 h-4 text-emerald-400" />,
+    FOLLOW: <UserPlus className="w-4 h-4 text-violet-400" />,
   };
 
   return (

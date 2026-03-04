@@ -44,13 +44,17 @@ export async function createNotification({
   type,
   message,
   link,
+  actorId,
 }: {
   userId: string;
   type:   string;
   message: string;
   link?:  string;
+  actorId?: string;
 }): Promise<void> {
-  // Don't notify yourself (no self-notifications)
+  // Don't notify yourself
+  if (actorId && actorId === userId) return;
+
   await prisma.notification.create({
     data: { userId, type, message, link },
   });
