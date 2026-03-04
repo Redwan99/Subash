@@ -209,10 +209,10 @@ export default async function HomePage() {
   }));
 
   return (
-    <main className="min-h-screen px-4 md:px-6 pt-20 md:pt-24 pb-20">
+    <main className="min-h-screen pt-10 md:pt-16 pb-20">
 
       {/* ── Hero Search Section ────────────────────────────────────────────── */}
-      <section className="max-w-4xl mx-auto text-center pt-8 pb-16 md:pt-16 md:pb-20">
+      <section className="max-w-4xl mx-auto text-center pt-4 pb-10 md:pt-12 md:pb-20">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight text-gray-900 dark:text-white mb-4">
           Discover Your Signature Scent.
         </h1>
@@ -246,7 +246,7 @@ export default async function HomePage() {
       </section>
 
       {/* Latest Community Reviews Grid — Masonry Layout */}
-      <section className="max-w-7xl mx-auto mt-16 md:mt-24 px-4">
+      <section className="max-w-7xl mx-auto mt-12 md:mt-24">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-2">

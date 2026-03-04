@@ -79,9 +79,9 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
 
                         <div className="flex items-center justify-center gap-6">
                             <div className="flex items-center gap-2">
-                                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--accent)] bg-white/10 shrink-0">
+                                <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-[var(--accent)] bg-white/10 shrink-0">
                                     {review.user.image ? (
-                                        <Image src={review.user.image} alt={review.user.name || "User"} fill className="object-cover" />
+                                        <Image src={review.user.image} alt={review.user.name || "User"} fill sizes="40px" className="object-cover" />
                                     ) : (
                                         <span className="flex items-center justify-center h-full text-white text-sm">{review.user.name?.[0] || "U"}</span>
                                     )}
@@ -119,11 +119,14 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <button className="p-2 rounded-full hover:bg-[var(--accent)]/10 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors">
-                            <Link href={`https://wa.me/?text=Check out this review of ${review.perfume.name} on Subash! ${process.env.NEXT_PUBLIC_SITE_URL || 'subash.com'}/review/${review.id}`}>
-                                <div className="text-xs font-bold uppercase tracking-wider">Share</div>
-                            </Link>
-                        </button>
+                        <Link
+                            href={`https://wa.me/?text=Check out this review of ${review.perfume.name} on Subash! ${process.env.NEXT_PUBLIC_SITE_URL || 'https://subash.com'}/review/${review.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-full hover:bg-[var(--accent)]/10 text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
+                        >
+                            <span className="text-xs font-bold uppercase tracking-wider">Share</span>
+                        </Link>
                     </div>
                 </div>
 

@@ -36,8 +36,9 @@ export async function markAllNotificationsRead(): Promise<{ success: boolean }> 
   return { success: true };
 }
 
-// ─── Internal helper (not exported to the client) ─────────────────────────────
-// Shared by perfume.ts and fragram.ts to DRY up notification creation.
+// ─── Internal helper ──────────────────────────────────────────────────────────
+// Used by perfume.ts and fragram.ts to DRY up notification creation.
+// Protected by auth check to prevent abuse via direct server action invocation.
 
 export async function createNotification({
   userId,
@@ -52,6 +53,10 @@ export async function createNotification({
   link?:  string;
   actorId?: string;
 }): Promise<void> {
+  // Auth guard — only allow authenticated callers
+  const session = await auth();
+  if (!session?.user?.id) return;
+
   // Don't notify yourself
   if (actorId && actorId === userId) return;
 

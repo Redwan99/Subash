@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function getFragramPosts() {
   return await prisma.fragramPost.findMany({
     orderBy: { createdAt: "desc" },
+    take: 50,
     include: {
       user: {
         select: { name: true, image: true },
@@ -20,6 +21,12 @@ export async function getFragramPosts() {
 
 export async function likeFragramPost(postId: string) {
   try {
+    const { auth } = await import("@/auth");
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Must be logged in to like" };
+    }
+
     const post = await prisma.fragramPost.update({
       where: { id: postId },
       data: {
@@ -27,9 +34,7 @@ export async function likeFragramPost(postId: string) {
       },
     });
     
-    const { auth } = await import("@/auth");
-    const session = await auth();
-    if (session?.user && session.user.id !== post.userId) {
+    if (session.user.id !== post.userId) {
       await prisma.notification.create({
         data: {
           userId: post.userId,

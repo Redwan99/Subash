@@ -67,7 +67,7 @@ export default async function CreatorsPage() {
     const allCreators = [...dbList, ...fallbackPerfumers];
 
     return (
-        <div className="min-h-screen px-4 md:px-6 py-6 max-w-7xl mx-auto">
+        <div className="min-h-screen py-6 max-w-7xl mx-auto">
             {/* Header */}
             <div className="flex items-center gap-3 mb-2">
                 <div className="w-9 h-9 rounded-xl bg-[rgba(245,158,11,0.15)] flex items-center justify-center">

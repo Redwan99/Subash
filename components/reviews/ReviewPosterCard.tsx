@@ -36,7 +36,7 @@ export default function ReviewPosterCard({ review }: ReviewCardProps) {
         review.imageUrl ||
         review.perfume?.image_url ||
         "/placeholder-perfume.jpg";
-    const rating = review.overall_rating || 5;
+    const rating = review.overall_rating ?? 5;
 
     return (
         <Link 

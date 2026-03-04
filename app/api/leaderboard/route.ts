@@ -10,7 +10,7 @@ const getCachedLeaderboard = unstable_cache(
         const startDate = new Date();
 
         if (timeframe === "today") {
-            startDate.setHours(0, 0, 0, 0);
+            startDate.setUTCHours(0, 0, 0, 0);
         } else if (timeframe === "week") {
             startDate.setDate(now.getDate() - 7);
         } else if (timeframe === "month") {
@@ -81,7 +81,7 @@ const getCachedLeaderboard = unstable_cache(
 
         return { topPerfumes, topUsers };
     },
-    ['leaderboard-cache'],
+    ['leaderboard-cache', timeframe],
     { revalidate: 3600 }
 );
 

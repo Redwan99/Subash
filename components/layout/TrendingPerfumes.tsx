@@ -80,7 +80,7 @@ export async function TrendingPerfumes() {
                                 <div className="flex items-center gap-0.5 text-brand-500 shrink-0">
                                     <Flame size={10} className="fill-current opacity-80" />
                                     <span className="text-[9px] font-bold tabular-nums">
-                                        {p.weeklySearchCount.toLocaleString()}
+                                        {(p.weeklySearchCount ?? 0).toLocaleString()}
                                     </span>
                                 </div>
                             </div>

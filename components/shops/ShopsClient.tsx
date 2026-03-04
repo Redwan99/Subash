@@ -171,7 +171,7 @@ export function ShopsClient({ shops }: { shops: Shop[] }) {
     const unverified = shops.filter((s) => !s.isVerified);
 
     return (
-        <div className="min-h-screen px-4 md:px-6 py-6 max-w-7xl mx-auto">
+        <div className="min-h-screen py-6 max-w-7xl mx-auto">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">
                 <div className="w-9 h-9 rounded-xl bg-[rgba(232,67,147,0.15)] flex items-center justify-center">

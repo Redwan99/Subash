@@ -158,7 +158,8 @@ export function RightSidebar() {
       </div>
 
       {/* Footer: Trending */}
-      <div className="px-4 py-4 border-t border-[linear-gradient(90deg,transparent,var(--border-color),transparent)]">
+      <div className="px-4 py-4">
+        <div className="h-px w-full mb-4 bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)]" />
         <p className="text-[10px] font-semibold tracking-widest uppercase mb-2 text-[var(--text-muted)]">Trending This Week</p>
         <div className="space-y-1.5">
           {trending.length > 0

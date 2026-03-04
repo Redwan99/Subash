@@ -152,17 +152,28 @@ function LeaderRow({
             {/* Badge label */}
             <span
               className={cn(
-                "shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full",
+                "shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-0.5",
                 badge.gradientClass
                   ? cn(
-                      "[background-clip:text] [-webkit-background-clip:text] [-webkit-text-fill-color:transparent] border border-[#E84393]/20",
-                      badge.gradientClass,
+                      "border border-[#E84393]/20",
                       badge.shadowClass
                     )
                   : "text-[var(--text-muted)] border border-[var(--border-color)]"
               )}
             >
-              <badge.icon className="w-3.5 h-3.5 inline mr-0.5" /> {badge.label}
+              <badge.icon className={cn(
+                "w-3.5 h-3.5 shrink-0",
+                badge.gradientClass ? "text-[var(--accent)]" : ""
+              )} />
+              <span
+                className={cn(
+                  badge.gradientClass
+                    ? cn("[background-clip:text] [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]", badge.gradientClass)
+                    : ""
+                )}
+              >
+                {badge.label}
+              </span>
             </span>
           </div>
           {/* Role chip */}
@@ -193,18 +204,23 @@ function LeaderRow({
 // --- Page ----------------------------------------------------------------------
 
 export default async function LeaderboardsPage() {
-  const users = await prisma.user.findMany({
-    orderBy: { review_count: "desc" },
-    take: 50,
-    select: {
-      id:           true,
-      name:         true,
-      username:     true,
-      image:        true,
-      review_count: true,
-      role:         true,
-    },
-  });
+  let users: { id: string; name: string | null; username: string | null; image: string | null; review_count: number; role: string }[] = [];
+  try {
+    users = await prisma.user.findMany({
+      orderBy: { review_count: "desc" },
+      take: 50,
+      select: {
+        id:           true,
+        name:         true,
+        username:     true,
+        image:        true,
+        review_count: true,
+        role:         true,
+      },
+    });
+  } catch (error) {
+    console.error("[leaderboards] Failed to fetch users:", error);
+  }
 
   const tiers: { label: string; icon: LucideIcon; min: number; gradientClass: string }[] = [
     { label: "VIP Nose",    icon: Crown,  min: 150, gradientClass: "bg-[linear-gradient(135deg,#E84393,#F783AC)]" },
