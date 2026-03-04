@@ -1,5 +1,5 @@
 // app/decants/page.tsx
-// Phase 5 â€” Global Decant Exchange (server component)
+// Phase 5 — Global Decant Exchange (server component)
 // Lists all AVAILABLE decant listings; client sub-component handles sort toggle.
 
 import prisma from "@/lib/prisma";
@@ -105,7 +105,7 @@ export default async function DecantMarketPage() {
 }
 
 export const metadata = {
-  title: "The Decant Exchange â€” Subash",
+  title: "The Decant Exchange — Subash",
   description:
     "Browse authentic fragrance decants from verified sellers in Bangladesh's fragrance community.",
 };

@@ -50,7 +50,7 @@ const WearingStatusModal = dynamic(
 const NAV_LINKS: { href: string; icon: LucideIcon; label: string }[] = [
   { href: "/leaderboards", icon: Trophy, label: "Leaderboards" },
   { href: "/fragram", icon: Camera, label: "Fragram" },
-  { href: "/encyclopedia", icon: BookOpen, label: "Encyclopedia" },
+  { href: "/perfume", icon: Droplet, label: "Perfumes" },
   { href: "/creators", icon: Users2, label: "Creators" },
   { href: "/shops", icon: Store, label: "Boutiques" },
   { href: "/decants", icon: ShoppingBag, label: "Decants" },
@@ -308,9 +308,13 @@ export function TopNavbar({ featureToggles }: { featureToggles?: Record<string, 
         {/* Nav links — hidden on very small screens */}
         <nav className="hidden sm:flex items-center gap-0.5">
           {NAV_LINKS.filter(l => {
-            if (l.label === "Encyclopedia" && featureToggles?.ENABLE_ENCYCLOPEDIA === false) return false;
+            if (l.label === "Perfumes" && featureToggles?.ENABLE_ENCYCLOPEDIA === false) return false;
             if (l.label === "Creators" && featureToggles?.ENABLE_CREATORS === false) return false;
             if (l.label === "Boutiques" && featureToggles?.ENABLE_SHOPS === false) return false;
+            if (l.label === "Decants" && featureToggles?.ENABLE_DECANTS === false) return false;
+            if (l.label === "Leaderboards" && featureToggles?.ENABLE_LEADERBOARDS === false) return false;
+            if (l.label === "Fragram" && featureToggles?.ENABLE_FRAGRAM === false) return false;
+            if (l.label === "Wardrobe" && featureToggles?.ENABLE_WARDROBE === false) return false;
             return true;
           }).map(({ href, icon, label }) => {
             const current = pathname || "";

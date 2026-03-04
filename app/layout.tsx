@@ -2,6 +2,7 @@
 import { Inter, Playfair_Display } from "next/font/google";
 import { Providers } from "./providers";
 import { TopNavbar } from "@/components/layout/TopNavbar";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import "./globals.css";
 
 const inter = Inter({
@@ -97,6 +98,8 @@ export default async function RootLayout({
               {children}
             </div>
           </div>
+          {/* Floating Chat Widget — shown globally */}
+          {featureToggles.ENABLE_AI_BOT !== false && <ChatWidget />}
         </Providers>
       </body>
     </html>

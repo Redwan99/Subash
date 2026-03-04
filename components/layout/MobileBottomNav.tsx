@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, BookOpen, User, Droplet } from "lucide-react";
+import { Home, Compass, Droplet, User } from "lucide-react";
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -11,7 +11,7 @@ export default function MobileBottomNav() {
     { name: "Home", path: "/", icon: Home },
     { name: "Reviews", path: "/reviews", icon: Compass },
     { name: "Status", path: "#status", icon: Droplet, isAction: true },
-    { name: "Lexicon", path: "/encyclopedia", icon: BookOpen },
+    { name: "Perfumes", path: "/perfume", icon: Droplet },
     { name: "Profile", path: "/profile", icon: User },
   ];
 

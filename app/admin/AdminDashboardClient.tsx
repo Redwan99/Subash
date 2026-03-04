@@ -7,8 +7,8 @@ import Image from "next/image";
 import {
     Users, Star, Sparkles, ShieldAlert, Trash2, Crown,
     BarChart3, ShieldCheck, AlertTriangle, CheckCircle2,
-    ChevronDown, Search, RefreshCw, Settings2, Power, Store, BookOpen, Users2, Activity,
-    Briefcase, Database
+    ChevronDown, Search, RefreshCw, Settings2, Power, Store, Droplet, Users2, Activity,
+    Briefcase, Database, Globe, Camera, Trophy, Layers, MessageCircle, ShoppingBag
 } from "lucide-react";
 import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus } from "@/lib/actions/admin";
 import type { Role, FeatureToggle } from "@prisma/client";
@@ -400,6 +400,11 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
             "ENABLE_SHOPS": true,
             "ENABLE_ENCYCLOPEDIA": true,
             "ENABLE_CREATORS": true,
+            "ENABLE_DECANTS": true,
+            "ENABLE_LEADERBOARDS": true,
+            "ENABLE_FRAGRAM": true,
+            "ENABLE_WARDROBE": true,
+            "MAINTENANCE_MODE": false,
         };
         // Override with DB values if they exist
         if (featureToggles && featureToggles.length > 0) {
@@ -563,10 +568,15 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[
-                                { key: "ENABLE_AI_BOT", label: "ScentBot AI", desc: "Global access to the AI Fragrance Assistant", icon: <Sparkles size={16} /> },
+                                { key: "ENABLE_AI_BOT", label: "ScentBot AI", desc: "Global access to the AI Fragrance Assistant", icon: <MessageCircle size={16} /> },
+                                { key: "ENABLE_ENCYCLOPEDIA", label: "Perfumes", desc: "Main fragrance discovery grid and filters", icon: <Droplet size={16} /> },
                                 { key: "ENABLE_SHOPS", label: "Boutiques Hub", desc: "Verified sellers and shop directory", icon: <Store size={16} /> },
-                                { key: "ENABLE_ENCYCLOPEDIA", label: "Perfume Encyclopedia", desc: "Main fragrance discovery grid and filters", icon: <BookOpen size={16} /> },
-                                { key: "ENABLE_CREATORS", label: "Creators Network", desc: "Master perfumers and brand directories", icon: <Users2 size={16} /> }
+                                { key: "ENABLE_CREATORS", label: "Creators Network", desc: "Master perfumers and brand directories", icon: <Users2 size={16} /> },
+                                { key: "ENABLE_DECANTS", label: "Decant Exchange", desc: "Peer-to-peer decant marketplace", icon: <ShoppingBag size={16} /> },
+                                { key: "ENABLE_LEADERBOARDS", label: "Leaderboards", desc: "Reviewer rankings and gamification", icon: <Trophy size={16} /> },
+                                { key: "ENABLE_FRAGRAM", label: "Fragram", desc: "Photo-sharing fragrance community", icon: <Camera size={16} /> },
+                                { key: "ENABLE_WARDROBE", label: "Wardrobe", desc: "Personal fragrance collection shelves", icon: <Layers size={16} /> },
+                                { key: "MAINTENANCE_MODE", label: "Maintenance Mode", desc: "Show maintenance page to all non-admin users", icon: <Globe size={16} /> },
                             ].map(feature => (
                                 <div key={feature.key} className="flex items-center justify-between p-5 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.015)] hover:bg-[rgba(255,255,255,0.03)] transition-colors">
                                     <div className="flex gap-3">

@@ -15,7 +15,7 @@ export function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const [mounted, setMounted] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
-  // Avoid hydration mismatch â€” only render after mount
+  // Avoid hydration mismatch — only render after mount
   useEffect(() => setMounted(true), []);
   if (!mounted) {
     return <div className="w-14 h-7 rounded-full bg-[var(--border-color)]" />;
