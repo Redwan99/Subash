@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { Search, Loader2, User as UserIcon } from "lucide-react";
+import { Search, Loader2, User as UserIcon, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { getOmnibarResults } from "@/lib/actions/search";
@@ -13,6 +13,7 @@ interface PerfumeResult {
   brand: string;
   image_url: string | null;
   transparentImageUrl: string | null;
+  searchCount: number;
 }
 
 interface UserResult {
@@ -126,9 +127,17 @@ export default function GlobalSearch() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-brand-500 transition-colors">
-                        {perfume.name}
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-bold text-gray-900 dark:text-white truncate group-hover:text-brand-500 transition-colors">
+                          {perfume.name}
+                        </p>
+                        {perfume.searchCount > 0 && results.perfumes.indexOf(perfume) < 3 && (
+                          <span className="flex items-center gap-0.5 shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                            <TrendingUp size={8} />
+                            Trending
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-500 truncate">{perfume.brand}</p>
                     </div>
                   </Link>

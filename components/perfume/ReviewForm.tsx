@@ -245,9 +245,11 @@ function SignInCTA() {
 export function ReviewForm({
   perfumeId,
   onSubmitted,
+  embedded = false,
 }: {
   perfumeId: string;
   onSubmitted?: () => void;
+  embedded?: boolean;
 }) {
   const { data: session } = useSession();
   const shouldReduceMotion = useReducedMotion();
@@ -308,10 +310,12 @@ export function ReviewForm({
   };
 
   return (
-    <div className="rounded-2xl p-6 bg-[var(--bg-glass)] backdrop-blur-[10px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]">
-      <h2 className="text-lg font-bold mb-5 text-[var(--text-primary)]">
-        Write a Review
-      </h2>
+    <div className={embedded ? '' : 'rounded-2xl p-6 bg-[var(--bg-glass)] backdrop-blur-[10px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]'}>
+      {!embedded && (
+        <h2 className="text-lg font-bold mb-5 text-[var(--text-primary)]">
+          Write a Review
+        </h2>
+      )}
 
       {/* Status feedback */}
       {state && (

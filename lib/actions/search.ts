@@ -176,7 +176,8 @@ export async function getOmnibarResults(query: string) {
             { brand: { contains: query } },
           ],
         },
-        take: 5,
+        orderBy: { searchCount: "desc" },
+        take: 8,
         select: {
           id: true,
           slug: true,
@@ -184,6 +185,7 @@ export async function getOmnibarResults(query: string) {
           brand: true,
           image_url: true,
           transparentImageUrl: true,
+          searchCount: true,
         },
       }),
       prisma.user.findMany({

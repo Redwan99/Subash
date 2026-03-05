@@ -127,53 +127,94 @@ const getLatestReviews = unstable_cache(
 );
 
 
-async function getClimatePicks(climateTags: string[]) {
-  const climateWhere = climateTags.length
-    ? {
-        OR: climateTags.map((tag) => ({ weather_tags: { contains: `"${tag}"` } })),
-      }
-    : undefined;
+// Map climate tags to fragrance accords that suit the weather
+const CLIMATE_ACCORD_MAP: Record<string, string[]> = {
+  HOT: ["citrus", "aquatic", "fresh", "ozonic", "green", "aromatic"],
+  COLD: ["amber", "vanilla", "woody", "warm spicy", "oud", "balsamic", "tobacco"],
+  MILD: ["floral", "rose", "powdery", "musk", "violet", "lavender"],
+  HUMID: ["aquatic", "fresh", "ozonic", "citrus", "marine"],
+  DRY: ["woody", "leather", "aromatic", "earthy", "vetiver"],
+  RAINY: ["petrichor", "earthy", "green", "woody", "musk", "moss"],
+};
 
-  // Parallel: run groupBy and a fallback prefetch together — if groupBy
-  // returns results we discard the fallback; if not, it's already ready.
+async function getClimatePicks(climateTags: string[]) {
+  const TARGET = 12;
   try {
-    const [grouped, fallback] = await Promise.all([
-      prisma.review.groupBy({
-        by: ["perfumeId"],
-        where: climateWhere,
-        _avg: { overall_rating: true },
-        _count: { id: true },
-        orderBy: [{ _avg: { overall_rating: "desc" } }, { _count: { id: "desc" } }],
-        take: 12,
-      }),
+    // 1) Exact matches: reviews with matching weather tags
+    const climateWhere = climateTags.length
+      ? { OR: climateTags.map((tag) => ({ weather_tags: { contains: `"${tag}"` } })) }
+      : undefined;
+
+    const [grouped, accordPerfumes, fallback] = await Promise.all([
+      // Reviews with exact weather tag match
+      climateWhere
+        ? prisma.review.groupBy({
+            by: ["perfumeId"],
+            where: climateWhere,
+            _avg: { overall_rating: true },
+            _count: { id: true },
+            orderBy: [{ _avg: { overall_rating: "desc" } }, { _count: { id: "desc" } }],
+            take: TARGET,
+          })
+        : Promise.resolve([]),
+      // 2) Accord-based: perfumes with climate-appropriate accords
+      (async () => {
+        const accords = climateTags.flatMap((t) => CLIMATE_ACCORD_MAP[t] ?? []);
+        if (!accords.length) return [];
+        return prisma.perfume.findMany({
+          where: { OR: accords.map((a) => ({ accords: { contains: a } })) },
+          select: { id: true, slug: true, name: true, brand: true, image_url: true },
+          orderBy: { searchCount: "desc" },
+          take: TARGET,
+        }) as Promise<PerfumeCard[]>;
+      })(),
+      // 3) Trending fallback
       prisma.perfume.findMany({
         select: { id: true, slug: true, name: true, brand: true, image_url: true },
-        orderBy: [{ release_year: "desc" }, { name: "asc" }],
-        take: 12,
-      }),
+        orderBy: { searchCount: "desc" },
+        take: TARGET,
+      }) as Promise<PerfumeCard[]>,
     ]);
 
-    if (!grouped.length) {
-      return (fallback as PerfumeCard[]).map((p) => ({ ...p, rating: 0, reviewCount: 0 }));
+    const seen = new Set<string>();
+    const results: Array<{ id: string; slug: string; name: string; brand: string; image_url: string | null; rating: number; reviewCount: number }> = [];
+
+    // Add exact weather-tag matches first
+    if (grouped.length) {
+      const ids = grouped.map((g) => g.perfumeId);
+      const perfumes = (await prisma.perfume.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, slug: true, name: true, brand: true, image_url: true },
+      })) as PerfumeCard[];
+      const byId = new Map(perfumes.map((p) => [p.id, p]));
+      for (const g of grouped) {
+        const p = byId.get(g.perfumeId);
+        if (p && !seen.has(p.id)) {
+          seen.add(p.id);
+          results.push({ ...p, rating: g._avg?.overall_rating ?? 0, reviewCount: g._count?.id ?? 0 });
+        }
+      }
     }
 
-    const ids = grouped.map((g) => g.perfumeId);
-    const perfumes = (await prisma.perfume.findMany({
-      where: { id: { in: ids } },
-      select: { id: true, slug: true, name: true, brand: true, image_url: true },
-    })) as PerfumeCard[];
+    // Fill with accord-based matches
+    for (const p of accordPerfumes) {
+      if (results.length >= TARGET) break;
+      if (!seen.has(p.id)) {
+        seen.add(p.id);
+        results.push({ ...p, rating: 0, reviewCount: 0 });
+      }
+    }
 
-    const byId = new Map(perfumes.map((p) => [p.id, p]));
-    return grouped
-      .map((g) => {
-        const perfume = byId.get(g.perfumeId);
-        if (!perfume) return null;
-        return { ...perfume, rating: g._avg?.overall_rating ?? 0, reviewCount: g._count?.id ?? 0 };
-      })
-      .filter(Boolean) as Array<{
-        id: string; slug: string; name: string; brand: string;
-        image_url: string | null; rating: number; reviewCount: number;
-      }>;
+    // Fill remaining with trending
+    for (const p of fallback) {
+      if (results.length >= TARGET) break;
+      if (!seen.has(p.id)) {
+        seen.add(p.id);
+        results.push({ ...p, rating: 0, reviewCount: 0 });
+      }
+    }
+
+    return results;
   } catch (error) {
     console.warn("[homepage] climate picks fallback to empty (DB unavailable)", error);
     return [];

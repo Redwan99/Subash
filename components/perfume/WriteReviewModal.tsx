@@ -1,13 +1,13 @@
 "use client";
 
 // components/perfume/WriteReviewModal.tsx
-// Lightweight wrapper for cases where we may want
-// a standalone modal trigger separate from ScentProfile.
+// Floating review modal — portals to document.body to escape all stacking contexts.
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import { PenSquare, X, Star } from "lucide-react";
+import { PenSquare, X, Star, Sparkles } from "lucide-react";
 
 const ReviewForm = dynamic(
   () => import("./ReviewForm").then((m) => m.ReviewForm),
@@ -16,6 +16,10 @@ const ReviewForm = dynamic(
 
 export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; variant?: 'cta' | 'default' }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure we only portal after client mount
+  useEffect(() => { setMounted(true); }, []);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -25,8 +29,92 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
     }
   }, [open]);
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open]);
+
   const isCta = variant === 'cta';
   const ButtonIcon = isCta ? Star : PenSquare;
+
+  const modal = (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[99999] flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          style={{ isolation: 'isolate' }}
+        >
+          {/* Backdrop */}
+          <motion.div
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            onClick={() => setOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          />
+
+          {/* Modal panel */}
+          <motion.div
+            className="relative w-[94vw] max-w-3xl max-h-[88vh] flex flex-col rounded-3xl overflow-hidden border border-white/[0.08] shadow-[0_32px_80px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05),inset_0_1px_0_rgba(255,255,255,0.06)]"
+            style={{
+              background: 'linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-base) 100%)',
+            }}
+            initial={{ scale: 0.92, opacity: 0, y: 30 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          >
+            {/* Accent gradient bar */}
+            <div className="h-[3px] w-full bg-[linear-gradient(90deg,#E84393,#D6336C,#F783AC,#E84393)] shrink-0" />
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#E84393,#D6336C)] shadow-[0_4px_16px_rgba(232,67,147,0.3)]">
+                  <Sparkles size={16} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-[var(--text-primary)] leading-tight">
+                    Write a Review
+                  </h2>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    Share your honest impression
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-xl text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-white/[0.06] transition-all"
+                aria-label="Close review"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mx-4 shrink-0" />
+
+            {/* Form body — scrollable */}
+            <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-5">
+              <ReviewForm
+                perfumeId={perfumeId}
+                onSubmitted={() => setOpen(false)}
+                embedded
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
     <>
@@ -47,50 +135,7 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
         )}
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/40 backdrop-blur-sm px-4 pt-[5vh] sm:pt-[8vh] overflow-y-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
-          >
-            <motion.div
-              className="relative max-w-4xl w-full max-h-[90vh] overflow-hidden rounded-2xl bg-[var(--bg-elevated)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]"
-              initial={{ scale: 0.9, opacity: 0, y: 12 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 12 }}
-              transition={{ type: "spring", stiffness: 260, damping: 24 }}
-            >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--bg-glass-border)] bg-[var(--bg-glass)]/80 backdrop-blur-sm">
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
-                    Quick Review
-                  </span>
-                  <span className="text-sm font-bold text-[var(--text-primary)]">
-                    {"Share your impression"}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--bg-glass-border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition-colors"
-                  aria-label="Close review"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-              <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-52px)]">
-                <ReviewForm
-                  perfumeId={perfumeId}
-                  onSubmitted={() => setOpen(false)}
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {mounted && createPortal(modal, document.body)}
     </>
   );
 }

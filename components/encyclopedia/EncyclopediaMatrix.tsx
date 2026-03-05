@@ -206,10 +206,22 @@ const PerfumeCard = React.memo(function PerfumeCard({ perfume }: { perfume: any 
   );
 });
 
+interface TrendingPerfume {
+  id: string;
+  slug: string;
+  name: string;
+  brand: string;
+  image_url: string | null;
+  transparentImageUrl: string | null;
+  weeklySearchCount: number;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function EncyclopediaMatrix({ initialData }: { initialData: any[] }) {
+export default function EncyclopediaMatrix({ initialData, monthlyTrending = [] }: { initialData: any[]; monthlyTrending?: TrendingPerfume[] }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [results, setResults] = useState<any[]>(initialData);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [trendingResults, setTrendingResults] = useState<any[]>([]);
   const [isPending, startTransition] = useTransition();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -255,18 +267,28 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
     take: PAGE_SIZE,
   }), [selectedAccords, sort, gender, mood, weatherTags, timeTags, debouncedNotes]);
 
+  const hasActiveFilters = selectedAccords.length > 0 || !!gender || !!mood || weatherTags.length > 0 || timeTags.length > 0 || !!debouncedNotes;
+
   // Fetch when filters change — resets results
   useEffect(() => {
     filtersVersion.current += 1;
     const version = filtersVersion.current;
     startTransition(() => {
-      searchEncyclopedia({ ...buildFilterParams(), skip: 0 }).then(data => {
+      const mainPromise = searchEncyclopedia({ ...buildFilterParams(), skip: 0 });
+      // Fetch trending for this filter set when sort isn't already trending and filters are active
+      const needsTrending = sort !== "trending" && hasActiveFilters;
+      const trendingPromise = needsTrending
+        ? searchEncyclopedia({ ...buildFilterParams(), sort: "trending", skip: 0, take: 8 })
+        : Promise.resolve([]);
+
+      Promise.all([mainPromise, trendingPromise]).then(([data, trending]) => {
         if (filtersVersion.current !== version) return;
         setResults(data);
+        setTrendingResults(trending);
         setHasMore(data.length >= PAGE_SIZE);
       });
     });
-  }, [buildFilterParams]);
+  }, [buildFilterParams, sort, hasActiveFilters]);
 
   // Infinite scroll — load more when sentinel is visible
   useEffect(() => {
@@ -555,6 +577,92 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
               <button onClick={() => setNotesQuery("")} className="hover:text-red-400 transition-colors"><X size={10} /></button>
             </span>
           )}
+        </div>
+      )}
+
+      {/* ── Monthly Trending section (always visible when no filters) ── */}
+      {!isPending && !hasActiveFilters && monthlyTrending.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose-500/20 to-orange-500/20 flex items-center justify-center">
+              <Flame size={14} className="text-rose-400" />
+            </div>
+            <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-wide">
+              Trending This Month
+            </h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-rose-500/20 to-transparent" />
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-[var(--accent)]/20 scrollbar-track-transparent -mx-1 px-1">
+            {monthlyTrending.map((perfume, i) => (
+              <Link
+                key={`monthly-${perfume.id}`}
+                href={`/perfume/${perfume.slug}`}
+                className="flex-shrink-0 w-36 sm:w-40 group"
+              >
+                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-b from-rose-500/5 to-transparent border border-rose-500/15 hover:border-rose-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-rose-500/10">
+                  <Image
+                    src={perfume.transparentImageUrl || perfume.image_url || ''}
+                    alt={perfume.name}
+                    fill
+                    className="object-contain p-3 drop-shadow-lg group-hover:scale-105 transition-transform duration-500"
+                    sizes="160px"
+                    loading={i < 4 ? "eager" : "lazy"}
+                  />
+                  <div className="absolute top-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-rose-500/15 backdrop-blur-sm border border-rose-500/20">
+                    <Flame size={9} className="text-rose-400" />
+                    <span className="text-[8px] font-bold text-rose-400 uppercase tracking-wider">#{i + 1}</span>
+                  </div>
+                </div>
+                <div className="mt-2 px-0.5">
+                  <p className="text-xs font-semibold text-[var(--text-primary)] line-clamp-1 group-hover:text-rose-400 transition-colors">{perfume.name}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] line-clamp-1">{perfume.brand}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Trending section when filters active ── */}
+      {!isPending && trendingResults.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+              <TrendingUp size={14} className="text-amber-400" />
+            </div>
+            <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-wide">
+              Trending in your search
+            </h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-amber-500/20 to-transparent" />
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-[var(--accent)]/20 scrollbar-track-transparent -mx-1 px-1">
+            {trendingResults.map(perfume => (
+              <Link
+                key={`trending-${perfume.id}`}
+                href={`/perfume/${perfume.slug}`}
+                className="flex-shrink-0 w-36 sm:w-40 group"
+              >
+                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-b from-amber-500/5 to-transparent border border-amber-500/15 hover:border-amber-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10">
+                  <Image
+                    src={perfume.transparentImageUrl || perfume.image_url}
+                    alt={perfume.name}
+                    fill
+                    className="object-contain p-3 drop-shadow-lg group-hover:scale-105 transition-transform duration-500"
+                    sizes="160px"
+                    loading="lazy"
+                  />
+                  <div className="absolute top-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-500/15 backdrop-blur-sm border border-amber-500/20">
+                    <TrendingUp size={9} className="text-amber-400" />
+                    <span className="text-[8px] font-bold text-amber-400 uppercase tracking-wider">Hot</span>
+                  </div>
+                </div>
+                <div className="mt-2 px-0.5">
+                  <p className="text-xs font-semibold text-[var(--text-primary)] line-clamp-1 group-hover:text-amber-400 transition-colors">{perfume.name}</p>
+                  <p className="text-[10px] text-[var(--text-muted)] line-clamp-1">{perfume.brand}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

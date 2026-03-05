@@ -31,47 +31,88 @@ function pickWeatherTheme(tags: string[], hour: number): string {
   return "theme-rose";
 }
 
+// Map climate tags to fragrance accords that suit the weather
+const CLIMATE_ACCORD_MAP: Record<string, string[]> = {
+  HOT: ["citrus", "aquatic", "fresh", "ozonic", "green", "aromatic"],
+  COLD: ["amber", "vanilla", "woody", "warm spicy", "oud", "balsamic", "tobacco"],
+  MILD: ["floral", "rose", "powdery", "musk", "violet", "lavender"],
+  HUMID: ["aquatic", "fresh", "ozonic", "citrus", "marine"],
+  DRY: ["woody", "leather", "aromatic", "earthy", "vetiver"],
+  RAINY: ["petrichor", "earthy", "green", "woody", "musk", "moss"],
+};
+
 async function _getClimatePicks(climateTags: string[]) {
+  const TARGET = 12;
+
   const climateWhere = climateTags.length
-    ? {
-        OR: climateTags.map((tag) => ({ weather_tags: { contains: `"${tag}"` } })),
-      }
+    ? { OR: climateTags.map((tag) => ({ weather_tags: { contains: `"${tag}"` } })) }
     : undefined;
 
-  // Parallel: groupBy + fallback prefetch run together
-  const [grouped, fallback] = await Promise.all([
-    prisma.review.groupBy({
-      by: ["perfumeId"],
-      where: climateWhere,
-      _avg: { overall_rating: true },
-      _count: { id: true },
-      orderBy: [{ _avg: { overall_rating: "desc" } }, { _count: { id: "desc" } }],
-      take: 12,
-    }),
+  const [grouped, accordPerfumes, fallback] = await Promise.all([
+    climateWhere
+      ? prisma.review.groupBy({
+          by: ["perfumeId"],
+          where: climateWhere,
+          _avg: { overall_rating: true },
+          _count: { id: true },
+          orderBy: [{ _avg: { overall_rating: "desc" } }, { _count: { id: "desc" } }],
+          take: TARGET,
+        })
+      : Promise.resolve([]),
+    (async () => {
+      const accords = climateTags.flatMap((t) => CLIMATE_ACCORD_MAP[t] ?? []);
+      if (!accords.length) return [];
+      return prisma.perfume.findMany({
+        where: { OR: accords.map((a) => ({ accords: { contains: a } })) },
+        select: { id: true, slug: true, name: true, brand: true, image_url: true },
+        orderBy: { searchCount: "desc" },
+        take: TARGET,
+      });
+    })(),
     prisma.perfume.findMany({
       select: { id: true, slug: true, name: true, brand: true, image_url: true },
-      orderBy: [{ release_year: "desc" }, { name: "asc" }],
-      take: 12,
+      orderBy: { searchCount: "desc" },
+      take: TARGET,
     }),
   ]);
 
-  if (!grouped.length) {
-    return fallback.map((p) => ({ ...p, rating: 0, reviewCount: 0 }));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const seen = new Set<string>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const results: any[] = [];
+
+  if (grouped.length) {
+    const perfumes = await prisma.perfume.findMany({
+      where: { id: { in: grouped.map((g) => g.perfumeId) } },
+      select: { id: true, slug: true, name: true, brand: true, image_url: true },
+    });
+    const byId = new Map(perfumes.map((p) => [p.id, p]));
+    for (const g of grouped) {
+      const p = byId.get(g.perfumeId);
+      if (p && !seen.has(p.id)) {
+        seen.add(p.id);
+        results.push({ ...p, rating: g._avg?.overall_rating ?? 0, reviewCount: g._count?.id ?? 0 });
+      }
+    }
   }
 
-  const perfumes = await prisma.perfume.findMany({
-    where: { id: { in: grouped.map((g) => g.perfumeId) } },
-    select: { id: true, slug: true, name: true, brand: true, image_url: true },
-  });
+  for (const p of accordPerfumes) {
+    if (results.length >= TARGET) break;
+    if (!seen.has(p.id)) {
+      seen.add(p.id);
+      results.push({ ...p, rating: 0, reviewCount: 0 });
+    }
+  }
 
-  const byId = new Map(perfumes.map((p) => [p.id, p]));
-  return grouped
-    .map((g) => {
-      const p = byId.get(g.perfumeId);
-      if (!p) return null;
-      return { ...p, rating: g._avg?.overall_rating ?? 0, reviewCount: g._count?.id ?? 0 };
-    })
-    .filter(Boolean);
+  for (const p of fallback) {
+    if (results.length >= TARGET) break;
+    if (!seen.has(p.id)) {
+      seen.add(p.id);
+      results.push({ ...p, rating: 0, reviewCount: 0 });
+    }
+  }
+
+  return results;
 }
 
 // Cache picks per unique tag combination for 30 min, tagged for revalidation
