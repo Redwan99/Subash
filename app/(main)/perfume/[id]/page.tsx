@@ -352,6 +352,20 @@ export default async function PerfumePage({
           />
         </section>
 
+        {/* ── Write Review CTA ──────────────────────────────── */}
+        <section className="flex items-center justify-between rounded-2xl border border-[var(--bg-glass-border)] bg-[var(--bg-glass)] backdrop-blur-xl px-5 py-4 shadow-[var(--shadow-glass)]">
+          <div>
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">Tried this fragrance?</h3>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">Share your experience with the community.</p>
+          </div>
+          <a
+            href="#review-form"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#E84393,#D6336C)] shadow-[0_2px_12px_rgba(232,67,147,0.3)] hover:shadow-[0_4px_20px_rgba(232,67,147,0.5)] transition-all"
+          >
+            <Star size={14} /> Write a Review
+          </a>
+        </section>
+
         {/* ── User Reviews ─────────────────────────────────────── */}
         {reviewCount > 0 && (
           <section className="rounded-3xl border border-[var(--bg-glass-border)] bg-[var(--bg-glass)] backdrop-blur-xl p-6 shadow-[var(--shadow-glass)]">

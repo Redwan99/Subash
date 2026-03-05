@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { requestPasswordReset, resetPassword, type ActionResult } from "@/lib/actions/auth";
+import { requestPasswordReset, resetPassword } from "@/lib/actions/auth";
 
 function RequestResetForm() {
   const [state, formAction, pending] = useActionState(requestPasswordReset, null);

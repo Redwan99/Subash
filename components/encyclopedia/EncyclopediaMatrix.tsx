@@ -189,7 +189,7 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
 
   // Pagination
   // Show all perfumes at once, no pagination
-  const [hasMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filtersVersion = useRef(0); // track filter changes to discard stale fetches
 
@@ -542,7 +542,7 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
       {/* Infinite scroll sentinel */}
       {!isPending && hasMore && (
         <div ref={sentinelRef} className="flex items-center justify-center py-10">
-          {loadingMore && <Loader2 className="w-6 h-6 text-[var(--accent)] animate-spin" />}
+          <Loader2 className="w-6 h-6 text-[var(--accent)] animate-spin" />
         </div>
       )}
       {!isPending && !hasMore && results.length > 0 && (

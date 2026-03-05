@@ -1,5 +1,6 @@
 ﻿import { TrendingPerfumes } from "./TrendingPerfumes";
 import { ScentOfTheDay } from "./ScentOfTheDay";
+import { PlatformStats } from "./PlatformStats";
 
 export async function LeftSidebar() {
   return (
@@ -11,8 +12,8 @@ export async function LeftSidebar() {
         {/* Trending Section */}
         <TrendingPerfumes />
 
-        {/* Platform Stats - moved below TrendingPerfumes */}
-        {/* TODO: Import and render PlatformStats component here, or fetch stats and render inline */}
+        {/* Platform Stats */}
+        <PlatformStats />
       </div>
 
       <p className="text-center text-[10px] py-4 shrink-0 text-[var(--text-muted)] border-t border-black/10 dark:border-white/10">
