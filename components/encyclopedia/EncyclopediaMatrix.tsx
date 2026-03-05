@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useTransition, useRef, useCallback, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { searchEncyclopedia } from "@/lib/actions/encyclopedia";
 import Image from "next/image";
 import Link from "next/link";
@@ -186,6 +187,13 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
   const [results, setResults] = useState<any[]>(initialData);
   const [isPending, startTransition] = useTransition();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Portal target for rendering filters in the left sidebar
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const el = document.getElementById("matrix-filter-portal");
+    setPortalTarget(el);
+  }, []);
 
   // Pagination
   // Show all perfumes at once, no pagination
@@ -415,12 +423,8 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
 
   return (
     <>
-      {/* ── Desktop: Fixed filter panel replacing LeftSidebar ── */}
-      <aside className="hidden lg:flex fixed left-0 top-[var(--topnav-height,60px)] h-[calc(100vh-var(--topnav-height,60px))] w-[var(--sidebar-width)] z-[42] flex-col overflow-y-auto bg-[var(--bg-glass)] backdrop-blur-xl border-r border-[var(--bg-glass-border)] [scrollbar-width:thin] [-ms-overflow-style:none]">
-        <div className="p-4 space-y-0 flex-1 pt-5">
-          {filterContent}
-        </div>
-      </aside>
+      {/* ── Desktop: Portal filter content into left sidebar ── */}
+      {portalTarget && createPortal(filterContent, portalTarget)}
 
       {/* ── Mobile: Collapsible filter drawer ── */}
       <div className="lg:hidden mb-4">

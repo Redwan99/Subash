@@ -184,33 +184,39 @@ export default async function HomePage() {
   const city = process.env.NEXT_PUBLIC_DEFAULT_CITY ?? "Dhaka";
 
   // Fan out: weather + trending + reviews all start at the same time.
-  // climatePicks depends on weather tags — it starts after weather resolves,
-  // but by then trending and reviews are already in flight.
+  // Each fetch is individually guarded — a single failure cannot crash the page.
 
   const [weather, trending, latestReviews, session, followingFeed] = await Promise.all([
-      getWeather(city),
-      getCachedTrendingPerfumes(12, 7),
-      getLatestReviews(),
+      getWeather(city).catch(() => null),
+      getCachedTrendingPerfumes(12, 7).catch(() => [] as TrendingPerfumeCard[]),
+      getLatestReviews().catch(() => [] as LatestReview[]),
       auth().catch(() => null),
-      getFollowingFeed(),
+      getFollowingFeed().catch(() => []),
   ]);
 
   // Trending can contain nulls if a perfume was deleted between stats fetch and hydration; guard them out.
-  const trendingPerfumes = trending.filter(Boolean) as TrendingPerfumeCard[];
+  const trendingPerfumes = (trending ?? []).filter(Boolean) as TrendingPerfumeCard[];
 
   const climateTags = weather
     ? computeClimateTags(weather.temp, weather.humidity, weather.condition)
     : ["MILD"];
   const initialTheme = pickWeatherTheme(climateTags);
-  const climatePicks = await getClimatePicks(climateTags);
-  const feedInitialReviews: LiveReview[] = latestReviews.map((review) => ({
+
+  let climatePicks: Awaited<ReturnType<typeof getClimatePicks>> = [];
+  try {
+    climatePicks = await getClimatePicks(climateTags);
+  } catch (e) {
+    console.warn("[homepage] climate picks failed", e);
+  }
+
+  const feedInitialReviews: LiveReview[] = (latestReviews ?? []).map((review) => ({
     ...review,
     createdAt:
       typeof review.createdAt === "string"
         ? review.createdAt
         : review.createdAt instanceof Date
         ? review.createdAt.toISOString()
-        : "",
+        : new Date().toISOString(),
   }));
 
   return (

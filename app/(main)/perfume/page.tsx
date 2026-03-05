@@ -13,7 +13,12 @@ export const metadata: Metadata = {
 };
 
 export default async function PerfumesPage() {
-    const initialData = await searchEncyclopedia({ sort: "trending" });
+    let initialData: Awaited<ReturnType<typeof searchEncyclopedia>> = [];
+    try {
+        initialData = await searchEncyclopedia({ sort: "trending" });
+    } catch (e) {
+        console.error("[PerfumesPage] Failed to load initial data", e);
+    }
 
     return (
         <div className="w-full animate-fade-in-up">
