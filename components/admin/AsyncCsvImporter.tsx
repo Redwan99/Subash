@@ -28,9 +28,13 @@ import {
   FileWarning,
   XCircle,
   RefreshCw,
+  Eye,
+  Play,
+  ArrowLeft,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  previewCsv,
   startCsvImport,
   getImportJobStatus,
   getImportHistory,
@@ -40,6 +44,7 @@ import {
 
 type JobStatus = Awaited<ReturnType<typeof getImportJobStatus>>;
 type HistoryItem = Awaited<ReturnType<typeof getImportHistory>>[number];
+type PreviewData = Awaited<ReturnType<typeof previewCsv>>;
 
 // ── Progress Bar ──────────────────────────────────────────────────────────────
 
@@ -121,6 +126,8 @@ export function AsyncCsvImporter() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<PreviewData | null>(null);
+  const [previewing, setPreviewing] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [job, setJob] = useState<JobStatus>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -211,6 +218,8 @@ export function AsyncCsvImporter() {
     setJob(null);
     setError(null);
     setUploading(false);
+    setPreview(null);
+    setPreviewing(false);
     setShowErrors(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (pollRef.current) {
@@ -219,9 +228,35 @@ export function AsyncCsvImporter() {
     }
   };
 
-  // ── Upload ────────────────────────────────────────────────────────────────
+  // ── Preview ───────────────────────────────────────────────────────────────
 
-  const handleUpload = async () => {
+  const handlePreview = async () => {
+    if (!file) return;
+    setPreviewing(true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const result = await previewCsv(formData);
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setPreview(result);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to preview file."
+      );
+    } finally {
+      setPreviewing(false);
+    }
+  };
+
+  // ── Import ────────────────────────────────────────────────────────────────
+
+  const handleStartImport = async () => {
     if (!file) return;
     setUploading(true);
     setError(null);
@@ -235,6 +270,7 @@ export function AsyncCsvImporter() {
         setError(result.error);
         setUploading(false);
       } else {
+        setPreview(null);
         setJobId(result.jobId);
         setUploading(false);
       }
@@ -442,6 +478,144 @@ export function AsyncCsvImporter() {
             </div>
           )}
         </div>
+      ) : preview && !preview.error ? (
+        /* ── Preview Panel ─────────────────────────────────────────────── */
+        <div className="space-y-5">
+          {/* File & Format Info */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <FormatBadge format={preview.format ?? null} />
+            <span className="text-sm font-medium text-[var(--text-secondary)]">
+              {file?.name}
+            </span>
+            <span className="text-xs text-[var(--text-muted)] ml-auto">
+              {preview.totalRows?.toLocaleString()} rows detected
+            </span>
+          </div>
+
+          {/* Column Headers */}
+          {preview.headers && preview.headers.length > 0 && (
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">
+                Columns ({preview.headers.length})
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {preview.headers.map((h) => (
+                  <span
+                    key={h}
+                    className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-secondary)]"
+                  >
+                    {h}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sample Data Table */}
+          {preview.sampleRows && preview.sampleRows.length > 0 && (
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)] mb-2">
+                Sample Data (first {preview.sampleRows.length} rows)
+              </p>
+              <div className="overflow-x-auto rounded-lg border border-[var(--border-color)]">
+                <table className="w-full text-[11px]">
+                  <thead>
+                    <tr className="bg-[var(--bg-glass)]">
+                      {(preview.headers ?? Object.keys(preview.sampleRows[0])).slice(0, 8).map((h) => (
+                        <th
+                          key={h}
+                          className="px-3 py-2 text-left font-bold text-[var(--text-muted)] uppercase tracking-wider whitespace-nowrap border-b border-[var(--border-color)]"
+                        >
+                          {h}
+                        </th>
+                      ))}
+                      {(preview.headers ?? []).length > 8 && (
+                        <th className="px-3 py-2 text-left text-[var(--text-muted)] border-b border-[var(--border-color)]">
+                          ...
+                        </th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {preview.sampleRows.map((row, i) => (
+                      <tr
+                        key={i}
+                        className="border-b border-[var(--border-color)] last:border-b-0 hover:bg-[var(--bg-glass)]"
+                      >
+                        {(preview.headers ?? Object.keys(row)).slice(0, 8).map((h) => (
+                          <td
+                            key={h}
+                            className="px-3 py-2 text-[var(--text-secondary)] max-w-[200px] truncate"
+                          >
+                            {row[h] || "—"}
+                          </td>
+                        ))}
+                        {(preview.headers ?? []).length > 8 && (
+                          <td className="px-3 py-2 text-[var(--text-muted)]">
+                            ...
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Error */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, height: 0 }}
+                className="p-4 rounded-lg flex items-start gap-3 border bg-red-500/10 border-red-500/20"
+              >
+                <AlertCircle
+                  size={18}
+                  className="text-red-400 shrink-0 mt-0.5"
+                />
+                <p className="text-sm text-red-400">{error}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => {
+                setPreview(null);
+                setError(null);
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-[var(--bg-glass)] border border-[var(--border-color)] transition-colors"
+            >
+              <ArrowLeft size={14} />
+              Change File
+            </button>
+            <button
+              onClick={handleStartImport}
+              disabled={uploading}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                !uploading
+                  ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] hover:shadow-[0_0_20px_rgba(232,67,147,0.3)] text-white"
+                  : "bg-[var(--bg-glass-border)] text-[var(--text-muted)] cursor-not-allowed"
+              }`}
+            >
+              {uploading ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  Starting Import...
+                </>
+              ) : (
+                <>
+                  <Play size={14} />
+                  Start Import ({preview.totalRows?.toLocaleString()} rows)
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       ) : (
         /* ── Upload Zone ───────────────────────────────────────────────── */
         <>
@@ -466,14 +640,14 @@ export function AsyncCsvImporter() {
               onChange={handleFileChange}
             />
 
-            {uploading ? (
+            {previewing ? (
               <div className="flex flex-col items-center">
                 <Loader2
                   size={32}
                   className="text-[var(--accent)] animate-spin mb-3"
                 />
                 <span className="text-sm font-medium text-[var(--accent)] animate-pulse">
-                  Uploading & detecting format...
+                  Analyzing CSV file...
                 </span>
               </div>
             ) : file ? (
@@ -492,6 +666,7 @@ export function AsyncCsvImporter() {
                     e.stopPropagation();
                     setFile(null);
                     setError(null);
+                    setPreview(null);
                   }}
                   className="mt-3 text-[10px] text-red-400 hover:text-red-300 transition-colors uppercase font-bold tracking-wider"
                 >
@@ -566,26 +741,26 @@ export function AsyncCsvImporter() {
             ))}
           </div>
 
-          {/* Upload Button */}
+          {/* Preview Button */}
           <div className="mt-6 flex justify-end">
             <button
-              onClick={handleUpload}
-              disabled={!file || uploading}
+              onClick={handlePreview}
+              disabled={!file || previewing}
               className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
-                file && !uploading
+                file && !previewing
                   ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] hover:shadow-[0_0_20px_rgba(232,67,147,0.3)] text-white"
                   : "bg-[var(--bg-glass-border)] text-[var(--text-muted)] cursor-not-allowed"
               }`}
             >
-              {uploading ? (
+              {previewing ? (
                 <>
                   <Loader2 size={14} className="animate-spin" />
-                  Starting Import...
+                  Analyzing...
                 </>
               ) : (
                 <>
-                  <UploadCloud size={14} />
-                  Upload & Import
+                  <Eye size={14} />
+                  Upload & Preview
                 </>
               )}
             </button>

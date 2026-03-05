@@ -15,16 +15,21 @@ async function getAdminData() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = prisma as any;
 
+  // Wrap each query to handle missing tables/columns gracefully
+  const safe = async <T,>(fn: () => Promise<T>, fallback: T): Promise<T> => {
+    try { return await fn(); } catch { return fallback; }
+  };
+
   const [totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, scrapedPerfumes, ratedPerfumes, recentReviews, users, featureToggles, auditLogs, brandClaims] =
     await Promise.all([
-      prisma.user.count(),
-      prisma.review.count(),
-      prisma.perfume.count(),
-      db.review.count({ where: { status: "PENDING" } }),
-      db.review.count({ where: { status: "SPAM" } }),
-      db.perfume.count({ where: { scraped: true } }),
-      db.perfume.count({ where: { rating_value: { not: null } } }),
-      db.review.findMany({
+      safe(() => prisma.user.count(), 0),
+      safe(() => prisma.review.count(), 0),
+      safe(() => prisma.perfume.count(), 0),
+      safe(() => db.review.count({ where: { status: "PENDING" } }), 0),
+      safe(() => db.review.count({ where: { status: "SPAM" } }), 0),
+      safe(() => db.perfume.count({ where: { scraped: true } }), 0),
+      safe(() => db.perfume.count({ where: { rating_value: { not: null } } }), 0),
+      safe(() => db.review.findMany({
         take: 50,
         orderBy: { createdAt: "desc" },
         select: {
@@ -36,8 +41,8 @@ async function getAdminData() {
           user: { select: { id: true, name: true, email: true, image: true } },
           perfume: { select: { id: true, name: true, brand: true, slug: true } },
         },
-      }),
-      prisma.user.findMany({
+      }), []),
+      safe(() => prisma.user.findMany({
         take: 100,
         orderBy: { createdAt: "desc" },
         select: {
@@ -52,18 +57,18 @@ async function getAdminData() {
           banReason: true,
           createdAt: true,
         },
-      }),
-      db.featureToggle.findMany({
+      }), []),
+      safe(() => db.featureToggle.findMany({
         orderBy: { key: "asc" },
-      }),
-      db.auditLog.findMany({
+      }), []),
+      safe(() => db.auditLog.findMany({
         take: 100,
         orderBy: { createdAt: "desc" },
-      }),
-      db.brandClaim.findMany({
+      }), []),
+      safe(() => db.brandClaim.findMany({
         orderBy: { createdAt: "desc" },
         include: { user: { select: { name: true, email: true } } },
-      }),
+      }), []),
     ]);
 
   return {

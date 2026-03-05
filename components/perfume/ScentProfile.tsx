@@ -9,7 +9,8 @@
 import { useState } from "react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
-import { PenSquare, X } from "lucide-react";
+import { PenSquare, X, Sparkles, Heart, TreePine } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 // --- Types --------------------------------------------------------------------
 
@@ -71,14 +72,14 @@ function NoteChip({
 function PyramidRow({
   tier,
   label,
-  icon,
+  icon: Icon,
   notes,
   index,
   shouldReduceMotion,
 }: {
   tier: "top" | "heart" | "base";
   label: string;
-  icon: string;
+  icon: LucideIcon;
   notes: string[];
   index: number;
   shouldReduceMotion: boolean | null;
@@ -113,7 +114,7 @@ function PyramidRow({
     >
       {/* Tier label */}
       <div className="flex items-center gap-1.5 mb-2.5">
-        <span>{icon}</span>
+        <Icon size={14} className={NOTE_COLORS[tier].label} />
         <span className={`text-[10px] font-bold uppercase tracking-widest ${NOTE_COLORS[tier].label}`}>
           {label} Notes
         </span>
@@ -290,10 +291,10 @@ export function ScentProfile({
           </span>
         </div>
 
-        {/* Pyramid: top ? widest, base ? narrowest */}
+        {/* Pyramid: top → widest, base → narrowest */}
         <div className="flex flex-col items-center gap-6">
           <PyramidRow
-            tier="top"   label="Top"   icon="??"
+            tier="top"   label="Top"   icon={Sparkles}
             notes={top_notes}   index={0} shouldReduceMotion={shouldReduceMotion}
           />
 
@@ -303,7 +304,7 @@ export function ScentProfile({
           )}
 
           <PyramidRow
-            tier="heart" label="Heart" icon="??"
+            tier="heart" label="Heart" icon={Heart}
             notes={heart_notes} index={1} shouldReduceMotion={shouldReduceMotion}
           />
 
@@ -312,7 +313,7 @@ export function ScentProfile({
           )}
 
           <PyramidRow
-            tier="base"  label="Base"  icon="??"
+            tier="base"  label="Base"  icon={TreePine}
             notes={base_notes}  index={2} shouldReduceMotion={shouldReduceMotion}
           />
         </div>

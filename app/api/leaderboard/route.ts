@@ -83,7 +83,7 @@ async function getCachedLeaderboard(timeframe: string) {
             return { topPerfumes, topUsers };
         },
         ['leaderboard-cache', timeframe],
-        { revalidate: 3600 }
+        { revalidate: 60 }
     )();
 }
 

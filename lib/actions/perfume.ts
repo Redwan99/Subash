@@ -69,6 +69,8 @@ const ReviewSchema = z.object({
   overall_rating: z.number().min(1).max(10),
   longevity_score: z.number().int().min(1).max(10),
   sillage_score: z.number().int().min(1).max(10),
+  projection_score: z.number().int().min(1).max(10).optional(),
+  intensity_score: z.number().int().min(1).max(10).optional(),
   time_tags: z.array(z.enum(["MORNING", "DAY", "EVENING", "NIGHT", "ANYTIME", "BOTH"])),
   weather_tags: z.array(z.enum(["HOT", "MILD", "COLD", "HUMID", "DRY", "RAINY"])),
   genderLeaning: z.number().int().min(1).max(5).optional(),
@@ -100,7 +102,7 @@ export async function submitReview(
     };
   }
 
-  const { perfumeId, text, overall_rating, longevity_score, sillage_score, time_tags, weather_tags, genderLeaning, occasion, valueRating, blindBuySafe } =
+  const { perfumeId, text, overall_rating, longevity_score, sillage_score, projection_score, intensity_score, time_tags, weather_tags, genderLeaning, occasion, valueRating, blindBuySafe } =
     parsed.data;
 
   try {
@@ -113,6 +115,8 @@ export async function submitReview(
           overall_rating,
           longevity_score,
           sillage_score,
+          projection_score: projection_score ?? null,
+          intensity_score: intensity_score ?? null,
           time_tags: JSON.stringify(time_tags),
           weather_tags: JSON.stringify(weather_tags),
           genderLeaning,

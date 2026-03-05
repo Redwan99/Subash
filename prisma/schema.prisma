@@ -245,9 +245,11 @@ model Review {
   perfumeId       String
   text            String
   overall_rating  Float        // 1.0 – 10.0
-  longevity_score Int          // 1 – 10
-  sillage_score   Int          // 1 – 10
-  status          String        @default("APPROVED")
+  longevity_score  Int          // 1 – 10
+  sillage_score    Int          // 1 – 10
+  projection_score Int?         // 1 – 10 (optional for older reviews)
+  intensity_score  Int?         // 1 – 10 (optional for older reviews)
+  status           String       @default("APPROVED")
   time_tags       String        @default("[]")
   weather_tags    String        @default("[]")    // stringified array of weather tags
   upvote_count    Int          @default(0)

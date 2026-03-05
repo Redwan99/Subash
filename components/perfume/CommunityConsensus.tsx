@@ -4,12 +4,17 @@
 // Placeholder percentages until the voting backend is wired.
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Flower2, Sun, Leaf, Snowflake, Sunrise, SunMedium, Sunset, Moon, Zap } from "lucide-react";
+import { Flower2, Sun, Leaf, Snowflake, Sunrise, SunMedium, Sunset, Moon, Zap, Timer, Volume2, Radio, Gauge } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 
 type ConsensusProps = {
   reviewCount: number;
   avgRating: number; // 1–5 scale from ReviewForm
+  ratingCounts?: { love: number; like: number; ok: number; mixed: number; dislike: number };
+  avgLongevity?: number; // 1–5
+  avgSillage?: number;   // 1–5
+  avgProjection?: number; // 1–5 (actual from reviews)
+  avgIntensity?: number;  // 1–5 (actual from reviews)
 };
 
 const SEASONS: { key: string; label: string; icon: LucideIcon }[] = [
@@ -27,17 +32,16 @@ const TIMES: { key: string; label: string; icon: LucideIcon }[] = [
   { key: "anytime",  label: "Anytime",  icon: Zap },
 ];
 
-// Derive rough community verdict from avg rating
-function deriveVerdictBars(avgRating: number, reviewCount: number) {
+// Derive community verdict from individual review ratings
+function deriveVerdictBars(avgRating: number, reviewCount: number, ratingCounts?: { love: number; like: number; ok: number; mixed: number; dislike: number }) {
   if (reviewCount === 0) return null;
 
-  const total = reviewCount;
-  // Approximate dist based on avg. Placeholder until real vote tallying exists.
-  const love    = Math.round(total * Math.max(0, (avgRating - 4) / 1) * 0.8);
-  const like    = Math.round(total * Math.min(0.5, (avgRating / 5) * 0.4));
-  const ok      = Math.round(total * 0.15);
-  const mixed   = Math.round(total * Math.max(0, (3 - avgRating) * 0.12));
-  const dislike = Math.max(0, total - love - like - ok - mixed);
+  // Use actual counts if provided, otherwise estimate from average
+  const love    = ratingCounts?.love    ?? Math.round(reviewCount * Math.max(0, Math.min(1, (avgRating - 4) / 1)));
+  const like    = ratingCounts?.like    ?? Math.round(reviewCount * Math.max(0, Math.min(1, avgRating >= 3.5 && avgRating < 4.5 ? 0.6 : avgRating >= 4.5 ? 0.15 : 0.1)));
+  const ok      = ratingCounts?.ok      ?? Math.round(reviewCount * Math.max(0, Math.min(1, avgRating >= 2.5 && avgRating < 3.5 ? 0.6 : 0.05)));
+  const mixed   = ratingCounts?.mixed   ?? Math.round(reviewCount * Math.max(0, Math.min(1, avgRating >= 1.5 && avgRating < 2.5 ? 0.6 : 0.03)));
+  const dislike = ratingCounts?.dislike ?? Math.max(0, reviewCount - love - like - ok - mixed);
 
   return [
     { label: "Love it",  count: love,    color: "bg-brand-500",   textColor: "text-brand-400" },
@@ -52,13 +56,49 @@ function deriveVerdictBars(avgRating: number, reviewCount: number) {
 const ACTIVE_SEASONS = ["winter", "autumn"];
 const ACTIVE_TIMES   = ["night"];
 
-export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
+const PERF_LABELS = ["Very Weak", "Weak", "Moderate", "Strong", "Enormous"];
+
+function PerfBar({ label, value, icon: Icon, color, shouldReduceMotion }: {
+  label: string; value: number; icon: LucideIcon; color: string; shouldReduceMotion: boolean | null;
+}) {
+  const pct = Math.max(0, ((value - 1) / 4) * 100);
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex items-center gap-1.5">
+          <Icon size={13} style={{ color }} />
+          <span className="text-xs font-semibold text-[var(--text-secondary)]">{label}</span>
+        </div>
+        <span className="text-xs font-bold tabular-nums" style={{ color }}>
+          {value.toFixed(1)} / 5
+          <span className="text-[10px] font-normal text-[var(--text-muted)] ml-1">
+            ({PERF_LABELS[Math.min(4, Math.max(0, Math.round(value) - 1))]})
+          </span>
+        </span>
+      </div>
+      <div className="h-[3px] w-full rounded-full bg-[var(--bg-glass-border)] overflow-hidden">
+        <motion.div
+          className="h-full rounded-full"
+          style={{ background: `linear-gradient(90deg, ${color}80, ${color})` }}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.9, ease: [0.22, 0.61, 0.36, 1] }}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLongevity = 0, avgSillage = 0, avgProjection, avgIntensity }: ConsensusProps) {
   const shouldReduceMotion = useReducedMotion();
-  const verdictBars = deriveVerdictBars(avgRating, reviewCount);
+  const verdictBars = deriveVerdictBars(avgRating, reviewCount, ratingCounts);
 
   if (reviewCount === 0) return null;
 
   const total = reviewCount;
+  // Use actual review data if available, otherwise derive from longevity/sillage
+  const projection = avgProjection && avgProjection > 0 ? avgProjection : (avgSillage > 0 ? Math.min(5, avgSillage * 0.95 + 0.15) : 0);
+  const intensity = avgIntensity && avgIntensity > 0 ? avgIntensity : (avgLongevity > 0 && avgSillage > 0 ? Math.min(5, (avgLongevity * 0.6 + avgSillage * 0.4)) : 0);
 
   return (
     <div className="rounded-3xl border border-[var(--bg-glass-border)] bg-[var(--bg-glass)] backdrop-blur-xl p-6 shadow-[var(--shadow-glass)]">
@@ -66,7 +106,7 @@ export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
         Community Consensus · {total} review{total !== 1 ? "s" : ""}
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {/* ── Verdict ───────────────────────────────── */}
         <div className="space-y-3">
           <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-4">
@@ -99,7 +139,18 @@ export function CommunityConsensus({ reviewCount, avgRating }: ConsensusProps) {
             );
           })}
         </div>
-
+        {/* ── Key Performance Metrics ─────────────────── */}
+        {(avgLongevity > 0 || avgSillage > 0) && (
+          <div className="space-y-3">
+            <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-4">
+              Key Performance
+            </p>
+            <PerfBar label="Longevity" value={avgLongevity} icon={Timer} color="#F59E0B" shouldReduceMotion={shouldReduceMotion} />
+            <PerfBar label="Sillage" value={avgSillage} icon={Volume2} color="#F783AC" shouldReduceMotion={shouldReduceMotion} />
+            <PerfBar label="Projection" value={projection} icon={Radio} color="#60A5FA" shouldReduceMotion={shouldReduceMotion} />
+            <PerfBar label="Intensity" value={intensity} icon={Gauge} color="#A78BFA" shouldReduceMotion={shouldReduceMotion} />
+          </div>
+        )}
         {/* ── Season & Time ─────────────────────────── */}
         <div className="space-y-4">
           <div>

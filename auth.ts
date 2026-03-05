@@ -148,15 +148,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // or review milestones to force a refresh.
     async jwt({ token, user }) {
       if (user?.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { role: true, review_count: true, phoneVerified: true, username: true },
-        });
-        token.id = user.id;
-        token.role = dbUser?.role ?? "STANDARD";
-        token.review_count = dbUser?.review_count ?? 0;
-        token.phoneVerified = dbUser?.phoneVerified ?? false;
-        token.username = dbUser?.username ?? null;
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { role: true, review_count: true, phoneVerified: true, username: true },
+          });
+          token.id = user.id;
+          token.role = dbUser?.role ?? "STANDARD";
+          token.review_count = dbUser?.review_count ?? 0;
+          token.phoneVerified = dbUser?.phoneVerified ?? false;
+          token.username = dbUser?.username ?? null;
+        } catch {
+          // DB may be missing columns — use defaults
+          token.id = user.id;
+          token.role = "STANDARD";
+          token.review_count = 0;
+          token.phoneVerified = false;
+          token.username = null;
+        }
       }
       return token;
     },

@@ -220,7 +220,7 @@ function AddModal({
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={r.image_url} alt={r.name} className="w-full h-full object-contain" />
                         ) : (
-                          <span className="text-xs">??</span>
+                          <Droplets size={14} className="text-[var(--accent)]" />
                         )}
                       </div>
                       <div className="min-w-0">

@@ -7,7 +7,7 @@
 import { useState, useRef, useEffect, useTransition } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, X, Loader2, Droplets } from "lucide-react";
 import { searchPerfumes, type PerfumeSearchResult } from "@/lib/actions/perfume";
 import { incrementSearchCount } from "@/lib/actions/search";
 import { cn } from "@/lib/utils";
@@ -44,7 +44,7 @@ function ResultRow({
             className="w-full h-full object-contain p-0.5"
           />
         ) : (
-          <span className="text-lg">??</span>
+          <Droplets size={18} className="text-[var(--accent)]" />
         )}
       </div>
 

@@ -41,6 +41,8 @@ const TIME_OPTIONS: { value: TimeTag; label: string; icon: LucideIcon }[] = [
   { value: "anytime", label: "Anytime", icon: Zap },
 ];
 
+const PROJECTION_LABELS = ["", "Skin scent", "Intimate", "Close", "Arm's length", "Moderate", "Room filling", "Strong presence", "Heavy", "Enormous", "Nuclear"];
+const INTENSITY_LABELS = ["", "Very light", "Light", "Soft", "Noticeable", "Moderate", "Above average", "Strong", "Powerful", "Overwhelming", "Nuclear"];
 const LONGEVITY_LABELS = ["", "Fades in mins", "Under 2h", "2-3h", "3-4h", "4-5h", "5-6h", "6-8h", "8-12h", "12h+", "Eternal"];
 const SILLAGE_LABELS = ["", "On skin only", "Intimate", "Personal", "Noticeable", "Soft aura", "Moderate", "Filling room", "Heavy", "Enormous", "Nuclear"];
 const MAX_REVIEW_LENGTH = 800;
@@ -254,6 +256,8 @@ export function ReviewForm({
   const [rating, setRating] = useState(3);
   const [longevity, setLongevity] = useState(5);
   const [sillage, setSillage] = useState(5);
+  const [projection, setProjection] = useState(5);
+  const [intensity, setIntensity] = useState(5);
   const [weatherTags, setWeatherTags] = useState<WeatherTag[]>([]);
   const [times, setTimes] = useState<TimeTag[]>([]);
   const [genderLeaning, setGenderLeaning] = useState<number>(3);
@@ -284,6 +288,8 @@ export function ReviewForm({
       overall_rating: rating,
       longevity_score: longevity,
       sillage_score: sillage,
+      projection_score: projection,
+      intensity_score: intensity,
       time_tags: normalizedTimes,
       weather_tags: weatherTags,
       genderLeaning,
@@ -295,6 +301,7 @@ export function ReviewForm({
     setLoading(false);
     if (result.success) {
       setText(""); setRating(3); setLongevity(5); setSillage(5);
+      setProjection(5); setIntensity(5);
       setWeatherTags([]); setTimes([]);
       onSubmitted?.();
     }
@@ -380,6 +387,26 @@ export function ReviewForm({
           onChange={setSillage}
           labelMap={SILLAGE_LABELS}
           accentColor="#F783AC"
+        />
+
+        {/* Projection slider */}
+        <RangeSlider
+          label="Projection"
+          sublabel="How strongly does it reach others?"
+          value={projection}
+          onChange={setProjection}
+          labelMap={PROJECTION_LABELS}
+          accentColor="#60A5FA"
+        />
+
+        {/* Intensity slider */}
+        <RangeSlider
+          label="Intensity"
+          sublabel="How potent is the overall scent?"
+          value={intensity}
+          onChange={setIntensity}
+          labelMap={INTENSITY_LABELS}
+          accentColor="#A78BFA"
         />
         </div>
 

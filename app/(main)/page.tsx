@@ -191,7 +191,7 @@ export default async function HomePage() {
       getWeather(city),
       getCachedTrendingPerfumes(12, 7),
       getLatestReviews(),
-      auth(),
+      auth().catch(() => null),
       getFollowingFeed(),
   ]);
 

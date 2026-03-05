@@ -12,24 +12,26 @@ const globalForPrisma = globalThis as unknown as {
 // connection during static generation (e.g. Docker build).
 const shouldMock = process.env.SKIP_DB === "true" || !process.env.DATABASE_URL;
 
-const prismaClient: PrismaClient = shouldMock
-  ? (() => {
-      type MockFn = (...args: unknown[]) => Promise<unknown[]>;
-      const handler: ProxyHandler<MockFn> = {
-        get() {
-          return proxyFn;
-        },
-        apply() {
-          return Promise.resolve([]);
-        },
-      };
-      const proxyFn: MockFn = new Proxy(async () => [], handler);
-      return proxyFn as unknown as PrismaClient;
-    })()
-  : (globalForPrisma.prisma ??
-      new PrismaClient({
-        log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-      }));
+let prismaClient: PrismaClient;
+
+if (shouldMock) {
+  type MockFn = (...args: unknown[]) => Promise<unknown[]>;
+  const handler: ProxyHandler<MockFn> = {
+    get() {
+      return proxyFn;
+    },
+    apply() {
+      return Promise.resolve([]);
+    },
+  };
+  const proxyFn: MockFn = new Proxy(async () => [], handler);
+  prismaClient = proxyFn as unknown as PrismaClient;
+} else {
+  prismaClient = globalForPrisma.prisma ??
+    new PrismaClient({
+      log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+    });
+}
 
 if (!shouldMock && process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prismaClient;

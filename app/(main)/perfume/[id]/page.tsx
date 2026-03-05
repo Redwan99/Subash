@@ -9,7 +9,7 @@ import Link from "next/link";
 export const revalidate = 60;
 import { notFound } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
-import { ShoppingCart, ExternalLink, Tag, Store, Check, Star } from "lucide-react";
+import { ShoppingCart, ExternalLink, Tag, Store, Check, Star, Clock, Wind } from "lucide-react";
 import NextDynamic from "next/dynamic";
 import { DecantCard, type DecantCardData } from "@/components/marketplace/DecantCard";
 import { auth } from "@/auth";
@@ -18,6 +18,7 @@ import { WardrobeActionBar } from "@/components/perfume/WardrobeActionBar";
 import { CommunityConsensus } from "@/components/perfume/CommunityConsensus";
 import ViewTracker from "@/components/perfume/ViewTracker";
 import { parsePrismaArray } from "@/lib/utils";
+
 
 // Lazy-load the heavy interactive client bundle (ScentProfile, DupeEngine, ReviewForm)
 const PerfumeInteractive = NextDynamic(
@@ -101,10 +102,17 @@ export default async function PerfumePage({
         },
       },
       reviews: {
+        orderBy: { createdAt: "desc" },
         select: {
+          id: true,
           overall_rating: true,
           longevity_score: true,
           sillage_score: true,
+          projection_score: true,
+          intensity_score: true,
+          text: true,
+          createdAt: true,
+          user: { select: { id: true, name: true, image: true, username: true } },
         },
       },
       dupesForThis: {
@@ -169,6 +177,22 @@ export default async function PerfumePage({
   const avgSillage = reviewCount
     ? perfume.reviews.reduce((sum: number, r: { sillage_score: number }) => sum + r.sillage_score, 0) / reviewCount
     : 1;
+  const avgProjection = reviewCount
+    ? perfume.reviews.reduce((sum: number, r: { projection_score: number | null }) => sum + (r.projection_score ?? 0), 0) / perfume.reviews.filter((r: { projection_score: number | null }) => r.projection_score != null).length || 0
+    : 0;
+  const avgIntensity = reviewCount
+    ? perfume.reviews.reduce((sum: number, r: { intensity_score: number | null }) => sum + (r.intensity_score ?? 0), 0) / perfume.reviews.filter((r: { intensity_score: number | null }) => r.intensity_score != null).length || 0
+    : 0;
+
+  // Compute actual rating distribution for CommunityConsensus
+  const ratingCounts = { love: 0, like: 0, ok: 0, mixed: 0, dislike: 0 };
+  perfume.reviews.forEach((r: { overall_rating: number }) => {
+    if (r.overall_rating >= 4.5) ratingCounts.love++;
+    else if (r.overall_rating >= 3.5) ratingCounts.like++;
+    else if (r.overall_rating >= 2.5) ratingCounts.ok++;
+    else if (r.overall_rating >= 1.5) ratingCounts.mixed++;
+    else ratingCounts.dislike++;
+  });
 
   const dupes = perfume.dupesForThis.map((d: {
     id: string; votes: number;
@@ -220,6 +244,11 @@ export default async function PerfumePage({
         <CommunityConsensus
           reviewCount={reviewCount}
           avgRating={avgRating}
+          ratingCounts={ratingCounts}
+          avgLongevity={avgLongevity}
+          avgSillage={avgSillage}
+          avgProjection={avgProjection}
+          avgIntensity={avgIntensity}
         />
 
         {/* Marketplace */}
@@ -325,6 +354,58 @@ export default async function PerfumePage({
             initialDupes={dupes}
           />
         </section>
+
+        {/* ── User Reviews ─────────────────────────────────────── */}
+        {reviewCount > 0 && (
+          <section className="rounded-3xl border border-[var(--bg-glass-border)] bg-[var(--bg-glass)] backdrop-blur-xl p-6 shadow-[var(--shadow-glass)]">
+            <h2 className="text-xs font-bold uppercase tracking-widest mb-5 text-[var(--text-muted)] flex items-center gap-2">
+              <Star size={13} className="text-[var(--accent)]" /> Community Reviews ({reviewCount})
+            </h2>
+            <div className="space-y-3">
+              {perfume.reviews.map((r: {
+                id: string; overall_rating: number; longevity_score: number; sillage_score: number;
+                text: string; createdAt: Date;
+                user: { id: string; name: string | null; image: string | null; username: string | null };
+              }) => (
+                <div
+                  key={r.id}
+                  className="rounded-2xl px-4 py-4 transition-all bg-[var(--bg-surface)] border border-[var(--bg-glass-border)] hover:border-[rgba(232,67,147,0.25)]"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {r.user.image ? (
+                        <img src={r.user.image} alt="" className="w-6 h-6 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-[linear-gradient(135deg,#E84393,#C2255C)] flex items-center justify-center text-[8px] font-black text-white">
+                          {(r.user.name ?? "?").charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="text-xs font-semibold text-[var(--text-primary)] truncate">
+                        {r.user.name ?? "Anonymous"}
+                      </span>
+                    </div>
+                    <div className="shrink-0 flex items-center gap-1">
+                      <Star size={12} className="text-[#F59E0B] fill-current" />
+                      <span className="text-sm font-bold text-[var(--text-primary)]">{r.overall_rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs leading-relaxed text-[var(--text-secondary)] mb-2">{r.text}</p>
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <span className="flex items-center gap-1 text-[10px] text-[var(--text-muted)]">
+                      <Clock size={10} className="text-[#60A5FA]" /> Longevity: {r.longevity_score}/10
+                    </span>
+                    <span className="flex items-center gap-1 text-[10px] text-[var(--text-muted)]">
+                      <Wind size={10} className="text-[#F783AC]" /> Sillage: {r.sillage_score}/10
+                    </span>
+                    <span className="text-[10px] ml-auto text-[var(--text-muted)]">
+                      {new Date(r.createdAt).toLocaleDateString("en-GB")}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </main>
   );

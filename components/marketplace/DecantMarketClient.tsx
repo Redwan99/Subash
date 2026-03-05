@@ -4,7 +4,7 @@
 
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Clock, TrendingDown, PlusCircle } from "lucide-react";
+import { Clock, TrendingDown, PlusCircle, FlaskConical } from "lucide-react";
 import Link from "next/link";
 import { DecantCard, type DecantCardData } from "./DecantCard";
 import { cn } from "@/lib/utils";
@@ -80,7 +80,7 @@ export function DecantMarketClient({ listings }: { listings: DecantCardData[] })
         <div
           className="rounded-2xl p-16 text-center bg-[var(--bg-glass)] border border-dashed border-[var(--border-color)]"
         >
-          <span className="text-5xl">??</span>
+          <FlaskConical size={48} className="text-[var(--accent)] mx-auto" />
           <p className="text-base font-semibold mt-4 text-[var(--text-secondary)]">
             No decant listings yet
           </p>

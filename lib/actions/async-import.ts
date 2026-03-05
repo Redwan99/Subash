@@ -342,6 +342,59 @@ async function requireAdmin(): Promise<string> {
 // ── Public Actions ────────────────────────────────────────────────────────────
 
 /**
+ * Preview a CSV file: detect format, count rows, return sample rows.
+ * Does NOT write to the database.
+ */
+export async function previewCsv(formData: FormData): Promise<{
+  error?: string;
+  format?: string;
+  totalRows?: number;
+  headers?: string[];
+  sampleRows?: Record<string, string>[];
+}> {
+  try {
+    await requireAdmin();
+
+    const file = formData.get("file") as File;
+    if (!file || !file.name.endsWith(".csv")) {
+      return { error: "Please upload a valid .csv file." };
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+
+    let text: string;
+    try {
+      text = new TextDecoder("utf-8", { fatal: true }).decode(arrayBuffer);
+    } catch {
+      text = new TextDecoder("iso-8859-1").decode(arrayBuffer);
+    }
+
+    const firstLine = text.split("\n")[0] ?? "";
+    const quickHeaders = firstLine.split(/[;,]/).map((h) => h.trim().replace(/^"|"$/g, ""));
+    const { format, separator } = detectFormat(quickHeaders, firstLine);
+
+    const parsed = Papa.parse<Record<string, string>>(text, {
+      header: true,
+      skipEmptyLines: true,
+      delimiter: separator,
+    });
+
+    if (parsed.errors.length > 0 && parsed.data.length === 0) {
+      return { error: `CSV parse failed: ${parsed.errors[0]?.message}` };
+    }
+
+    const headers = parsed.meta.fields ?? [];
+    const totalRows = parsed.data.length;
+    // Return first 5 rows as a sample
+    const sampleRows = parsed.data.slice(0, 5);
+
+    return { format, totalRows, headers, sampleRows };
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Preview failed." };
+  }
+}
+
+/**
  * Start a CSV import job. Parses the CSV, creates a tracking record,
  * then processes rows in batches with progress updates.
  */

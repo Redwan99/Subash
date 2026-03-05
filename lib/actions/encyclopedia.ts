@@ -20,6 +20,8 @@ export async function searchEncyclopedia(filters: {
   weatherTags?: string[];
   timeTags?: string[];
   sort?: string;
+  skip?: number;
+  take?: number;
 }) {
   try {
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -105,10 +107,14 @@ export async function searchEncyclopedia(filters: {
     if (filters.sort === "a-z") orderBy = { name: "asc" };
     if (filters.sort === "most-reviewed") orderBy = { reviews: { _count: "desc" } };
 
+    const take = filters.take ?? 30;
+    const skip = filters.skip ?? 0;
+
     const results = await prisma.perfume.findMany({
       where,
       orderBy,
-      take: 60,
+      skip,
+      take,
       select: {
         id: true, slug: true, name: true, brand: true,
         image_url: true, transparentImageUrl: true, searchCount: true,

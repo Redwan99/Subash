@@ -6,7 +6,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { Activity, Star, Camera, Zap, TrendingUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { LeaderboardWidget } from "@/components/ui/LeaderboardWidget";
 
 // Types
@@ -80,7 +80,79 @@ function ActivityCard({ item, index, shouldReduceMotion }: { item: ActivityItem;
   );
 }
 
-// Right Sidebar — fetches live data from /api/sidebar
+// Scrollable Activity Feed with fade edges
+function ActivityFeed({ data, activity, shouldReduceMotion }: { data: SidebarData | null; activity: ActivityItem[]; shouldReduceMotion: boolean | null }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [fadeTop, setFadeTop] = useState(false);
+  const [fadeBottom, setFadeBottom] = useState(false);
+
+  const updateFade = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setFadeTop(el.scrollTop > 8);
+    setFadeBottom(el.scrollTop + el.clientHeight < el.scrollHeight - 8);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateFade();
+    el.addEventListener("scroll", updateFade, { passive: true });
+    return () => el.removeEventListener("scroll", updateFade);
+  }, [activity, updateFade]);
+
+  if (!data) {
+    return (
+      <div className="px-3 py-3 space-y-2">
+        {["w-11/12", "w-3/4", "w-4/5"].map((widthClass, i) => (
+          <div key={i} className="flex items-center gap-2.5 px-1">
+            <div className="w-7 h-7 rounded-lg skeleton shrink-0" />
+            <div className="flex-1 space-y-1.5">
+              <div className={`skeleton h-2 rounded-full ${widthClass}`} />
+              <div className="skeleton h-1.5 rounded-full w-2/5" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (activity.length === 0) {
+    return <p className="text-[11px] text-center py-6 text-[var(--text-muted)]">No recent activity yet</p>;
+  }
+
+  return (
+    <div className="relative flex-1 min-h-0">
+      {/* Fade top */}
+      <div
+        className="pointer-events-none absolute top-0 left-0 right-0 h-8 z-10 transition-opacity duration-300"
+        style={{
+          opacity: fadeTop ? 1 : 0,
+          background: "linear-gradient(to bottom, var(--bg-glass), transparent)",
+        }}
+      />
+      {/* Fade bottom */}
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 z-10 transition-opacity duration-300"
+        style={{
+          opacity: fadeBottom ? 1 : 0,
+          background: "linear-gradient(to top, var(--bg-glass), transparent)",
+        }}
+      />
+      <div
+        ref={scrollRef}
+        className="h-full overflow-y-auto px-3 py-3 space-y-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        style={{ maxHeight: "calc(3 * 76px + 16px)" }}
+      >
+        {activity.map((item, i) => (
+          <ActivityCard key={item.id} item={item} index={i} shouldReduceMotion={shouldReduceMotion} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Right Sidebar \u2014 fetches live data from /api/sidebar
 export function RightSidebar() {
   const shouldReduceMotion = useReducedMotion();
   const [data, setData] = useState<SidebarData | null>(null);
@@ -134,28 +206,8 @@ export function RightSidebar() {
 
       <div className="mx-4 h-px bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)]" />
 
-      {/* Activity Feed */}
-      <div className="flex-1 px-3 py-3 space-y-2">
-        {!data ? (
-          <div className="space-y-2 py-4">
-            {["w-11/12", "w-3/4", "w-4/5"].map((widthClass, i) => (
-              <div key={i} className="flex items-center gap-2.5 px-1">
-                <div className="w-7 h-7 rounded-lg skeleton shrink-0" />
-                <div className="flex-1 space-y-1.5">
-                  <div className={`skeleton h-2 rounded-full ${widthClass}`} />
-                  <div className="skeleton h-1.5 rounded-full w-2/5" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : activity.length === 0 ? (
-          <p className="text-[11px] text-center py-6 text-[var(--text-muted)]">No recent activity yet</p>
-        ) : (
-          activity.map((item, i) => (
-            <ActivityCard key={item.id} item={item} index={i} shouldReduceMotion={shouldReduceMotion} />
-          ))
-        )}
-      </div>
+      {/* Activity Feed — scrollable with fade edges, 3 visible cards */}
+      <ActivityFeed data={data} activity={activity} shouldReduceMotion={shouldReduceMotion} />
 
       {/* Footer: Trending */}
       <div className="px-4 py-4">
