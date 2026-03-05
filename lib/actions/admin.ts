@@ -8,6 +8,7 @@ import path from "path";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 import { Role } from "@prisma/client";
+import { sendPasswordChangedEmail } from "@/lib/email";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 
@@ -358,6 +359,11 @@ export async function adminResetUserPassword(
       where: { id: userId },
       data: { password: hashed },
     });
+
+    // Notify user their password was changed
+    if (user.email) {
+      sendPasswordChangedEmail(user.email, user.email).catch(console.error);
+    }
 
     await logAdminAction(adminId, "RESET_PASSWORD", `User: ${userId} (${user.email})`);
     return { success: true };

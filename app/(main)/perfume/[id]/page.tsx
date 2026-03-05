@@ -348,9 +348,6 @@ export default async function PerfumePage({
             accords={accords} top_notes={topNotes}
             heart_notes={heartNotes}
             base_notes={baseNotes}
-            avgLongevity={Math.max(1, avgLongevity)}
-            avgSillage={Math.max(1, avgSillage)}
-            reviewCount={reviewCount}
             initialDupes={dupes}
           />
         </section>

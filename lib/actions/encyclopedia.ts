@@ -107,14 +107,15 @@ export async function searchEncyclopedia(filters: {
     if (filters.sort === "a-z") orderBy = { name: "asc" };
     if (filters.sort === "most-reviewed") orderBy = { reviews: { _count: "desc" } };
 
-    const take = filters.take ?? 30;
+    // If take is explicitly set, use it; otherwise, fetch all perfumes
+    const take = typeof filters.take === "number" ? filters.take : undefined;
     const skip = filters.skip ?? 0;
 
     const results = await prisma.perfume.findMany({
       where,
       orderBy,
       skip,
-      take,
+      ...(take !== undefined ? { take } : {}),
       select: {
         id: true, slug: true, name: true, brand: true,
         image_url: true, transparentImageUrl: true, searchCount: true,

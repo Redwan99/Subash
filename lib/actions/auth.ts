@@ -6,10 +6,12 @@
 
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { z } from "zod";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { sendWelcomeEmail, sendAdminNewUserNotification, sendAccountInfoEmail, sendPasswordResetEmail, sendPasswordChangedEmail } from "@/lib/email";
 
 // ─── Validation schemas ───────────────────────────────────────────────────────
 
@@ -100,6 +102,22 @@ export async function registerUser(
     },
   });
 
+  // Send emails (fire-and-forget, don't block registration)
+  sendWelcomeEmail(email, name).catch(console.error);
+  sendAccountInfoEmail(email, { name, email, role: assignedRole }).catch(console.error);
+
+  // Notify admin(s) of new signup
+  prisma.user
+    .findMany({ where: { role: { in: ["SUPER_ADMIN", "ADMIN"] } }, select: { email: true } })
+    .then((admins) => {
+      for (const admin of admins) {
+        if (admin.email) {
+          sendAdminNewUserNotification(admin.email, { name, email }).catch(console.error);
+        }
+      }
+    })
+    .catch(console.error);
+
   return {
     success: true,
     message: "Account created! You can now sign in.",
@@ -145,4 +163,86 @@ export async function loginWithCredentials(
     }
     throw error; // Re-throw unexpected errors
   }
+}
+
+// ─── Forgot Password Action ──────────────────────────────────────────────────
+
+export async function requestPasswordReset(
+  _prevState: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  const email = formData.get("email") as string;
+  if (!email || !z.string().email().safeParse(email).success) {
+    return { success: false, errors: { _form: ["Please enter a valid email address."] } };
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  // Always return success to prevent email enumeration
+  if (!user) {
+    return { success: true, message: "If an account exists with that email, a reset link has been sent." };
+  }
+
+  // Generate a secure token
+  const token = crypto.randomBytes(32).toString("hex");
+  const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+  // Remove any existing tokens for this email
+  await prisma.verificationToken.deleteMany({ where: { identifier: email } });
+
+  // Store token
+  await prisma.verificationToken.create({
+    data: { identifier: email, token, expires },
+  });
+
+  // Send reset email
+  sendPasswordResetEmail(email, token).catch(console.error);
+
+  return { success: true, message: "If an account exists with that email, a reset link has been sent." };
+}
+
+// ─── Reset Password Action ───────────────────────────────────────────────────
+
+export async function resetPassword(
+  _prevState: ActionResult | null,
+  formData: FormData
+): Promise<ActionResult> {
+  const token = formData.get("token") as string;
+  const password = formData.get("password") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
+
+  if (!token) {
+    return { success: false, errors: { _form: ["Invalid or missing reset token."] } };
+  }
+  if (!password || password.length < 8) {
+    return { success: false, errors: { password: ["Password must be at least 8 characters."] } };
+  }
+  if (password !== confirmPassword) {
+    return { success: false, errors: { confirmPassword: ["Passwords do not match."] } };
+  }
+
+  // Find and validate token
+  const record = await prisma.verificationToken.findUnique({ where: { token } });
+  if (!record || record.expires < new Date()) {
+    // Clean up expired token
+    if (record) await prisma.verificationToken.delete({ where: { token } });
+    return { success: false, errors: { _form: ["This reset link has expired. Please request a new one."] } };
+  }
+
+  // Update password
+  const hashedPassword = await bcrypt.hash(password, 12);
+  await prisma.user.update({
+    where: { email: record.identifier },
+    data: { password: hashedPassword },
+  });
+
+  // Delete the used token
+  await prisma.verificationToken.delete({ where: { token } });
+
+  // Notify user
+  const user = await prisma.user.findUnique({ where: { email: record.identifier }, select: { name: true, email: true } });
+  if (user?.email) {
+    sendPasswordChangedEmail(user.email, user.name ?? "User").catch(console.error);
+  }
+
+  return { success: true, message: "Password reset successfully. You can now sign in." };
 }

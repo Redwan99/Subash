@@ -27,9 +27,6 @@ export function PerfumeInteractive({
   top_notes,
   heart_notes,
   base_notes,
-  avgLongevity,
-  avgSillage,
-  reviewCount,
   initialDupes,
 }: {
   perfumeId: string;
@@ -39,9 +36,6 @@ export function PerfumeInteractive({
   top_notes: string[];
   heart_notes: string[];
   base_notes: string[];
-  avgLongevity: number;
-  avgSillage: number;
-  reviewCount: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialDupes: any[];
 }) {
@@ -72,16 +66,12 @@ export function PerfumeInteractive({
     >
       <motion.div variants={item}>
         <ScentProfile
-          perfumeId={perfumeId}
           description={description}
           perfumer={perfumer}
           accords={accords}
           top_notes={top_notes}
           heart_notes={heart_notes}
           base_notes={base_notes}
-          avgLongevity={avgLongevity}
-          avgSillage={avgSillage}
-          reviewCount={reviewCount}
         />
       </motion.div>
       <motion.div variants={item}>

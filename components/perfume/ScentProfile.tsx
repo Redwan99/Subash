@@ -7,32 +7,21 @@
 //   • Accord pills with accent glow on hover
 
 import { useState } from "react";
-import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
-import dynamic from "next/dynamic";
-import { PenSquare, X, Sparkles, Heart, TreePine } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Sparkles, Heart, TreePine } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 // --- Types --------------------------------------------------------------------
 
 export type ScentProfileProps = {
-  perfumeId:   string;
   top_notes:    string[];
   heart_notes:  string[];
   base_notes:   string[];
-  /** Aggregated from all reviews */
-  avgLongevity: number; // 1–5
-  avgSillage:   number; // 1–5
-  reviewCount:  number;
   // Kaggle-imported enrichment fields
   description:  string | null;
   perfumer:     string | null;
   accords:      string[];
 };
-
-const ReviewForm = dynamic(
-  () => import("./ReviewForm").then((m) => m.ReviewForm),
-  { ssr: false }
-);
 
 // --- Note Chip ----------------------------------------------------------------
 
@@ -134,78 +123,18 @@ function PyramidRow({
 
 // --- Radar / Bar --------------------------------------------------------------
 
-const METRIC_LABELS = [
-  "Very Weak",
-  "Weak",
-  "Moderate",
-  "Strong",
-  "Eternal / Enormous",
-];
-
-function RadarBar({
-  label,
-  value,
-  valueClass,
-  barClass,
-  shouldReduceMotion,
-}: {
-  label: string;
-  value: number; // 1–5
-  valueClass: string;
-  barClass: string;
-  shouldReduceMotion: boolean | null;
-}) {
-  const pct = ((value - 1) / 4) * 100; // map 1–5 → 0–100%
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs font-semibold text-[var(--text-secondary)]">
-          {label}
-        </span>
-        <span className={`text-xs font-bold ${valueClass}`}>
-          {value.toFixed(1)} / 5 &nbsp;
-          <span className="text-[10px] font-normal text-[var(--text-muted)]">
-            ({METRIC_LABELS[Math.round(value) - 1]})
-          </span>
-        </span>
-      </div>
-
-      {/* Track */}
-      <div className="w-full h-3 rounded-full overflow-hidden bg-[var(--border-color)]">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: `${pct}%` }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={
-            shouldReduceMotion
-              ? { duration: 0 }
-              : { type: "spring", stiffness: 120, damping: 24, delay: 0.1 }
-          }
-          className={`h-full rounded-full ${barClass}`}
-        />
-      </div>
-    </div>
-  );
-}
-
 // --- Scent Profile ------------------------------------------------------------
 
 export function ScentProfile({
-  perfumeId,
   top_notes,
   heart_notes,
   base_notes,
-  avgLongevity,
-  avgSillage,
-  reviewCount,
   description,
   perfumer,
   accords,
 }: ScentProfileProps) {
   const shouldReduceMotion = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
-  const [isReviewOpen, setIsReviewOpen] = useState(false);
 
   // Detect whether description needs a Read More toggle (>220 characters is a good proxy)
   const isLong = (description?.length ?? 0) > 220;
@@ -318,98 +247,6 @@ export function ScentProfile({
           />
         </div>
       </section>
-
-      {/* -- Performance Radar ----------------------------------- */}
-      <section className="rounded-2xl p-6 bg-[var(--bg-glass)] backdrop-blur-[10px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]">
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-[var(--text-primary)]">
-              Performance
-            </h2>
-            <span className="text-[10px] text-[var(--text-muted)]">
-              Based on {reviewCount} review{reviewCount !== 1 ? "s" : ""}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsReviewOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold border border-[var(--border-color)] bg-[var(--bg-surface)]/80 hover:border-[var(--accent)]/60 hover:bg-[var(--accent)]/10 text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors"
-            >
-              <PenSquare size={14} />
-              <span className="hidden sm:inline">Write a review</span>
-              <span className="sm:hidden">Review</span>
-            </button>
-          </div>
-        </div>
-
-        {reviewCount === 0 ? (
-          <p className="text-sm text-center py-4 text-[var(--text-muted)]">
-            No reviews yet — be the first!
-          </p>
-        ) : (
-          <div className="space-y-5">
-            <RadarBar
-              label="Longevity"
-              value={avgLongevity}
-              valueClass="text-[#F59E0B]"
-              barClass="bg-[linear-gradient(90deg,rgba(245,158,11,0.5),#F59E0B)] shadow-[0_0_8px_rgba(245,158,11,0.35)]"
-              shouldReduceMotion={shouldReduceMotion}
-            />
-            <RadarBar
-              label="Sillage (Projection)"
-              value={avgSillage}
-              valueClass="text-[#F783AC]"
-              barClass="bg-[linear-gradient(90deg,rgba(247,131,172,0.5),#F783AC)] shadow-[0_0_8px_rgba(247,131,172,0.35)]"
-              shouldReduceMotion={shouldReduceMotion}
-            />
-          </div>
-        )}
-      </section>
-
-      <AnimatePresence>
-        {isReviewOpen && (
-          <motion.div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="relative max-w-4xl w-full max-h-[90vh] overflow-hidden rounded-2xl bg-[var(--bg-elevated)] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]"
-              initial={{ scale: 0.9, opacity: 0, y: 12 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 12 }}
-              transition={{ type: "spring", stiffness: 260, damping: 24 }}
-            >
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--bg-glass-border)] bg-[var(--bg-glass)]/80 backdrop-blur-sm">
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
-                    Quick Review
-                  </span>
-                  <span className="text-sm font-bold text-[var(--text-primary)]">
-                    {"Share your impression"}
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsReviewOpen(false)}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-[var(--bg-glass-border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] transition-colors"
-                  aria-label="Close review"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-              <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-52px)]">
-                <ReviewForm
-                  perfumeId={perfumeId}
-                  onSubmitted={() => setIsReviewOpen(false)}
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

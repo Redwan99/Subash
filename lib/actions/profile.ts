@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
+import { sendPasswordChangedEmail } from "@/lib/email";
 
 const UpdateProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(60).trim(),
@@ -94,6 +95,12 @@ export async function changePassword(
     where: { id: session.user.id },
     data: { password: hashed },
   });
+
+  // Notify user
+  const userDetails = await prisma.user.findUnique({ where: { id: session.user.id }, select: { email: true, name: true } });
+  if (userDetails?.email) {
+    sendPasswordChangedEmail(userDetails.email, userDetails.name ?? "User").catch(console.error);
+  }
 
   return { success: true };
 }

@@ -1,4 +1,5 @@
 import { LeftSidebar } from "@/components/layout/LeftSidebar";
+import { LeftSidebarWrapper } from "@/components/layout/LeftSidebarWrapper";
 import { RightSidebar } from "@/components/layout/RightSidebar";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 
@@ -13,7 +14,9 @@ export default function MainLayout({
             <div className="max-w-[1600px] mx-auto w-full flex justify-center pb-32 md:pb-6">
                 {/* Hide on mobile/tablet, show on lg desktop */}
                 <div className="hidden lg:block w-[var(--sidebar-width)] shrink-0">
-                    <LeftSidebar />
+                    <LeftSidebarWrapper>
+                        <LeftSidebar />
+                    </LeftSidebarWrapper>
                 </div>
 
                 <div className="flex-1 w-full py-6 px-4 sm:px-6 min-h-screen animate-fade-in-up">{children}</div>

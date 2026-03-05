@@ -3,10 +3,9 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
 export async function getFollowingFeed() {
-  const session = await auth();
-  if (!session?.user?.id) return [];
-
   try {
+    const session = await auth();
+    if (!session?.user?.id) return [];
     const following = await prisma.follows.findMany({
       where: { followerId: session.user.id },
       select: { followingId: true }

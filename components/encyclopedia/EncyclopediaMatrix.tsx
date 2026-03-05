@@ -188,8 +188,8 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Pagination
-  const PAGE_SIZE = 30;
-  const [hasMore, setHasMore] = useState(initialData.length >= PAGE_SIZE);
+  // Show all perfumes at once, no pagination
+  const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filtersVersion = useRef(0); // track filter changes to discard stale fetches
@@ -220,43 +220,15 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
     filtersVersion.current += 1;
     const version = filtersVersion.current;
     startTransition(() => {
-      searchEncyclopedia({ ...buildFilterParams(), skip: 0, take: PAGE_SIZE }).then(data => {
+      searchEncyclopedia({ ...buildFilterParams() }).then(data => {
         if (filtersVersion.current !== version) return; // stale
         setResults(data);
-        setHasMore(data.length >= PAGE_SIZE);
+        setHasMore(false);
       });
     });
   }, [buildFilterParams]);
 
-  // Load more (append)
-  const loadMore = useCallback(() => {
-    if (loadingMore || !hasMore) return;
-    setLoadingMore(true);
-    const version = filtersVersion.current;
-    searchEncyclopedia({ ...buildFilterParams(), skip: results.length, take: PAGE_SIZE }).then(data => {
-      if (filtersVersion.current !== version) { setLoadingMore(false); return; }
-      setResults(prev => {
-        // dedupe by id
-        const ids = new Set(prev.map(p => p.id));
-        const newItems = data.filter((p: { id: string }) => !ids.has(p.id));
-        return [...prev, ...newItems];
-      });
-      setHasMore(data.length >= PAGE_SIZE);
-      setLoadingMore(false);
-    });
-  }, [loadingMore, hasMore, results.length, buildFilterParams]);
-
-  // IntersectionObserver on sentinel
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      entries => { if (entries[0].isIntersecting) loadMore(); },
-      { rootMargin: "400px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [loadMore]);
+  // Remove load more and infinite scroll logic (all perfumes shown at once)
 
   // Sort results alphabetically by name
   const sortedResults = useMemo(() => {

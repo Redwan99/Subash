@@ -25,6 +25,13 @@ function timeAgo(date: Date): string {
 
 const getCachedSidebarData = unstable_cache(
   async () => {
+    // ── 0. Platform Stats ──────────────────────────────────────
+    const [totalUsers, totalPerfumes, totalReviews] = await Promise.all([
+      prisma.user.count(),
+      prisma.perfume.count(),
+      prisma.review.count(),
+    ]);
+
     // ── 1. Perfume of the Day ────────────────────────────────────
     // Check PerfumeOfTheDay table first, else pick by day-of-year mod count
     const todayStart = new Date();
@@ -84,10 +91,12 @@ const getCachedSidebarData = unstable_cache(
     // ── 3. Trending Perfumes (7‑day search activity) ────
     const trendingPerfumes = await getTrendingPerfumes(5, 7);
 
-    // ── 4. Recent Activity (reviews + fragram posts) ─────────────
+    // ── 4. Recent Activity (reviews + fragram posts — last 24 hours) ─────────────
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const [recentReviews, recentPosts] = await Promise.all([
       prisma.review.findMany({
-        take: 3,
+        where: { createdAt: { gte: oneDayAgo } },
+        take: 20,
         orderBy: { createdAt: "desc" },
         select: {
           id: true, overall_rating: true, text: true, createdAt: true,
@@ -96,7 +105,8 @@ const getCachedSidebarData = unstable_cache(
         },
       }),
       prisma.fragramPost.findMany({
-        take: 2,
+        where: { createdAt: { gte: oneDayAgo } },
+        take: 20,
         orderBy: { createdAt: "desc" },
         select: {
           id: true, likes: true, caption: true, createdAt: true,
@@ -159,7 +169,7 @@ const getCachedSidebarData = unstable_cache(
         : perfume
     );
 
-    return { potd: hydratedPotd, trendingBrands, trendingPerfumes: hydratedTrending, activity };
+    return { potd: hydratedPotd, trendingBrands, trendingPerfumes: hydratedTrending, activity, stats: { totalUsers, totalPerfumes, totalReviews } };
   },
   ['sidebar-cache'],
   { revalidate: 120 }
@@ -167,14 +177,10 @@ const getCachedSidebarData = unstable_cache(
 
 export async function GET() {
   try {
-    const { potd, trendingBrands, trendingPerfumes, activity } = await getCachedSidebarData();
+    const { potd, trendingBrands, trendingPerfumes, activity, stats } = await getCachedSidebarData();
 
     // Dynamically recalculate timeAgo for activity so it's fresh even if cached
     const freshActivity = activity.sort((a, b) => {
-      // timeAgo sorting relies on fresh display, but wait...
-      // The cached values already have string `timeAgo` calculated at generation time.
-      // E.g., "5m ago". Let's serve it as is, or we'd need to cache raw Date and map here.
-      // The cache lives for 1hr. The string is close enough or we can leave it to client.
       return a.time.localeCompare(b.time);
     });
 
@@ -183,9 +189,10 @@ export async function GET() {
       trendingBrands,
       trendingPerfumes,
       activity: freshActivity,
+      stats,
     });
   } catch (err) {
     console.error("[/api/sidebar]", err);
-    return NextResponse.json({ potd: null, trendingBrands: [], trendingPerfumes: [], activity: [] });
+    return NextResponse.json({ potd: null, trendingBrands: [], trendingPerfumes: [], activity: [], stats: { totalUsers: 0, totalPerfumes: 0, totalReviews: 0 } });
   }
 }

@@ -5,7 +5,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { Activity, Star, Camera, Zap, TrendingUp } from "lucide-react";
+import { Activity, Star, Camera, Zap, TrendingUp, Users, FlaskConical, MessageSquare, Wifi } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { LeaderboardWidget } from "@/components/ui/LeaderboardWidget";
 
@@ -28,9 +28,16 @@ interface TrendingPerfume {
   brand: string;
 }
 
+interface PlatformStats {
+  totalUsers: number;
+  totalPerfumes: number;
+  totalReviews: number;
+}
+
 interface SidebarData {
   activity: ActivityItem[];
   trendingPerfumes: TrendingPerfume[];
+  stats?: PlatformStats;
 }
 
 // Icon + color per type
@@ -142,7 +149,6 @@ function ActivityFeed({ data, activity, shouldReduceMotion }: { data: SidebarDat
       <div
         ref={scrollRef}
         className="h-full overflow-y-auto px-3 py-3 space-y-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        style={{ maxHeight: "calc(3 * 76px + 16px)" }}
       >
         {activity.map((item, i) => (
           <ActivityCard key={item.id} item={item} index={i} shouldReduceMotion={shouldReduceMotion} />
@@ -165,7 +171,6 @@ export function RightSidebar() {
   }, []);
 
   const activity = data?.activity ?? [];
-  const trending = data?.trendingPerfumes ?? [];
 
   return (
     <motion.aside
@@ -206,34 +211,33 @@ export function RightSidebar() {
 
       <div className="mx-4 h-px bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)]" />
 
-      {/* Activity Feed — scrollable with fade edges, 3 visible cards */}
+      {/* Activity Feed — scrollable with fade edges */}
       <ActivityFeed data={data} activity={activity} shouldReduceMotion={shouldReduceMotion} />
 
-      {/* Footer: Trending */}
-      <div className="px-4 py-4">
-        <div className="h-px w-full mb-4 bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)]" />
-        <p className="text-[10px] font-semibold tracking-widest uppercase mb-2 text-[var(--text-muted)]">Trending This Week</p>
-        <div className="space-y-1.5">
-          {trending.length > 0
-            ? trending.map(({ id, slug, name, brand }, i) => (
-              <Link key={id} href={`/perfume/${slug}`} prefetch={false}>
-                <div className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                  <span className="text-[10px] font-bold w-4 text-right text-[var(--accent)]">{i + 1}</span>
-                  <div className="min-w-0">
-                    <span className="text-xs truncate block text-[var(--text-secondary)]">{name}</span>
-                    <span className="text-[10px] text-[var(--text-muted)]">{brand}</span>
-                  </div>
+      {/* Platform Stats */}
+      {data?.stats && (
+        <div className="px-4 py-4">
+          <div className="h-px w-full mb-4 bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)]" />
+          <p className="text-[10px] font-semibold tracking-widest uppercase mb-3 text-[var(--text-muted)]">Platform Stats</p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { label: "Users", value: data.stats.totalUsers, icon: Users, color: "text-[#60A5FA]" },
+              { label: "Perfumes", value: data.stats.totalPerfumes, icon: FlaskConical, color: "text-[#F783AC]" },
+              { label: "Reviews", value: data.stats.totalReviews, icon: MessageSquare, color: "text-[#F59E0B]" },
+              { label: "Online", value: "—", icon: Wifi, color: "text-[#34D399]" },
+            ].map(({ label, value, icon: Icon, color }) => (
+              <div key={label} className="flex items-center gap-2 p-2 rounded-lg bg-[var(--bg-glass)] border border-[var(--border-color)]">
+                <Icon size={14} className={color} />
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-[var(--text-primary)]">{typeof value === "number" ? value.toLocaleString() : value}</p>
+                  <p className="text-[10px] text-[var(--text-muted)]">{label}</p>
                 </div>
-              </Link>
-            ))
-            : ["…", "…", "…"].map((_, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span className="text-[10px] font-bold w-4 text-right text-[var(--accent)]">{i + 1}</span>
-                <span className="text-xs text-[var(--text-muted)]">Loading…</span>
               </div>
             ))}
+          </div>
         </div>
-      </div>
+      )}
+
     </motion.aside>
   );
 }
