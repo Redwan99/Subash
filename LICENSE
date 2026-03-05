@@ -1,16 +1,187 @@
+SUBASH — PROPRIETARY SOFTWARE LICENSE
+======================================
+
 Copyright (c) 2026 Subash / Redwan99. All Rights Reserved.
 
-1. PERMITTED USE
-You are permitted to access and use the Subash application as an end-user via the official public deployment (e.g., subash.rico.bd).
+Effective Date: January 1, 2026
+Last Updated: March 5, 2026
 
-2. RESTRICTIONS
-Unless you have been granted prior, explicit written permission or a commercial contract from the copyright holder:
-- You may NOT copy, modify, distribute, sell, or lease any part of this source code.
-- You may NOT host your own instance of this software for public or commercial use.
-- You may NOT scrape, mass-download, or extract the compiled database, reviews, or user data.
-- You may NOT reverse-engineer the proprietary Scent AI or Reputation algorithms.
+This license governs the use of the Subash software, its source code,
+compiled artifacts, databases, algorithms, visual assets, and all
+associated documentation (collectively, the "Software").
 
-3. USER-GENERATED CONTENT
-By submitting reviews, ratings, or collection data to the platform, users grant Subash a perpetual, non-exclusive license to display and utilize this data within the platform.
+By accessing, downloading, or using the Software in any form, you
+agree to be bound by the terms of this license.
 
-For commercial licensing, API access, or enterprise deployment contracts, please contact the repository owner directly.
+
+1. DEFINITIONS
+
+   "Software" refers to the Subash fragrance discovery platform,
+   including all source code, compiled binaries, database schemas,
+   seed data, design assets, icons, stylesheets, API endpoints,
+   documentation, and configuration files contained in this repository.
+
+   "Owner" refers to the copyright holder: Redwan99 / Subash.
+
+   "Official Deployment" refers to the production instance hosted at
+   subash.rico.bd or any domain explicitly designated by the Owner.
+
+   "User" refers to any individual or entity accessing the Software.
+
+   "User Content" refers to reviews, ratings, wardrobe data, comments,
+   and any other content submitted by Users through the platform.
+
+
+2. PERMITTED USE
+
+   a) You may access and use the Software as an end-user through the
+      Official Deployment.
+
+   b) You may view this source code on GitHub for educational and
+      reference purposes only.
+
+   c) You may fork this repository solely for the purpose of
+      submitting pull requests back to the original repository,
+      subject to the Owner's approval.
+
+
+3. RESTRICTIONS
+
+   Unless you have obtained prior, explicit written permission or a
+   commercial license from the Owner, you may NOT:
+
+   a) COPY, reproduce, or duplicate the Software or any substantial
+      portion thereof.
+
+   b) MODIFY, adapt, translate, or create derivative works based on
+      the Software.
+
+   c) DISTRIBUTE, sublicense, sell, lease, rent, lend, or otherwise
+      transfer the Software or access to it to any third party.
+
+   d) HOST, deploy, or operate your own instance of the Software,
+      whether for public, private, commercial, or non-commercial use.
+
+   e) SCRAPE, crawl, mass-download, or programmatically extract data
+      from the Official Deployment or the bundled database, including
+      but not limited to perfume records, reviews, user data, and
+      pricing information.
+
+   f) REVERSE-ENGINEER, decompile, disassemble, or attempt to derive
+      the source code, algorithms, or data structures of any compiled
+      or obfuscated portions of the Software, including the Scent AI,
+      recommendation engine, and reputation scoring systems.
+
+   g) REMOVE, alter, or obscure any copyright notices, license text,
+      attribution, or proprietary markings within the Software.
+
+   h) USE the Software, its name, or its branding to imply
+      endorsement, affiliation, or sponsorship without written consent.
+
+
+4. INTELLECTUAL PROPERTY
+
+   a) The Software and all intellectual property rights therein are and
+      shall remain the exclusive property of the Owner.
+
+   b) The Subash name, logo, visual design system, color palette, and
+      glass-morphism UI theme are proprietary trade dress of the Owner.
+
+   c) The curated fragrance database, including enriched metadata,
+      scent profiles, and editorial descriptions, is a compilation
+      protected by copyright.
+
+   d) No rights or licenses are granted by implication, estoppel, or
+      otherwise, except as expressly set forth in this license.
+
+
+5. USER-GENERATED CONTENT
+
+   a) Users retain ownership of the original text and creative
+      expression in their User Content.
+
+   b) By submitting User Content to the platform, Users grant Subash
+      a worldwide, perpetual, irrevocable, non-exclusive, royalty-free
+      license to use, display, reproduce, modify, adapt, publish, and
+      distribute the User Content within the platform and for
+      promotional purposes.
+
+   c) Users represent that their User Content does not infringe on
+      the intellectual property rights of any third party.
+
+   d) The Owner reserves the right to moderate, edit, or remove User
+      Content at its sole discretion.
+
+
+6. DATA & PRIVACY
+
+   a) The Software collects and processes personal data as described
+      in the platform's Privacy Policy.
+
+   b) Automated data collection (bots, scrapers, crawlers) is
+      strictly prohibited without prior written authorization.
+
+   c) The Owner implements reasonable security measures to protect
+      User data but provides no guarantee against unauthorized access.
+
+
+7. DISCLAIMER OF WARRANTIES
+
+   THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT
+   WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+   LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+   THE OWNER DOES NOT WARRANT THAT THE SOFTWARE WILL BE
+   UNINTERRUPTED, ERROR-FREE, OR FREE OF HARMFUL COMPONENTS.
+
+
+8. LIMITATION OF LIABILITY
+
+   IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
+   SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF
+   PROFITS, DATA, OR GOODWILL, ARISING OUT OF OR IN CONNECTION WITH
+   THE USE OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGES.
+
+   THE OWNER'S TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT PAID BY
+   THE USER (IF ANY) FOR ACCESS TO THE SOFTWARE IN THE TWELVE (12)
+   MONTHS PRECEDING THE CLAIM.
+
+
+9. TERMINATION
+
+   a) This license is effective until terminated.
+
+   b) The Owner may terminate this license at any time, with or
+      without cause, by providing notice through the repository or
+      the Official Deployment.
+
+   c) Upon termination, you must immediately cease all use of the
+      Software and destroy any copies in your possession.
+
+   d) Sections 3, 4, 7, 8, and 10 survive termination.
+
+
+10. GOVERNING LAW
+
+    This license shall be governed by and construed in accordance with
+    the laws of Bangladesh, without regard to its conflict of law
+    provisions. Any disputes arising under this license shall be
+    subject to the exclusive jurisdiction of the courts of Dhaka,
+    Bangladesh.
+
+
+11. COMMERCIAL LICENSING
+
+    For commercial licensing, white-label agreements, API access,
+    enterprise deployment contracts, or any use not expressly permitted
+    above, please contact the repository owner directly.
+
+
+12. AMENDMENTS
+
+    The Owner reserves the right to modify this license at any time.
+    Changes take effect upon being committed to the repository.
+    Continued use of the Software after changes constitutes acceptance
+    of the revised terms.
