@@ -23,7 +23,7 @@ export default async function PerfumesPage() {
                     {/* Platform Stats */}
                     {/* TODO: Import and render PlatformStats component here, or inline stats if available */}
                     {/* Discovery Matrix filter panel */}
-                    <EncyclopediaMatrix initialData={initialData} sidebarOnly />
+                    <EncyclopediaMatrix initialData={initialData} />
                 </div>
             </aside>
 

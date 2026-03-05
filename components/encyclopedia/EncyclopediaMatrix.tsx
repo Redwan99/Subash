@@ -7,8 +7,8 @@ import {
   Filter, Loader2, Heart, Sparkles, Coffee, ShieldCheck, Eye,
   Sun, Cloud, Snowflake, Droplets, CloudRain, CloudFog,
   Sunrise, SunMedium, Sunset, Moon,
-  User, Users, ChevronDown, ChevronUp, Search, X, SlidersHorizontal,
-  Star, TrendingUp, ArrowDownAZ, Clock, Award,
+  User, Users, ChevronDown, Search, X, SlidersHorizontal,
+  TrendingUp, ArrowDownAZ, Clock, Award,
   Flame, TreePine, Citrus as CitrusIcon, Candy, Gem, Cherry, Wind,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -189,8 +189,7 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
 
   // Pagination
   // Show all perfumes at once, no pagination
-  const [hasMore, setHasMore] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const filtersVersion = useRef(0); // track filter changes to discard stale fetches
 
