@@ -235,20 +235,36 @@ export function AsyncCsvImporter() {
     setPreviewing(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
+    // Step 1: Upload file to server
+    const uploadForm = new FormData();
+    uploadForm.append("file", file);
+    let serverPath = "";
     try {
-      const result = await previewCsv(formData);
+      const uploadRes = await fetch("/api/csv-upload", {
+        method: "POST",
+        body: uploadForm,
+      });
+      const uploadJson = await uploadRes.json();
+      if (!uploadJson.success || !uploadJson.url) {
+        throw new Error(uploadJson.error || "Failed to upload CSV file.");
+      }
+      serverPath = uploadJson.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload CSV file.");
+      setPreviewing(false);
+      return;
+    }
+
+    // Step 2: Preview from server path
+    try {
+      const result = await previewCsv({ path: serverPath });
       if (result.error) {
         setError(result.error);
       } else {
         setPreview(result);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to preview file."
-      );
+      setError(err instanceof Error ? err.message : "Failed to preview file.");
     } finally {
       setPreviewing(false);
     }
@@ -261,11 +277,29 @@ export function AsyncCsvImporter() {
     setUploading(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append("file", file);
-
+    // Step 1: Upload file to server
+    const uploadForm = new FormData();
+    uploadForm.append("file", file);
+    let serverPath = "";
     try {
-      const result = await startCsvImport(formData);
+      const uploadRes = await fetch("/api/csv-upload", {
+        method: "POST",
+        body: uploadForm,
+      });
+      const uploadJson = await uploadRes.json();
+      if (!uploadJson.success || !uploadJson.url) {
+        throw new Error(uploadJson.error || "Failed to upload CSV file.");
+      }
+      serverPath = uploadJson.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload CSV file.");
+      setUploading(false);
+      return;
+    }
+
+    // Step 2: Start import from server path
+    try {
+      const result = await startCsvImport({ path: serverPath });
       if (result.error) {
         setError(result.error);
         setUploading(false);
@@ -275,9 +309,7 @@ export function AsyncCsvImporter() {
         setUploading(false);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to start import."
-      );
+      setError(err instanceof Error ? err.message : "Failed to start import.");
       setUploading(false);
     }
   };

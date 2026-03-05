@@ -205,7 +205,12 @@ export default async function HomePage() {
   const climatePicks = await getClimatePicks(climateTags);
   const feedInitialReviews: LiveReview[] = latestReviews.map((review) => ({
     ...review,
-    createdAt: review.createdAt.toISOString(),
+    createdAt:
+      typeof review.createdAt === "string"
+        ? review.createdAt
+        : review.createdAt instanceof Date
+        ? review.createdAt.toISOString()
+        : "",
   }));
 
   return (
