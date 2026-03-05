@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useTransition, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useTransition, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { searchEncyclopedia } from "@/lib/actions/encyclopedia";
 import Image from "next/image";
@@ -182,10 +182,36 @@ function GenderOption({
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PAGE_SIZE = 40;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PerfumeCard = React.memo(function PerfumeCard({ perfume }: { perfume: any }) {
+  return (
+    <Link href={`/perfume/${perfume.slug}`} className="flex flex-col bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] rounded-2xl overflow-hidden hover:-translate-y-0.5 hover:border-[var(--accent)]/30 hover:shadow-lg hover:shadow-[var(--accent)]/8 transition-[transform,border-color,box-shadow] duration-200 group will-change-[transform]">
+      <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] bg-gradient-to-b from-white/5 to-transparent p-3 sm:p-5 flex items-center justify-center">
+        <Image src={perfume.transparentImageUrl || perfume.image_url} alt={perfume.name} fill className="object-contain p-4 drop-shadow-xl group-hover:scale-105 transition-transform duration-500 ease-out" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" loading="lazy" />
+        {perfume.gender && (
+          <span className={`absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full capitalize border ${
+            perfume.gender.toLowerCase() === 'men' ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' : perfume.gender.toLowerCase() === 'women' ? 'text-pink-400 bg-pink-500/10 border-pink-500/20' : 'text-[var(--accent)] bg-[var(--accent)]/10 border-[var(--accent)]/20'
+          }`}>
+            {perfume.gender}
+          </span>
+        )}
+      </div>
+      <div className="p-3 sm:p-4 flex flex-col gap-0.5 border-t border-[var(--bg-glass-border)]">
+        <h3 className="font-bold text-[var(--text-primary)] text-sm sm:text-base line-clamp-1 group-hover:text-[var(--accent)] transition-colors duration-200">{perfume.name}</h3>
+        <p className="text-xs sm:text-sm text-[var(--text-muted)] line-clamp-1">{perfume.brand}</p>
+      </div>
+    </Link>
+  );
+});
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function EncyclopediaMatrix({ initialData }: { initialData: any[] }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [results, setResults] = useState<any[]>(initialData);
   const [isPending, startTransition] = useTransition();
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   // Portal target for rendering filters in the left sidebar
@@ -196,10 +222,9 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
   }, []);
 
   // Pagination
-  // Show all perfumes at once, no pagination
-  const [hasMore, setHasMore] = useState(false);
+  const [hasMore, setHasMore] = useState(initialData.length >= PAGE_SIZE);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const filtersVersion = useRef(0); // track filter changes to discard stale fetches
+  const filtersVersion = useRef(0);
 
   // Filters
   const [selectedAccords, setSelectedAccords] = useState<string[]>([]);
@@ -209,8 +234,15 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
   const [weatherTags, setWeatherTags] = useState<string[]>([]);
   const [timeTags, setTimeTags] = useState<string[]>([]);
   const [notesQuery, setNotesQuery] = useState("");
+  const [debouncedNotes, setDebouncedNotes] = useState("");
 
-  const activeFilterCount = selectedAccords.length + (gender ? 1 : 0) + (mood ? 1 : 0) + weatherTags.length + timeTags.length + (notesQuery.trim() ? 1 : 0);
+  // Debounce notes input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedNotes(notesQuery.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [notesQuery]);
+
+  const activeFilterCount = selectedAccords.length + (gender ? 1 : 0) + (mood ? 1 : 0) + weatherTags.length + timeTags.length + (debouncedNotes ? 1 : 0);
 
   const buildFilterParams = useCallback(() => ({
     accords: selectedAccords,
@@ -219,28 +251,46 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
     mood: mood || undefined,
     weatherTags: weatherTags.length > 0 ? weatherTags : undefined,
     timeTags: timeTags.length > 0 ? timeTags : undefined,
-    notes: notesQuery.trim() || undefined,
-  }), [selectedAccords, sort, gender, mood, weatherTags, timeTags, notesQuery]);
+    notes: debouncedNotes || undefined,
+    take: PAGE_SIZE,
+  }), [selectedAccords, sort, gender, mood, weatherTags, timeTags, debouncedNotes]);
 
-  // Initial fetch when filters change — resets results
+  // Fetch when filters change — resets results
   useEffect(() => {
     filtersVersion.current += 1;
     const version = filtersVersion.current;
     startTransition(() => {
-      searchEncyclopedia({ ...buildFilterParams() }).then(data => {
-        if (filtersVersion.current !== version) return; // stale
+      searchEncyclopedia({ ...buildFilterParams(), skip: 0 }).then(data => {
+        if (filtersVersion.current !== version) return;
         setResults(data);
-        setHasMore(false);
+        setHasMore(data.length >= PAGE_SIZE);
       });
     });
   }, [buildFilterParams]);
 
-  // Remove load more and infinite scroll logic (all perfumes shown at once)
-
-  // Sort results alphabetically by name
-  const sortedResults = useMemo(() => {
-    return [...results].sort((a, b) => (a.name || "").localeCompare(b.name || ""));
-  }, [results]);
+  // Infinite scroll — load more when sentinel is visible
+  useEffect(() => {
+    if (!hasMore) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoadingMore && !isPending) {
+          setIsLoadingMore(true);
+          const version = filtersVersion.current;
+          searchEncyclopedia({ ...buildFilterParams(), skip: results.length }).then(data => {
+            if (filtersVersion.current !== version) return;
+            setResults(prev => [...prev, ...data]);
+            setHasMore(data.length >= PAGE_SIZE);
+            setIsLoadingMore(false);
+          }).catch(() => setIsLoadingMore(false));
+        }
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, isLoadingMore, isPending, results.length, buildFilterParams]);
 
   const toggleAccord = (accord: string) => {
     setSelectedAccords(prev => prev.includes(accord) ? prev.filter(a => a !== accord) : [...prev, accord]);
@@ -513,25 +563,10 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 text-[var(--accent)] animate-spin" />
         </div>
-      ) : sortedResults.length > 0 ? (
+      ) : results.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 w-full contain-paint">
-          {sortedResults.map(perfume => (
-            <Link key={perfume.id} href={`/perfume/${perfume.slug}`} className="flex flex-col bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] rounded-2xl overflow-hidden hover:-translate-y-1 hover:border-[var(--accent)]/30 hover:shadow-xl hover:shadow-[var(--accent)]/10 transition-all duration-300 group">
-              <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] bg-gradient-to-b from-white/5 to-transparent p-3 sm:p-5 flex items-center justify-center">
-                <Image src={perfume.transparentImageUrl || perfume.image_url} alt={perfume.name} fill className="object-contain p-4 drop-shadow-xl group-hover:scale-110 transition-transform duration-700 ease-out" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" />
-                {perfume.gender && (
-                  <span className={`absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full capitalize border ${
-                    perfume.gender.toLowerCase() === 'men' ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' : perfume.gender.toLowerCase() === 'women' ? 'text-pink-400 bg-pink-500/10 border-pink-500/20' : 'text-[var(--accent)] bg-[var(--accent)]/10 border-[var(--accent)]/20'
-                  }`}>
-                    {perfume.gender}
-                  </span>
-                )}
-              </div>
-              <div className="p-3 sm:p-4 flex flex-col gap-0.5 border-t border-[var(--bg-glass-border)]">
-                <h3 className="font-bold text-[var(--text-primary)] text-sm sm:text-base line-clamp-1 group-hover:text-[var(--accent)] transition-colors">{perfume.name}</h3>
-                <p className="text-xs sm:text-sm text-[var(--text-muted)] line-clamp-1">{perfume.brand}</p>
-              </div>
-            </Link>
+          {results.map(perfume => (
+            <PerfumeCard key={perfume.id} perfume={perfume} />
           ))}
         </div>
       ) : (
@@ -546,7 +581,7 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
       {/* Infinite scroll sentinel */}
       {!isPending && hasMore && (
         <div ref={sentinelRef} className="flex items-center justify-center py-10">
-          <Loader2 className="w-6 h-6 text-[var(--accent)] animate-spin" />
+          {isLoadingMore && <Loader2 className="w-6 h-6 text-[var(--accent)] animate-spin" />}
         </div>
       )}
       {!isPending && !hasMore && results.length > 0 && (

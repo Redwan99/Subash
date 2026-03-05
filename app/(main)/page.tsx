@@ -276,10 +276,19 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-3 gap-6 space-y-6 contain-paint">
-          {latestReviews.map((review) => (
-            <ReviewPosterCard key={review.id} review={review} />
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-[minmax(0,1fr)] gap-4 contain-paint">
+          {latestReviews.map((review, i) => {
+            // Bento pattern: positions 0,3 are featured (tall or wide)
+            const isFeatured = i === 0 || i === 3;
+            return (
+              <div
+                key={review.id}
+                className={isFeatured ? 'sm:row-span-2' : ''}
+              >
+                <ReviewPosterCard review={review} size={isFeatured ? 'featured' : 'compact'} />
+              </div>
+            );
+          })}
         </div>
       </section>
 

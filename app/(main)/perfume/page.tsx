@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default async function PerfumesPage() {
     let initialData: Awaited<ReturnType<typeof searchEncyclopedia>> = [];
     try {
-        initialData = await searchEncyclopedia({ sort: "trending" });
+        initialData = await searchEncyclopedia({ sort: "trending", take: 40 });
     } catch (e) {
         console.error("[PerfumesPage] Failed to load initial data", e);
     }

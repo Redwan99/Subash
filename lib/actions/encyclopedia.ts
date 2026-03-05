@@ -107,8 +107,8 @@ export async function searchEncyclopedia(filters: {
     if (filters.sort === "a-z") orderBy = { name: "asc" };
     if (filters.sort === "most-reviewed") orderBy = { reviews: { _count: "desc" } };
 
-    // If take is explicitly set, use it; otherwise, fetch all perfumes
-    const take = typeof filters.take === "number" ? filters.take : undefined;
+    // Default page size 40; pass take=0 to explicitly fetch all (not recommended)
+    const take = typeof filters.take === "number" ? (filters.take === 0 ? undefined : filters.take) : 40;
     const skip = filters.skip ?? 0;
 
     const results = await prisma.perfume.findMany({
