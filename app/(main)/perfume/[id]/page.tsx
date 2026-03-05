@@ -18,6 +18,7 @@ import { WardrobeActionBar } from "@/components/perfume/WardrobeActionBar";
 import { CommunityConsensus } from "@/components/perfume/CommunityConsensus";
 import ViewTracker from "@/components/perfume/ViewTracker";
 import { parsePrismaArray } from "@/lib/utils";
+import { WriteReviewModal } from "@/components/perfume/WriteReviewModal";
 
 
 // Lazy-load the heavy interactive client bundle (ScentProfile, DupeEngine, ReviewForm)
@@ -358,12 +359,7 @@ export default async function PerfumePage({
             <h3 className="text-sm font-bold text-[var(--text-primary)]">Tried this fragrance?</h3>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">Share your experience with the community.</p>
           </div>
-          <a
-            href="#review-form"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[linear-gradient(135deg,#E84393,#D6336C)] shadow-[0_2px_12px_rgba(232,67,147,0.3)] hover:shadow-[0_4px_20px_rgba(232,67,147,0.5)] transition-all"
-          >
-            <Star size={14} /> Write a Review
-          </a>
+          <WriteReviewModal perfumeId={perfume.id} variant="cta" icon={Star} />
         </section>
 
         {/* ── User Reviews ─────────────────────────────────────── */}
