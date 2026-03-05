@@ -8,14 +8,13 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { PenSquare, X, Star } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
 const ReviewForm = dynamic(
   () => import("./ReviewForm").then((m) => m.ReviewForm),
   { ssr: false }
 );
 
-export function WriteReviewModal({ perfumeId, variant, icon: Icon, label }: { perfumeId: string; variant?: 'cta' | 'default'; icon?: LucideIcon; label?: string }) {
+export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; variant?: 'cta' | 'default' }) {
   const [open, setOpen] = useState(false);
 
   // Lock body scroll when modal is open
@@ -27,7 +26,7 @@ export function WriteReviewModal({ perfumeId, variant, icon: Icon, label }: { pe
   }, [open]);
 
   const isCta = variant === 'cta';
-  const ButtonIcon = Icon || PenSquare;
+  const ButtonIcon = isCta ? Star : PenSquare;
 
   return (
     <>
@@ -40,10 +39,10 @@ export function WriteReviewModal({ perfumeId, variant, icon: Icon, label }: { pe
         }
       >
         <ButtonIcon size={14} />
-        {isCta ? (label || 'Write a Review') : (
+        {isCta ? 'Write a Review' : (
           <>
-            <span className="hidden sm:inline">{label || 'Write a review'}</span>
-            <span className="sm:hidden">{label || 'Review'}</span>
+            <span className="hidden sm:inline">Write a review</span>
+            <span className="sm:hidden">Review</span>
           </>
         )}
       </button>

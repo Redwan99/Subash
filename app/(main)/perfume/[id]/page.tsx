@@ -359,7 +359,7 @@ export default async function PerfumePage({
             <h3 className="text-sm font-bold text-[var(--text-primary)]">Tried this fragrance?</h3>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">Share your experience with the community.</p>
           </div>
-          <WriteReviewModal perfumeId={perfume.id} variant="cta" icon={Star} />
+          <WriteReviewModal perfumeId={perfume.id} variant="cta" />
         </section>
 
         {/* ── User Reviews ─────────────────────────────────────── */}
