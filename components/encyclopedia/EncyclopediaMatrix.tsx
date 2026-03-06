@@ -214,7 +214,7 @@ const PerfumeCard = React.memo(function PerfumeCard({ perfume, isTrending }: { p
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function EncyclopediaMatrix({ initialData }: { initialData: any[] }) {
+export default function EncyclopediaMatrix({ initialData, initialQuery = "" }: { initialData: any[]; initialQuery?: string }) {
   const { isEnabled } = useFeatureToggles();
 
   // User submit perfume modal
@@ -288,6 +288,10 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
   const [timeTags, setTimeTags] = useState<string[]>([]);
   const [notesQuery, setNotesQuery] = useState("");
   const [debouncedNotes, setDebouncedNotes] = useState("");
+  const [keywordQuery, setKeywordQuery] = useState(initialQuery);
+  const [debouncedKeyword, setDebouncedKeyword] = useState(initialQuery);
+  const [brandQuery, setBrandQuery] = useState("");
+  const [debouncedBrand, setDebouncedBrand] = useState("");
 
   // Debounce notes input (300ms)
   useEffect(() => {
@@ -295,7 +299,19 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
     return () => clearTimeout(timer);
   }, [notesQuery]);
 
-  const activeFilterCount = selectedAccords.length + (gender ? 1 : 0) + (mood ? 1 : 0) + weatherTags.length + timeTags.length + (debouncedNotes ? 1 : 0);
+  // Debounce keyword input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedKeyword(keywordQuery.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [keywordQuery]);
+
+  // Debounce brand input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedBrand(brandQuery.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [brandQuery]);
+
+  const activeFilterCount = selectedAccords.length + (gender ? 1 : 0) + (mood ? 1 : 0) + weatherTags.length + timeTags.length + (debouncedNotes ? 1 : 0) + (debouncedKeyword ? 1 : 0) + (debouncedBrand ? 1 : 0);
 
   const buildFilterParams = useCallback(() => ({
     accords: selectedAccords,
@@ -305,10 +321,12 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
     weatherTags: weatherTags.length > 0 ? weatherTags : undefined,
     timeTags: timeTags.length > 0 ? timeTags : undefined,
     notes: debouncedNotes || undefined,
+    query: debouncedKeyword || undefined,
+    brands: debouncedBrand ? [debouncedBrand] : undefined,
     take: PAGE_SIZE,
-  }), [selectedAccords, sort, gender, mood, weatherTags, timeTags, debouncedNotes]);
+  }), [selectedAccords, sort, gender, mood, weatherTags, timeTags, debouncedNotes, debouncedKeyword, debouncedBrand]);
 
-  const hasActiveFilters = selectedAccords.length > 0 || !!gender || !!mood || weatherTags.length > 0 || timeTags.length > 0 || !!debouncedNotes;
+  const hasActiveFilters = selectedAccords.length > 0 || !!gender || !!mood || weatherTags.length > 0 || timeTags.length > 0 || !!debouncedNotes || !!debouncedKeyword || !!debouncedBrand;
 
   // Fetch when filters change — resets results
   useEffect(() => {
@@ -374,6 +392,8 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
     setWeatherTags([]);
     setTimeTags([]);
     setNotesQuery("");
+    setKeywordQuery("");
+    setBrandQuery("");
     setSort("trending");
   };
 
@@ -399,6 +419,42 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
           </button>
         )}
       </div>
+
+      {/* Keyword Search */}
+      <FilterSection title="Search Keyword" icon={Search} color="#818CF8" defaultOpen={!!keywordQuery} count={keywordQuery.trim() ? 1 : 0}>
+        <div className="relative">
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          <input
+            value={keywordQuery}
+            onChange={(e) => setKeywordQuery(e.target.value)}
+            placeholder="Search perfume name, brand..."
+            className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs bg-[var(--bg-surface)] border border-[var(--bg-glass-border)] focus:border-[var(--accent)] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)] transition-colors"
+          />
+          {keywordQuery && (
+            <button onClick={() => setKeywordQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+              <X size={12} />
+            </button>
+          )}
+        </div>
+      </FilterSection>
+
+      {/* Brand Filter */}
+      <FilterSection title="Filter by Brand" icon={Award} color="#F472B6" defaultOpen={false} count={brandQuery.trim() ? 1 : 0}>
+        <div className="relative">
+          <Award size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+          <input
+            value={brandQuery}
+            onChange={(e) => setBrandQuery(e.target.value)}
+            placeholder="e.g. Dior, Chanel, Tom Ford..."
+            className="w-full pl-9 pr-3 py-2.5 rounded-xl text-xs bg-[var(--bg-surface)] border border-[var(--bg-glass-border)] focus:border-[var(--accent)] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)] transition-colors"
+          />
+          {brandQuery && (
+            <button onClick={() => setBrandQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+              <X size={12} />
+            </button>
+          )}
+        </div>
+      </FilterSection>
 
       {/* Notes Search */}
       <FilterSection title="Search Notes" icon={Search} color="#60A5FA" defaultOpen={false} count={notesQuery.trim() ? 1 : 0}>
@@ -616,6 +672,20 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
               <Search size={10} />
               {notesQuery}
               <button onClick={() => setNotesQuery("")} className="hover:text-red-400 transition-colors"><X size={10} /></button>
+            </span>
+          )}
+          {keywordQuery.trim() && (
+            <span className="flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <Search size={10} />
+              &ldquo;{keywordQuery}&rdquo;
+              <button onClick={() => setKeywordQuery("")} className="hover:text-red-400 transition-colors"><X size={10} /></button>
+            </span>
+          )}
+          {brandQuery.trim() && (
+            <span className="flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20">
+              <Award size={10} />
+              {brandQuery}
+              <button onClick={() => setBrandQuery("")} className="hover:text-red-400 transition-colors"><X size={10} /></button>
             </span>
           )}
         </div>

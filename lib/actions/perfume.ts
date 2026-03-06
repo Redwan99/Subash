@@ -143,6 +143,92 @@ export async function submitReview(
   }
 }
 
+// ─── Update (Edit) an Existing Review ─────────────────────────────────────────
+
+export async function updateReview(
+  input: z.infer<typeof ReviewSchema>
+): Promise<ReviewFormState> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "You must be signed in." };
+  }
+
+  const parsed = ReviewSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: "Validation failed",
+      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+    };
+  }
+
+  const { perfumeId, text, overall_rating, longevity_score, sillage_score, projection_score, intensity_score, time_tags, weather_tags, genderLeaning, occasion, valueRating, blindBuySafe } =
+    parsed.data;
+
+  try {
+    await prisma.review.update({
+      where: {
+        userId_perfumeId: {
+          userId: session.user.id,
+          perfumeId,
+        },
+      },
+      data: {
+        text,
+        overall_rating,
+        longevity_score,
+        sillage_score,
+        projection_score: projection_score ?? null,
+        intensity_score: intensity_score ?? null,
+        time_tags: JSON.stringify(time_tags),
+        weather_tags: JSON.stringify(weather_tags),
+        genderLeaning,
+        occasion,
+        valueRating,
+        blindBuySafe,
+      },
+    });
+
+    revalidatePath(`/perfume/${perfumeId}`);
+    return { success: true };
+  } catch {
+    return { success: false, error: "Failed to update review. Please try again." };
+  }
+}
+
+// ─── Get User's Existing Review ───────────────────────────────────────────────
+
+export async function getUserReviewForPerfume(perfumeId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
+  const review = await prisma.review.findUnique({
+    where: {
+      userId_perfumeId: {
+        userId: session.user.id,
+        perfumeId,
+      },
+    },
+    select: {
+      id: true,
+      text: true,
+      overall_rating: true,
+      longevity_score: true,
+      sillage_score: true,
+      projection_score: true,
+      intensity_score: true,
+      time_tags: true,
+      weather_tags: true,
+      genderLeaning: true,
+      occasion: true,
+      valueRating: true,
+      blindBuySafe: true,
+    },
+  });
+
+  return review;
+}
+
 // ─── Add Dupe / Clone ─────────────────────────────────────────────────────────
 
 export async function addDupeVote(

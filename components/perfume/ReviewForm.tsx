@@ -17,7 +17,7 @@ import {
   Sunrise, SunMedium, Sunset, Moon, Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { submitReview, type ReviewFormState } from "@/lib/actions/perfume";
+import { submitReview, updateReview, type ReviewFormState } from "@/lib/actions/perfume";
 
 // --- Types --------------------------------------------------------------------
 
@@ -246,26 +246,51 @@ export function ReviewForm({
   perfumeId,
   onSubmitted,
   embedded = false,
+  existingReview,
 }: {
   perfumeId: string;
   onSubmitted?: () => void;
   embedded?: boolean;
+  existingReview?: {
+    id: string;
+    text: string;
+    overall_rating: number;
+    longevity_score: number;
+    sillage_score: number;
+    projection_score: number | null;
+    intensity_score: number | null;
+    time_tags: string;
+    weather_tags: string;
+    genderLeaning: number | null;
+    occasion: string | null;
+    valueRating: number | null;
+    blindBuySafe: boolean | null;
+  } | null;
 }) {
   const { data: session } = useSession();
   const shouldReduceMotion = useReducedMotion();
+  const isEditing = !!existingReview;
 
-  const [text, setText] = useState("");
-  const [rating, setRating] = useState(3);
-  const [longevity, setLongevity] = useState(5);
-  const [sillage, setSillage] = useState(5);
-  const [projection, setProjection] = useState(5);
-  const [intensity, setIntensity] = useState(5);
-  const [weatherTags, setWeatherTags] = useState<WeatherTag[]>([]);
-  const [times, setTimes] = useState<TimeTag[]>([]);
-  const [genderLeaning, setGenderLeaning] = useState<number>(3);
-  const [occasion, setOccasion] = useState<string>("");
-  const [valueRating, setValueRating] = useState<number>(2);
-  const [blindBuySafe, setBlindBuySafe] = useState<boolean>(true);
+  // Parse existing review arrays
+  const existingTimeTags: TimeTag[] = existingReview
+    ? (JSON.parse(existingReview.time_tags || "[]") as string[]).map(t => t.toLowerCase() as TimeTag)
+    : [];
+  const existingWeatherTags: WeatherTag[] = existingReview
+    ? (JSON.parse(existingReview.weather_tags || "[]") as WeatherTag[])
+    : [];
+
+  const [text, setText] = useState(existingReview?.text ?? "");
+  const [rating, setRating] = useState(existingReview ? Math.round(existingReview.overall_rating) : 3);
+  const [longevity, setLongevity] = useState(existingReview?.longevity_score ?? 5);
+  const [sillage, setSillage] = useState(existingReview?.sillage_score ?? 5);
+  const [projection, setProjection] = useState(existingReview?.projection_score ?? 5);
+  const [intensity, setIntensity] = useState(existingReview?.intensity_score ?? 5);
+  const [weatherTags, setWeatherTags] = useState<WeatherTag[]>(existingWeatherTags);
+  const [times, setTimes] = useState<TimeTag[]>(existingTimeTags);
+  const [genderLeaning, setGenderLeaning] = useState<number>(existingReview?.genderLeaning ?? 3);
+  const [occasion, setOccasion] = useState<string>(existingReview?.occasion ?? "");
+  const [valueRating, setValueRating] = useState<number>(existingReview?.valueRating ?? 2);
+  const [blindBuySafe, setBlindBuySafe] = useState<boolean>(existingReview?.blindBuySafe ?? true);
   const [state, setState] = useState<ReviewFormState | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -284,7 +309,7 @@ export function ReviewForm({
       "MORNING" | "DAY" | "EVENING" | "NIGHT" | "ANYTIME" | "BOTH"
     >;
 
-    const result = await submitReview({
+    const payload = {
       perfumeId,
       text,
       overall_rating: rating,
@@ -298,13 +323,19 @@ export function ReviewForm({
       occasion: occasion || null,
       valueRating,
       blindBuySafe,
-    });
+    };
+
+    const result = isEditing
+      ? await updateReview(payload)
+      : await submitReview(payload);
     setState(result);
     setLoading(false);
     if (result.success) {
-      setText(""); setRating(3); setLongevity(5); setSillage(5);
-      setProjection(5); setIntensity(5);
-      setWeatherTags([]); setTimes([]);
+      if (!isEditing) {
+        setText(""); setRating(3); setLongevity(5); setSillage(5);
+        setProjection(5); setIntensity(5);
+        setWeatherTags([]); setTimes([]);
+      }
       onSubmitted?.();
     }
   };
@@ -313,7 +344,7 @@ export function ReviewForm({
     <div className={embedded ? '' : 'rounded-2xl p-6 bg-[var(--bg-glass)] backdrop-blur-[10px] border border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]'}>
       {!embedded && (
         <h2 className="text-lg font-bold mb-5 text-[var(--text-primary)]">
-          Write a Review
+          {isEditing ? "Edit Your Review" : "Write a Review"}
         </h2>
       )}
 
@@ -328,7 +359,7 @@ export function ReviewForm({
             }`}
         >
           {state.success ? <CheckCircle size={16} /> : <AlertCircle size={16} />}
-          <span>{state.success ? "Review submitted! Thank you." : state.error}</span>
+          <span>{state.success ? (isEditing ? "Review updated successfully!" : "Review submitted! Thank you.") : state.error}</span>
         </motion.div>
       )}
 
@@ -568,7 +599,7 @@ export function ReviewForm({
             }`}
         >
           <Send size={15} />
-          {loading ? "Submitting..." : "Submit Review"}
+          {loading ? (isEditing ? "Updating..." : "Submitting...") : (isEditing ? "Update Review" : "Submit Review")}
         </motion.button>
         <p className="text-center text-[11px] text-[var(--text-muted)]">
           {text.trim().length < 10

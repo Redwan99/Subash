@@ -4,7 +4,7 @@
 // Placeholder percentages until the voting backend is wired.
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Flower2, Sun, Leaf, Snowflake, Sunrise, SunMedium, Sunset, Moon, Zap, Timer, Volume2, Radio, Gauge } from "lucide-react";
+import { Flower2, Sun, Leaf, Snowflake, Sunrise, SunMedium, Sunset, Moon, Zap, Timer, Volume2, Radio, Gauge, Briefcase, Heart, Coffee, Wine } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
 
 type ConsensusProps = {
@@ -15,6 +15,9 @@ type ConsensusProps = {
   avgSillage?: number;   // 1–10
   avgProjection?: number; // 1–10 (actual from reviews)
   avgIntensity?: number;  // 1–10 (actual from reviews)
+  activeSeasons?: string[];
+  activeTimes?: string[];
+  occasionCounts?: Record<string, number>;
 };
 
 const SEASONS: { key: string; label: string; icon: LucideIcon }[] = [
@@ -52,9 +55,13 @@ function deriveVerdictBars(avgRating: number, reviewCount: number, ratingCounts?
   ];
 }
 
-// Placeholder season/time consensus — later driven by review weather_tags / time_tags
-const ACTIVE_SEASONS = ["winter", "autumn"];
-const ACTIVE_TIMES   = ["night"];
+// Occasion metadata
+const OCCASIONS: { key: string; label: string; icon: LucideIcon }[] = [
+  { key: "office", label: "Office/Work", icon: Briefcase },
+  { key: "date",   label: "Date Night",  icon: Heart },
+  { key: "casual", label: "Casual/Daily", icon: Coffee },
+  { key: "formal", label: "Formal/Event", icon: Wine },
+];
 
 const PERF_LABELS = ["Minimal", "Very Weak", "Weak", "Mild", "Moderate", "Noticeable", "Strong", "Very Strong", "Powerful", "Enormous"];
 
@@ -89,7 +96,7 @@ function PerfBar({ label, value, icon: Icon, color, shouldReduceMotion }: {
   );
 }
 
-export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLongevity = 0, avgSillage = 0, avgProjection, avgIntensity }: ConsensusProps) {
+export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLongevity = 0, avgSillage = 0, avgProjection, avgIntensity, activeSeasons = [], activeTimes = [], occasionCounts = {} }: ConsensusProps) {
   const shouldReduceMotion = useReducedMotion();
   const verdictBars = deriveVerdictBars(avgRating, reviewCount, ratingCounts);
 
@@ -159,7 +166,7 @@ export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLo
             </p>
             <div className="grid grid-cols-4 gap-2">
               {SEASONS.map(({ key, label, icon: Icon }) => {
-                const active = ACTIVE_SEASONS.includes(key);
+                const active = activeSeasons.includes(key);
                 return (
                   <div
                     key={key}
@@ -189,7 +196,7 @@ export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLo
             </p>
             <div className="flex flex-wrap gap-2">
               {TIMES.map(({ key, label, icon: Icon }) => {
-                const active = ACTIVE_TIMES.includes(key);
+                const active = activeTimes.includes(key);
                 return (
                   <div
                     key={key}
@@ -212,6 +219,45 @@ export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLo
               })}
             </div>
           </div>
+
+          {/* Best Occasion */}
+          {Object.keys(occasionCounts).length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-3">
+                Best Occasion
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {OCCASIONS.map(({ key, label, icon: Icon }) => {
+                  const count = occasionCounts[key] || 0;
+                  const active = count > 0;
+                  return (
+                    <div
+                      key={key}
+                      className={`flex items-center gap-1.5 py-2 px-3 rounded-2xl border text-center transition-all duration-200 ${
+                        active
+                          ? "bg-brand-500/10 border-brand-500/50 shadow-[0_0_14px_rgba(232,67,147,0.25)]"
+                          : "bg-gray-100 dark:bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 ${active ? "text-brand-400" : "text-[var(--text-muted)]"}`} />
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider ${
+                          active ? "text-brand-400" : "text-[var(--text-muted)]"
+                        }`}
+                      >
+                        {label}
+                      </span>
+                      {active && (
+                        <span className="text-[9px] font-bold text-brand-300 bg-brand-500/15 px-1.5 py-0.5 rounded-full">
+                          {count}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { Users, FlaskConical, MessageSquare, Wifi } from "lucide-react";
 
 interface Stats {
@@ -10,7 +11,7 @@ interface Stats {
   onlineUsers?: number;
 }
 
-function getSessionId() {
+function getAnonSessionId() {
   if (typeof window === "undefined") return "";
   let sid = sessionStorage.getItem("_hb_sid");
   if (!sid) {
@@ -21,6 +22,7 @@ function getSessionId() {
 }
 
 export function PlatformStats() {
+  const { data: session } = useSession();
   const [stats, setStats] = useState<Stats | null>(null);
   const [online, setOnline] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -35,10 +37,10 @@ export function PlatformStats() {
       .catch(() => {});
   }, []);
 
-  // Heartbeat every 30s
+  // Heartbeat every 30s — use userId for authenticated users to deduplicate
   useEffect(() => {
     const sendHeartbeat = () => {
-      const sid = getSessionId();
+      const sid = session?.user?.id ? `user:${session.user.id}` : getAnonSessionId();
       if (!sid) return;
       fetch("/api/heartbeat", {
         method: "POST",
@@ -53,7 +55,7 @@ export function PlatformStats() {
     sendHeartbeat();
     intervalRef.current = setInterval(sendHeartbeat, 30_000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, []);
+  }, [session?.user?.id]);
 
   if (!stats) return null;
 

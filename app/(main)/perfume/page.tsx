@@ -12,10 +12,21 @@ export const metadata: Metadata = {
     description: "Discover your signature scent — filter by accord, mood, weather, time, gender, and notes.",
 };
 
-export default async function PerfumesPage() {
+export default async function PerfumesPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ q?: string }>;
+}) {
+    const { q } = await searchParams;
+    const initialQuery = typeof q === "string" ? q.trim() : "";
+
     let initialData: Awaited<ReturnType<typeof searchEncyclopedia>> = [];
     try {
-        initialData = await searchEncyclopedia({ sort: "trending", take: 40 });
+        initialData = await searchEncyclopedia({
+            sort: "trending",
+            take: 40,
+            ...(initialQuery ? { query: initialQuery } : {}),
+        });
     } catch (e) {
         console.error("[PerfumesPage] Failed to load initial data", e);
     }
@@ -31,7 +42,7 @@ export default async function PerfumesPage() {
                 </p>
             </div>
 
-            <EncyclopediaMatrix initialData={initialData} />
+            <EncyclopediaMatrix initialData={initialData} initialQuery={initialQuery} />
         </div>
     );
 }

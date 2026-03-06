@@ -69,7 +69,7 @@ export default function GlobalSearch() {
   const navigateToSearch = () => {
     if (query.trim()) {
       setIsOpen(false);
-      router.push(`/encyclopedia?q=${encodeURIComponent(query.trim())}`);
+      router.push(`/perfume?q=${encodeURIComponent(query.trim())}`);
     }
   };
 

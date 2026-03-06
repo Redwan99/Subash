@@ -7,14 +7,30 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
-import { PenSquare, X, Star, Sparkles } from "lucide-react";
+import { PenSquare, X, Star, Sparkles, Edit3 } from "lucide-react";
 
 const ReviewForm = dynamic(
   () => import("./ReviewForm").then((m) => m.ReviewForm),
   { ssr: false }
 );
 
-export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; variant?: 'cta' | 'default' }) {
+type ExistingReview = {
+  id: string;
+  text: string;
+  overall_rating: number;
+  longevity_score: number;
+  sillage_score: number;
+  projection_score: number | null;
+  intensity_score: number | null;
+  time_tags: string;
+  weather_tags: string;
+  genderLeaning: number | null;
+  occasion: string | null;
+  valueRating: number | null;
+  blindBuySafe: boolean | null;
+} | null;
+
+export function WriteReviewModal({ perfumeId, variant, existingReview }: { perfumeId: string; variant?: 'cta' | 'default'; existingReview?: ExistingReview }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -38,7 +54,8 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
   }, [open]);
 
   const isCta = variant === 'cta';
-  const ButtonIcon = isCta ? Star : PenSquare;
+  const isEditing = !!existingReview;
+  const ButtonIcon = isEditing ? Edit3 : (isCta ? Star : PenSquare);
 
   const modal = (
     <AnimatePresence>
@@ -82,10 +99,10 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-[var(--text-primary)] leading-tight">
-                    Write a Review
+                    {isEditing ? "Edit Your Review" : "Write a Review"}
                   </h2>
                   <p className="text-xs text-[var(--text-muted)]">
-                    Share your honest impression
+                    {isEditing ? "Update your impression" : "Share your honest impression"}
                   </p>
                 </div>
               </div>
@@ -108,6 +125,7 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
                 perfumeId={perfumeId}
                 onSubmitted={() => setOpen(false)}
                 embedded
+                existingReview={existingReview}
               />
             </div>
           </motion.div>
@@ -127,7 +145,7 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
         }
       >
         <ButtonIcon size={14} />
-        {isCta ? 'Write a Review' : (
+        {isEditing ? 'Edit Review' : isCta ? 'Write a Review' : (
           <>
             <span className="hidden sm:inline">Write a review</span>
             <span className="sm:hidden">Review</span>

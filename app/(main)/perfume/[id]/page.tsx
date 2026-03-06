@@ -113,6 +113,13 @@ export default async function PerfumePage({
           intensity_score: true,
           text: true,
           createdAt: true,
+          time_tags: true,
+          weather_tags: true,
+          genderLeaning: true,
+          occasion: true,
+          valueRating: true,
+          blindBuySafe: true,
+          userId: true,
           user: { select: { id: true, name: true, image: true, username: true } },
         },
       },
@@ -168,6 +175,11 @@ export default async function PerfumePage({
       })
     : null;
 
+  // Check if user has already reviewed this perfume
+  const userExistingReview = session?.user?.id
+    ? perfume.reviews.find((r: { userId: string }) => r.userId === session.user!.id) ?? null
+    : null;
+
   const reviewCount = perfume.reviews.length;
   const avgRating = reviewCount
     ? perfume.reviews.reduce((sum: number, r: { overall_rating: number }) => sum + r.overall_rating, 0) / reviewCount
@@ -187,13 +199,58 @@ export default async function PerfumePage({
 
   // Compute actual rating distribution for CommunityConsensus
   const ratingCounts = { love: 0, like: 0, ok: 0, mixed: 0, dislike: 0 };
-  perfume.reviews.forEach((r: { overall_rating: number }) => {
+  // Aggregate weather/time/occasion from reviews
+  const weatherCounts: Record<string, number> = {};
+  const timeCounts: Record<string, number> = {};
+  const occasionCounts: Record<string, number> = {};
+
+  perfume.reviews.forEach((r: { overall_rating: number; weather_tags?: string; time_tags?: string; occasion?: string | null }) => {
     if (r.overall_rating >= 4.5) ratingCounts.love++;
     else if (r.overall_rating >= 3.5) ratingCounts.like++;
     else if (r.overall_rating >= 2.5) ratingCounts.ok++;
     else if (r.overall_rating >= 1.5) ratingCounts.mixed++;
     else ratingCounts.dislike++;
+
+    // Aggregate weather tags
+    try {
+      const wTags = JSON.parse(r.weather_tags || "[]") as string[];
+      for (const tag of wTags) {
+        const key = tag.toLowerCase();
+        weatherCounts[key] = (weatherCounts[key] || 0) + 1;
+      }
+    } catch { /* ignore */ }
+
+    // Aggregate time tags
+    try {
+      const tTags = JSON.parse(r.time_tags || "[]") as string[];
+      for (const tag of tTags) {
+        const key = tag.toLowerCase();
+        timeCounts[key] = (timeCounts[key] || 0) + 1;
+      }
+    } catch { /* ignore */ }
+
+    // Aggregate occasion
+    if (r.occasion) {
+      occasionCounts[r.occasion] = (occasionCounts[r.occasion] || 0) + 1;
+    }
   });
+
+  // Derive active seasons from weather tags
+  const seasonMap: Record<string, string[]> = {
+    spring: ["mild", "humid"],
+    summer: ["hot", "humid"],
+    autumn: ["mild", "dry"],
+    winter: ["cold", "dry"],
+  };
+  const activeSeasons = Object.entries(seasonMap)
+    .filter(([, weatherKeys]) => weatherKeys.some(k => (weatherCounts[k] || 0) > 0))
+    .map(([season]) => season);
+
+  // Derive active times
+  const activeTimes = Object.entries(timeCounts)
+    .filter(([, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1])
+    .map(([key]) => key);
 
   const dupes = perfume.dupesForThis.map((d: {
     id: string; votes: number;
@@ -250,6 +307,9 @@ export default async function PerfumePage({
           avgSillage={avgSillage}
           avgProjection={avgProjection}
           avgIntensity={avgIntensity}
+          activeSeasons={activeSeasons}
+          activeTimes={activeTimes}
+          occasionCounts={occasionCounts}
         />
 
         {/* Marketplace */}
@@ -356,10 +416,32 @@ export default async function PerfumePage({
         {/* ── Write Review CTA ──────────────────────────────── */}
         <section className="flex items-center justify-between rounded-2xl border border-[var(--bg-glass-border)] bg-[var(--bg-glass)] backdrop-blur-xl px-5 py-4 shadow-[var(--shadow-glass)]">
           <div>
-            <h3 className="text-sm font-bold text-[var(--text-primary)]">Tried this fragrance?</h3>
-            <p className="text-xs text-[var(--text-muted)] mt-0.5">Share your experience with the community.</p>
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">
+              {userExistingReview ? "Update your review?" : "Tried this fragrance?"}
+            </h3>
+            <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              {userExistingReview ? "Your opinion may have changed — update your review." : "Share your experience with the community."}
+            </p>
           </div>
-          <WriteReviewModal perfumeId={perfume.id} variant="cta" />
+          <WriteReviewModal
+            perfumeId={perfume.id}
+            variant="cta"
+            existingReview={userExistingReview ? {
+              id: userExistingReview.id,
+              text: userExistingReview.text,
+              overall_rating: userExistingReview.overall_rating,
+              longevity_score: userExistingReview.longevity_score,
+              sillage_score: userExistingReview.sillage_score,
+              projection_score: userExistingReview.projection_score ?? null,
+              intensity_score: userExistingReview.intensity_score ?? null,
+              time_tags: userExistingReview.time_tags ?? "[]",
+              weather_tags: userExistingReview.weather_tags ?? "[]",
+              genderLeaning: userExistingReview.genderLeaning ?? null,
+              occasion: userExistingReview.occasion ?? null,
+              valueRating: userExistingReview.valueRating ?? null,
+              blindBuySafe: userExistingReview.blindBuySafe ?? null,
+            } : undefined}
+          />
         </section>
 
         {/* ── User Reviews ─────────────────────────────────────── */}

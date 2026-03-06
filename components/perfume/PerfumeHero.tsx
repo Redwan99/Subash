@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { Star, Droplets, Globe } from "lucide-react";
 
@@ -45,6 +46,15 @@ export function PerfumeHero({
 
   const accords = (perfume.accords || []).slice(0, 5);
   const topNotes = (perfume.top_notes || []).slice(0, 3);
+
+  const brandSlug = perfume.brand
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim();
 
   return (
     <motion.section
@@ -112,7 +122,9 @@ export function PerfumeHero({
           <div>
             <div className="mb-1 flex flex-wrap items-center gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-300/70">
-                {perfume.brand}
+                <Link href={`/brand/${brandSlug}`} className="hover:text-[var(--accent)] transition-colors">
+                  {perfume.brand}
+                </Link>
               </p>
               {genderLabel && (
                 <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-white/15 bg-gray-50 dark:bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:text-slate-100/90 backdrop-blur">

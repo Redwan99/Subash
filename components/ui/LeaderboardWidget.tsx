@@ -44,9 +44,9 @@ export function LeaderboardWidget() {
     }, [timeframe]);
 
     return (
-        <div className="mx-4 mb-4 rounded-xl bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--border-color)] overflow-hidden flex flex-col max-h-[520px]">
-            {/* Header & Tabs — stays fixed */}
-            <div className="p-3 border-b border-[var(--border-color)] shrink-0">
+        <div className="mx-4 mb-4 rounded-xl bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--border-color)] overflow-hidden flex flex-col">
+            {/* Header & Tabs — sticky within scroll container */}
+            <div className="p-3 border-b border-[var(--border-color)] shrink-0 sticky top-0 z-10 bg-[var(--bg-glass)] backdrop-blur-[8px] rounded-t-xl">
                 <div className="flex items-center gap-2 mb-3">
                     <Trophy size={14} className="text-[#F59E0B]" />
                     <h2 className="text-xs font-bold tracking-widest uppercase text-[#F59E0B]">
