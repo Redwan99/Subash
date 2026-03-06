@@ -9,6 +9,8 @@ const FEATURE_DEFAULTS: Record<string, boolean> = {
     ENABLE_LEADERBOARDS: true,
     ENABLE_FRAGRAM: true,
     ENABLE_WARDROBE: true,
+    ENABLE_REMINDS_ME_OF: true,
+    ENABLE_USER_PERFUME_SUBMIT: false,
     MAINTENANCE_MODE: false,
 };
 

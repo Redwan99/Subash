@@ -2,7 +2,7 @@
 // app/admin/AdminDashboardClient.tsx
 // Phase 9 — Pro Max Glassmorphism Admin Dashboard Client Component
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
     Users, Star, Sparkles, ShieldAlert, Trash2, Crown,
@@ -10,7 +10,8 @@ import {
     ChevronDown, Search, RefreshCw, Settings2, Power, Store, Droplet, Users2, Activity,
     Briefcase, Database, Globe, Camera, Trophy, Layers, MessageCircle, ShoppingBag, Key, Plus, Eye, EyeOff, Loader2, Save
 } from "lucide-react";
-import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus, toggleBanUser, adminResetUserPassword, adminDeleteUser } from "@/lib/actions/admin";
+import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus, toggleBanUser, adminResetUserPassword, adminDeleteUser, getAdminPerfumes, adminCreatePerfume, adminUpdatePerfume, adminDeletePerfume, type AdminPerfumeData } from "@/lib/actions/admin";
+import { Pencil } from "lucide-react";
 import { getEnvVariables, upsertEnvVariable, deleteEnvVariable, getEnvVariableDecrypted, type EnvVarItem } from "@/lib/actions/envvars";
 import type { Role, FeatureToggle } from "@prisma/client";
 import { AsyncCsvImporter } from "@/components/admin/AsyncCsvImporter";
@@ -546,7 +547,7 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
 
 // -- Main Dashboard -------------------------------------------------------------
 
-type Tab = "overview" | "reviews" | "users" | "system" | "env" | "audit" | "claims" | "import";
+type Tab = "overview" | "reviews" | "users" | "perfumes" | "system" | "env" | "audit" | "claims" | "import";
 
 export default function AdminDashboardClient({ totalUsers, totalReviews, totalPerfumes, scrapedPerfumes, ratedPerfumes, pendingReviews, spamReviews, recentReviews, users, featureToggles, auditLogs, brandClaims }: Props) {
     const [tab, setTab] = useState<Tab>("overview");
@@ -555,6 +556,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
         { id: "overview", label: "Overview", icon: <BarChart3 size={15} /> },
         { id: "reviews", label: "Reviews", icon: <Star size={15} /> },
         { id: "users", label: "Users", icon: <Users size={15} /> },
+        { id: "perfumes", label: "Perfumes", icon: <Droplet size={15} /> },
         { id: "system", label: "System Features", icon: <Settings2 size={15} /> },
         { id: "env", label: "Env Variables", icon: <Key size={15} /> },
         { id: "audit", label: "Audit Logs", icon: <Activity size={15} /> },
@@ -573,6 +575,8 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
             "ENABLE_LEADERBOARDS": true,
             "ENABLE_FRAGRAM": true,
             "ENABLE_WARDROBE": true,
+            "ENABLE_REMINDS_ME_OF": true,
+            "ENABLE_USER_PERFUME_SUBMIT": false,
             "MAINTENANCE_MODE": false,
         };
         // Override with DB values if they exist
@@ -720,6 +724,9 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     </div>
                 )}
 
+                {/* -- Perfumes Tab -- */}
+                {tab === "perfumes" && <PerfumesManager />}
+
                 {/* -- System Features Tab (Kill Switches) -- */}
                 {tab === "system" && (
                     <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
@@ -747,6 +754,8 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                                 { key: "ENABLE_LEADERBOARDS", label: "Leaderboards", desc: "Reviewer rankings and gamification", icon: <Trophy size={16} /> },
                                 { key: "ENABLE_FRAGRAM", label: "Fragram", desc: "Photo-sharing fragrance community", icon: <Camera size={16} /> },
                                 { key: "ENABLE_WARDROBE", label: "Wardrobe", desc: "Personal fragrance collection shelves", icon: <Layers size={16} /> },
+                                { key: "ENABLE_REMINDS_ME_OF", label: "Reminds Me Of", desc: "Community clone & alternative suggestions on perfume pages", icon: <Sparkles size={16} /> },
+                                { key: "ENABLE_USER_PERFUME_SUBMIT", label: "User Perfume Submissions", desc: "Allow users to submit new perfumes from the catalog page", icon: <Plus size={16} /> },
                                 { key: "MAINTENANCE_MODE", label: "Maintenance Mode", desc: "Show maintenance page to all non-admin users", icon: <Globe size={16} /> },
                             ].map(feature => (
                                 <div key={feature.key} className="flex items-center justify-between p-5 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.015)] hover:bg-[rgba(255,255,255,0.03)] transition-colors">
@@ -825,6 +834,353 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                 {/* -- Env Variables Tab -- */}
                 {tab === "env" && <EnvVariablesPanel />}
             </div>
+        </div>
+    );
+}
+
+// -- Perfumes Manager ---------------------------------------------------------
+function PerfumesManager() {
+    const [perfumes, setPerfumes] = useState<any[]>([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [pending, startTransition] = useTransition();
+    const [feedback, setFeedback] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+
+    // Add/Edit modal
+    const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [formData, setFormData] = useState<AdminPerfumeData>({
+        name: "", brand: "", description: "", perfumer: "", gender: "",
+        release_year: null, image_url: "", top_notes: [], heart_notes: [],
+        base_notes: [], accords: [], country: "", source_url: "",
+    });
+    // Comma-separated inputs for array fields
+    const [topNotesStr, setTopNotesStr] = useState("");
+    const [heartNotesStr, setHeartNotesStr] = useState("");
+    const [baseNotesStr, setBaseNotesStr] = useState("");
+    const [accordsStr, setAccordsStr] = useState("");
+
+    // Delete modal
+    const [deleteModal, setDeleteModal] = useState<{ id: string; name: string } | null>(null);
+
+    // Debounce search
+    useEffect(() => {
+        const t = setTimeout(() => { setDebouncedSearch(search); setPage(1); }, 300);
+        return () => clearTimeout(t);
+    }, [search]);
+
+    // Fetch perfumes
+    const load = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await getAdminPerfumes(page, debouncedSearch);
+            setPerfumes(res.perfumes);
+            setTotal(res.total);
+        } catch { /* */ }
+        setLoading(false);
+    }, [page, debouncedSearch]);
+
+    useEffect(() => { load(); }, [load]);
+
+    const flash = (type: "ok" | "err", msg: string) => {
+        setFeedback({ type, msg });
+        setTimeout(() => setFeedback(null), 4000);
+    };
+
+    const resetForm = () => {
+        setFormData({ name: "", brand: "", description: "", perfumer: "", gender: "", release_year: null, image_url: "", top_notes: [], heart_notes: [], base_notes: [], accords: [], country: "", source_url: "" });
+        setTopNotesStr(""); setHeartNotesStr(""); setBaseNotesStr(""); setAccordsStr("");
+        setEditingId(null);
+        setShowForm(false);
+    };
+
+    const openAdd = () => {
+        resetForm();
+        setShowForm(true);
+    };
+
+    const openEdit = (p: any) => {
+        const parse = (v: any) => {
+            if (!v) return [];
+            if (Array.isArray(v)) return v;
+            try { const parsed = JSON.parse(v); return Array.isArray(parsed) ? parsed : []; } catch { return []; }
+        };
+        setEditingId(p.id);
+        setFormData({
+            name: p.name || "", brand: p.brand || "", description: p.description || "", perfumer: p.perfumer || "",
+            gender: p.gender || "", release_year: p.release_year ?? null, image_url: p.image_url || "",
+            top_notes: parse(p.top_notes), heart_notes: parse(p.heart_notes), base_notes: parse(p.base_notes),
+            accords: parse(p.accords), country: p.country || "", source_url: p.source_url || "",
+        });
+        setTopNotesStr(parse(p.top_notes).join(", "));
+        setHeartNotesStr(parse(p.heart_notes).join(", "));
+        setBaseNotesStr(parse(p.base_notes).join(", "));
+        setAccordsStr(parse(p.accords).join(", "));
+        setShowForm(true);
+    };
+
+    const handleSave = () => {
+        const payload: AdminPerfumeData = {
+            ...formData,
+            top_notes: topNotesStr.split(",").map(s => s.trim()).filter(Boolean),
+            heart_notes: heartNotesStr.split(",").map(s => s.trim()).filter(Boolean),
+            base_notes: baseNotesStr.split(",").map(s => s.trim()).filter(Boolean),
+            accords: accordsStr.split(",").map(s => s.trim()).filter(Boolean),
+        };
+        startTransition(async () => {
+            const res = editingId
+                ? await adminUpdatePerfume(editingId, payload)
+                : await adminCreatePerfume(payload);
+            if (res.success) {
+                flash("ok", editingId ? "Perfume updated" : "Perfume created");
+                resetForm();
+                load();
+            } else {
+                flash("err", res.error || "Failed");
+            }
+        });
+    };
+
+    const handleDelete = () => {
+        if (!deleteModal) return;
+        startTransition(async () => {
+            const res = await adminDeletePerfume(deleteModal.id);
+            if (res.success) {
+                flash("ok", "Perfume deleted");
+                setPerfumes(prev => prev.filter(p => p.id !== deleteModal.id));
+                setTotal(prev => prev - 1);
+            } else {
+                flash("err", res.error || "Failed to delete");
+            }
+            setDeleteModal(null);
+        });
+    };
+
+    const totalPages = Math.ceil(total / 50);
+
+    const inputCls = "w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-brand-500/50";
+
+    return (
+        <div className="space-y-4">
+            {/* Feedback */}
+            {feedback && (
+                <div className={`px-4 py-2.5 rounded-xl text-sm font-medium border ${
+                    feedback.type === "ok" ? "bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.3)] text-emerald-400" : "bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.3)] text-red-400"
+                }`}>{feedback.msg}</div>
+            )}
+
+            {/* Header */}
+            <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
+                style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}>
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <Droplet size={18} className="text-[#A78BFA]" />
+                        <h2 className="text-lg font-bold text-white">Perfume Management</h2>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[rgba(167,139,250,0.1)] border border-[rgba(167,139,250,0.25)] text-[#A78BFA]">
+                            {total.toLocaleString()} total
+                        </span>
+                        <button onClick={openAdd}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-brand-500/20 border border-brand-500/30 text-brand-500 hover:bg-brand-500/30 transition-colors">
+                            <Plus size={12} /> Add Perfume
+                        </button>
+                    </div>
+                </div>
+
+                {/* Search */}
+                <div className="relative mb-4">
+                    <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.3)]" />
+                    <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search by name, brand, or slug..."
+                        className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.08)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none focus:border-[rgba(232,67,147,0.4)]"
+                    />
+                </div>
+
+                {/* Table */}
+                {loading ? (
+                    <div className="flex items-center justify-center py-16">
+                        <Loader2 size={24} className="animate-spin text-brand-500" />
+                    </div>
+                ) : (
+                    <>
+                        <div className="overflow-x-auto rounded-2xl border border-[rgba(255,255,255,0.07)]">
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="border-b border-[rgba(255,255,255,0.06)]" style={{ background: "rgba(255,255,255,0.03)" }}>
+                                        {["Name", "Brand", "Gender", "Year", "Source", "Added", "Actions"].map(h => (
+                                            <th key={h} className="px-4 py-3 text-left text-[10px] font-bold tracking-widest uppercase text-[rgba(255,255,255,0.3)]">{h}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {perfumes.map(p => (
+                                        <tr key={p.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.025)] transition-colors">
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-2.5">
+                                                    {p.image_url && p.image_url !== "/placeholder-bottle.png" ? (
+                                                        <Image src={p.image_url} alt="" width={28} height={28} className="rounded-lg object-cover" />
+                                                    ) : (
+                                                        <div className="w-7 h-7 rounded-lg bg-[rgba(167,139,250,0.2)] flex items-center justify-center text-xs text-[#A78BFA] font-bold">
+                                                            {p.name?.[0] ?? "?"}
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <p className="text-white font-medium text-[13px] line-clamp-1">{p.name}</p>
+                                                        <p className="text-[10px] text-[rgba(255,255,255,0.3)]">{p.slug}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-[rgba(255,255,255,0.55)] text-[13px]">{p.brand}</td>
+                                            <td className="px-4 py-3 text-[rgba(255,255,255,0.4)] text-[12px] capitalize">{p.gender || "—"}</td>
+                                            <td className="px-4 py-3 text-[rgba(255,255,255,0.4)] text-[12px]">{p.release_year || "—"}</td>
+                                            <td className="px-4 py-3">
+                                                <span className={`inline-flex text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                                    p.scraped ? "text-sky-400 bg-sky-500/10 border-sky-500/20" : "text-[#A78BFA] bg-purple-500/10 border-purple-500/20"
+                                                }`}>{p.scraped ? "Imported" : "Manual"}</span>
+                                            </td>
+                                            <td className="px-4 py-3 text-[rgba(255,255,255,0.3)] text-[11px] whitespace-nowrap">
+                                                {new Date(p.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "2-digit" })}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-1.5">
+                                                    <button onClick={() => openEdit(p)} disabled={pending} title="Edit"
+                                                        className="p-1.5 rounded-lg text-[#38BDF8] hover:bg-[rgba(56,189,248,0.12)] transition-colors disabled:opacity-40">
+                                                        <Pencil size={14} />
+                                                    </button>
+                                                    <button onClick={() => setDeleteModal({ id: p.id, name: `${p.brand} — ${p.name}` })} disabled={pending} title="Delete"
+                                                        className="p-1.5 rounded-lg text-[#EF4444] hover:bg-[rgba(239,68,68,0.12)] transition-colors disabled:opacity-40">
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {perfumes.length === 0 && (
+                                <p className="text-center py-10 text-[rgba(255,255,255,0.25)] text-sm">No perfumes found.</p>
+                            )}
+                        </div>
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-between mt-4">
+                                <p className="text-xs text-[rgba(255,255,255,0.3)]">Page {page} of {totalPages}</p>
+                                <div className="flex gap-2">
+                                    <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
+                                        className="px-3 py-1.5 text-xs rounded-lg border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.5)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-colors disabled:opacity-30">
+                                        Previous
+                                    </button>
+                                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
+                                        className="px-3 py-1.5 text-xs rounded-lg border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.5)] hover:text-white hover:bg-[rgba(255,255,255,0.05)] transition-colors disabled:opacity-30">
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+
+            {/* Add/Edit Modal */}
+            {showForm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={resetForm}>
+                    <div className="bg-[#1A1530] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-white font-bold text-lg mb-4">{editingId ? "Edit Perfume" : "Add New Perfume"}</h3>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Name *</label>
+                                <input type="text" value={formData.name} onChange={e => setFormData(d => ({ ...d, name: e.target.value }))} placeholder="Aventus" className={inputCls} />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Brand *</label>
+                                <input type="text" value={formData.brand} onChange={e => setFormData(d => ({ ...d, brand: e.target.value }))} placeholder="Creed" className={inputCls} />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Gender</label>
+                                <select value={formData.gender} onChange={e => setFormData(d => ({ ...d, gender: e.target.value }))}
+                                    className={`${inputCls} appearance-none cursor-pointer`}>
+                                    <option value="" className="bg-[#0D0A1E]">Any</option>
+                                    <option value="men" className="bg-[#0D0A1E]">Men</option>
+                                    <option value="women" className="bg-[#0D0A1E]">Women</option>
+                                    <option value="unisex" className="bg-[#0D0A1E]">Unisex</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Release Year</label>
+                                <input type="number" value={formData.release_year ?? ""} onChange={e => setFormData(d => ({ ...d, release_year: e.target.value ? Number(e.target.value) : null }))} placeholder="2010" className={inputCls} />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Perfumer</label>
+                                <input type="text" value={formData.perfumer} onChange={e => setFormData(d => ({ ...d, perfumer: e.target.value }))} placeholder="Olivier Creed" className={inputCls} />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Country</label>
+                                <input type="text" value={formData.country} onChange={e => setFormData(d => ({ ...d, country: e.target.value }))} placeholder="France" className={inputCls} />
+                            </div>
+                            <div className="col-span-2">
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Image URL</label>
+                                <input type="text" value={formData.image_url} onChange={e => setFormData(d => ({ ...d, image_url: e.target.value }))} placeholder="https://..." className={inputCls} />
+                            </div>
+                            <div className="col-span-2">
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Source URL</label>
+                                <input type="text" value={formData.source_url} onChange={e => setFormData(d => ({ ...d, source_url: e.target.value }))} placeholder="https://..." className={inputCls} />
+                            </div>
+                            <div className="col-span-2">
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Description</label>
+                                <textarea value={formData.description} onChange={e => setFormData(d => ({ ...d, description: e.target.value }))} rows={3} placeholder="A fresh, bold fragrance..." className={`${inputCls} resize-none`} />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Top Notes <span className="normal-case font-normal">(comma separated)</span></label>
+                                <input type="text" value={topNotesStr} onChange={e => setTopNotesStr(e.target.value)} placeholder="Bergamot, Lemon, Apple" className={inputCls} />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Heart Notes <span className="normal-case font-normal">(comma separated)</span></label>
+                                <input type="text" value={heartNotesStr} onChange={e => setHeartNotesStr(e.target.value)} placeholder="Rose, Jasmine, Birch" className={inputCls} />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Base Notes <span className="normal-case font-normal">(comma separated)</span></label>
+                                <input type="text" value={baseNotesStr} onChange={e => setBaseNotesStr(e.target.value)} placeholder="Musk, Sandalwood, Vetiver" className={inputCls} />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Accords <span className="normal-case font-normal">(comma separated)</span></label>
+                                <input type="text" value={accordsStr} onChange={e => setAccordsStr(e.target.value)} placeholder="Woody, Fresh, Citrus" className={inputCls} />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-2 justify-end mt-6">
+                            <button onClick={resetForm} className="px-4 py-2 text-sm rounded-xl border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] transition-all">Cancel</button>
+                            <button onClick={handleSave} disabled={pending || !formData.name.trim() || !formData.brand.trim()}
+                                className="px-5 py-2 text-sm rounded-xl font-semibold bg-brand-500/20 text-brand-500 border border-brand-500/30 hover:bg-brand-500/30 transition-all disabled:opacity-50">
+                                {pending ? <Loader2 size={14} className="inline animate-spin mr-1" /> : <Save size={14} className="inline mr-1" />}
+                                {pending ? "Saving..." : editingId ? "Update" : "Create"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Modal */}
+            {deleteModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setDeleteModal(null)}>
+                    <div className="bg-[#1A1530] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-white font-bold text-lg mb-1">Delete Perfume</h3>
+                        <p className="text-[rgba(255,255,255,0.5)] text-sm mb-2">Permanently delete <strong className="text-red-400">{deleteModal.name}</strong>?</p>
+                        <p className="text-[rgba(255,255,255,0.35)] text-xs mb-4">This will also remove all associated reviews, dupes, and wardrobe entries.</p>
+                        <div className="flex gap-2 justify-end">
+                            <button onClick={() => setDeleteModal(null)} className="px-4 py-2 text-sm rounded-xl border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] transition-all">Cancel</button>
+                            <button onClick={handleDelete} disabled={pending} className="px-4 py-2 text-sm rounded-xl font-semibold bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-all disabled:opacity-50">{pending ? "..." : "Delete"}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

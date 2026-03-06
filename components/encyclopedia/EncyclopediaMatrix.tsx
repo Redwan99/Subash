@@ -11,8 +11,11 @@ import {
   User, Users, ChevronDown, Search, X, SlidersHorizontal,
   TrendingUp, ArrowDownAZ, Clock, Award,
   Flame, TreePine, Citrus as CitrusIcon, Candy, Gem, Cherry, Wind,
+  Plus,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useFeatureToggles } from "@/components/providers/FeatureToggleProvider";
+import { userSubmitPerfume } from "@/lib/actions/admin";
 
 const POPULAR_ACCORDS: { value: string; label: string; icon: LucideIcon; color: string }[] = [
   { value: "Vanilla", label: "Vanilla", icon: Candy, color: "#F59E0B" },
@@ -212,6 +215,31 @@ const PerfumeCard = React.memo(function PerfumeCard({ perfume, isTrending }: { p
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function EncyclopediaMatrix({ initialData }: { initialData: any[] }) {
+  const { isEnabled } = useFeatureToggles();
+
+  // User submit perfume modal
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [submitName, setSubmitName] = useState("");
+  const [submitBrand, setSubmitBrand] = useState("");
+  const [submitGender, setSubmitGender] = useState("");
+  const [submitDesc, setSubmitDesc] = useState("");
+  const [submitPending, setSubmitPending] = useState(false);
+  const [submitFeedback, setSubmitFeedback] = useState<{ ok: boolean; msg: string } | null>(null);
+
+  const handleUserSubmit = async () => {
+    setSubmitPending(true);
+    setSubmitFeedback(null);
+    const res = await userSubmitPerfume({ name: submitName, brand: submitBrand, gender: submitGender || undefined, description: submitDesc || undefined });
+    setSubmitPending(false);
+    if (res.success) {
+      setSubmitFeedback({ ok: true, msg: "Perfume submitted successfully! It will appear in the catalog shortly." });
+      setSubmitName(""); setSubmitBrand(""); setSubmitGender(""); setSubmitDesc("");
+      setTimeout(() => { setShowSubmitModal(false); setSubmitFeedback(null); }, 2500);
+    } else {
+      setSubmitFeedback({ ok: false, msg: res.error || "Failed to submit." });
+    }
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [results, setResults] = useState<any[]>(initialData);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -571,6 +599,71 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
               <button onClick={() => setNotesQuery("")} className="hover:text-red-400 transition-colors"><X size={10} /></button>
             </span>
           )}
+        </div>
+      )}
+
+      {/* ── Suggest a Perfume button (feature-gated) ── */}
+      {isEnabled("ENABLE_USER_PERFUME_SUBMIT") && (
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={() => setShowSubmitModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[var(--accent)]/10 border border-[var(--accent)]/25 text-[var(--accent)] hover:bg-[var(--accent)]/15 transition-all"
+          >
+            <Plus size={15} />
+            Suggest a Perfume
+          </button>
+        </div>
+      )}
+
+      {/* Submit Perfume Modal */}
+      {showSubmitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowSubmitModal(false); setSubmitFeedback(null); }}>
+          <div className="bg-[#1A1530] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="text-white font-bold text-lg mb-1">Suggest a Perfume</h3>
+            <p className="text-[rgba(255,255,255,0.4)] text-sm mb-5">Know a fragrance that&apos;s missing? Add it to our database.</p>
+
+            {submitFeedback && (
+              <div className={`mb-4 px-4 py-2.5 rounded-xl text-sm font-medium border ${
+                submitFeedback.ok ? "bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.3)] text-emerald-400" : "bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.3)] text-red-400"
+              }`}>{submitFeedback.msg}</div>
+            )}
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Name *</label>
+                <input type="text" value={submitName} onChange={e => setSubmitName(e.target.value)} placeholder="Aventus"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-[var(--accent)]/50" />
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Brand *</label>
+                <input type="text" value={submitBrand} onChange={e => setSubmitBrand(e.target.value)} placeholder="Creed"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-[var(--accent)]/50" />
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Gender</label>
+                <select value={submitGender} onChange={e => setSubmitGender(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white outline-none focus:border-[var(--accent)]/50 appearance-none cursor-pointer">
+                  <option value="" className="bg-[#0D0A1E]">Any</option>
+                  <option value="men" className="bg-[#0D0A1E]">Men</option>
+                  <option value="women" className="bg-[#0D0A1E]">Women</option>
+                  <option value="unisex" className="bg-[#0D0A1E]">Unisex</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Description <span className="normal-case font-normal">(optional)</span></label>
+                <textarea value={submitDesc} onChange={e => setSubmitDesc(e.target.value)} rows={2} placeholder="What makes this fragrance special?"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-[var(--accent)]/50 resize-none" />
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-end mt-5">
+              <button onClick={() => { setShowSubmitModal(false); setSubmitFeedback(null); }} className="px-4 py-2 text-sm rounded-xl border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] transition-all">Cancel</button>
+              <button onClick={handleUserSubmit} disabled={submitPending || !submitName.trim() || !submitBrand.trim()}
+                className="px-5 py-2 text-sm rounded-xl font-semibold bg-[var(--accent)]/20 text-[var(--accent)] border border-[var(--accent)]/30 hover:bg-[var(--accent)]/25 transition-all disabled:opacity-50">
+                {submitPending ? "Submitting..." : "Submit"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

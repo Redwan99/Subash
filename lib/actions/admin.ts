@@ -395,3 +395,220 @@ export async function adminDeleteUser(
     return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
 }
+
+// ── Admin Perfume CRUD ────────────────────────────────────────────────────────
+
+export type AdminPerfumeData = {
+  name: string;
+  brand: string;
+  description?: string;
+  perfumer?: string;
+  gender?: string;
+  release_year?: number | null;
+  image_url?: string;
+  top_notes?: string[];
+  heart_notes?: string[];
+  base_notes?: string[];
+  accords?: string[];
+  country?: string;
+  source_url?: string;
+};
+
+function slugify(brand: string, name: string): string {
+  return `${brand}-${name}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
+
+export async function getAdminPerfumes(
+  page: number = 1,
+  search?: string,
+  pageSize: number = 50
+): Promise<{ perfumes: any[]; total: number }> {
+  await requireAdmin();
+
+  const where: AnyWhere = {};
+  if (search && search.trim()) {
+    const q = search.trim();
+    where.OR = [
+      { name: { contains: q } },
+      { brand: { contains: q } },
+      { slug: { contains: q.toLowerCase() } },
+    ];
+  }
+
+  const [perfumes, total] = await Promise.all([
+    prisma.perfume.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        brand: true,
+        slug: true,
+        image_url: true,
+        gender: true,
+        release_year: true,
+        scraped: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.perfume.count({ where }),
+  ]);
+
+  return { perfumes, total };
+}
+
+export async function adminCreatePerfume(
+  data: AdminPerfumeData
+): Promise<{ success: boolean; error?: string; id?: string }> {
+  try {
+    const adminId = await requireAdmin();
+
+    if (!data.name?.trim() || !data.brand?.trim()) {
+      return { success: false, error: "Name and brand are required." };
+    }
+
+    const slug = slugify(data.brand, data.name);
+
+    const existing = await prisma.perfume.findUnique({ where: { slug } });
+    if (existing) {
+      return { success: false, error: `A perfume with slug "${slug}" already exists.` };
+    }
+
+    const perfume = await prisma.perfume.create({
+      data: {
+        name: data.name.trim(),
+        brand: data.brand.trim(),
+        slug,
+        description: data.description?.trim() || "",
+        perfumer: data.perfumer?.trim() || null,
+        gender: data.gender?.trim() || null,
+        release_year: data.release_year ?? null,
+        image_url: data.image_url?.trim() || "/placeholder-bottle.png",
+        top_notes: data.top_notes ? JSON.stringify(data.top_notes) : undefined,
+        heart_notes: data.heart_notes ? JSON.stringify(data.heart_notes) : undefined,
+        base_notes: data.base_notes ? JSON.stringify(data.base_notes) : undefined,
+        accords: data.accords ? JSON.stringify(data.accords) : undefined,
+        country: data.country?.trim() || null,
+        source_url: data.source_url?.trim() || null,
+        scraped: false,
+      },
+    });
+
+    await logAdminAction(adminId, "CREATE_PERFUME", `${data.brand} — ${data.name} (slug: ${slug})`);
+    revalidatePath("/admin");
+    revalidatePath("/perfume");
+    return { success: true, id: perfume.id };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
+export async function adminUpdatePerfume(
+  id: string,
+  data: Partial<AdminPerfumeData>
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const adminId = await requireAdmin();
+
+    const existing = await prisma.perfume.findUnique({ where: { id } });
+    if (!existing) return { success: false, error: "Perfume not found." };
+
+    const updateData: Record<string, unknown> = {};
+    if (data.name !== undefined) updateData.name = data.name.trim();
+    if (data.brand !== undefined) updateData.brand = data.brand.trim();
+    if (data.description !== undefined) updateData.description = data.description.trim();
+    if (data.perfumer !== undefined) updateData.perfumer = data.perfumer.trim() || null;
+    if (data.gender !== undefined) updateData.gender = data.gender.trim() || null;
+    if (data.release_year !== undefined) updateData.release_year = data.release_year;
+    if (data.image_url !== undefined) updateData.image_url = data.image_url.trim() || "/placeholder-bottle.png";
+    if (data.top_notes !== undefined) updateData.top_notes = JSON.stringify(data.top_notes);
+    if (data.heart_notes !== undefined) updateData.heart_notes = JSON.stringify(data.heart_notes);
+    if (data.base_notes !== undefined) updateData.base_notes = JSON.stringify(data.base_notes);
+    if (data.accords !== undefined) updateData.accords = JSON.stringify(data.accords);
+    if (data.country !== undefined) updateData.country = data.country.trim() || null;
+    if (data.source_url !== undefined) updateData.source_url = data.source_url.trim() || null;
+
+    // If name or brand changed, update slug
+    if (data.name !== undefined || data.brand !== undefined) {
+      const newName = data.name?.trim() || existing.name;
+      const newBrand = data.brand?.trim() || existing.brand;
+      updateData.slug = slugify(newBrand, newName);
+    }
+
+    await prisma.perfume.update({ where: { id }, data: updateData });
+
+    await logAdminAction(adminId, "UPDATE_PERFUME", `ID: ${id}, ${existing.brand} — ${existing.name}`);
+    revalidatePath("/admin");
+    revalidatePath(`/perfume/${existing.slug}`);
+    revalidatePath("/perfume");
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
+export async function adminDeletePerfume(
+  id: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const adminId = await requireAdmin();
+
+    const perfume = await prisma.perfume.findUnique({
+      where: { id },
+      select: { name: true, brand: true, slug: true },
+    });
+    if (!perfume) return { success: false, error: "Perfume not found." };
+
+    await prisma.perfume.delete({ where: { id } });
+
+    await logAdminAction(adminId, "DELETE_PERFUME", `${perfume.brand} — ${perfume.name} (slug: ${perfume.slug})`);
+    revalidatePath("/admin");
+    revalidatePath("/perfume");
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
+// ── User Perfume Submission ───────────────────────────────────────────────────
+export async function userSubmitPerfume(
+  data: AdminPerfumeData
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) return { success: false, error: "You must be logged in." };
+
+    if (!data.name?.trim() || !data.brand?.trim()) {
+      return { success: false, error: "Name and brand are required." };
+    }
+
+    const slug = slugify(data.brand, data.name);
+
+    const existing = await prisma.perfume.findUnique({ where: { slug } });
+    if (existing) {
+      return { success: false, error: "This perfume already exists in our database." };
+    }
+
+    await prisma.perfume.create({
+      data: {
+        name: data.name.trim(),
+        brand: data.brand.trim(),
+        slug,
+        description: data.description?.trim() || "",
+        gender: data.gender?.trim() || null,
+        image_url: "/placeholder-bottle.png",
+        scraped: false,
+      },
+    });
+
+    revalidatePath("/perfume");
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}

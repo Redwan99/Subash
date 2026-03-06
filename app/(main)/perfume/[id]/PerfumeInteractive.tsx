@@ -5,6 +5,7 @@
 
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
+import { useFeatureToggles } from "@/components/providers/FeatureToggleProvider";
 
 const Skeleton = ({ h }: { h: string }) => (
   <div className={`${h} rounded-2xl animate-pulse bg-[var(--bg-glass)]`} />
@@ -40,6 +41,7 @@ export function PerfumeInteractive({
   initialDupes: any[];
 }) {
   const shouldReduceMotion = useReducedMotion();
+  const { isEnabled } = useFeatureToggles();
 
   const container = {
     hidden: {},
@@ -74,9 +76,11 @@ export function PerfumeInteractive({
           base_notes={base_notes}
         />
       </motion.div>
-      <motion.div variants={item}>
-        <DupeEngine targetPerfumeId={perfumeId} existingDupes={initialDupes} />
-      </motion.div>
+      {isEnabled("ENABLE_REMINDS_ME_OF") && (
+        <motion.div variants={item}>
+          <DupeEngine targetPerfumeId={perfumeId} existingDupes={initialDupes} />
+        </motion.div>
+      )}
     </motion.div>
   );
 }
