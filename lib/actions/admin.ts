@@ -575,9 +575,20 @@ export async function adminDeletePerfume(
   }
 }
 
-// ── User Perfume Submission ───────────────────────────────────────────────────
+// ── User Perfume Submission (goes to SuggestedPerfume queue for admin review) ─
 export async function userSubmitPerfume(
-  data: AdminPerfumeData
+  data: {
+    name?: string;
+    brand?: string;
+    gender?: string;
+    description?: string;
+    perfumer?: string;
+    releaseYear?: number | null;
+    topNotes?: string;
+    heartNotes?: string;
+    baseNotes?: string;
+    accords?: string;
+  }
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const session = await auth();
@@ -587,28 +598,81 @@ export async function userSubmitPerfume(
       return { success: false, error: "Name and brand are required." };
     }
 
-    const slug = slugify(data.brand, data.name);
-
-    const existing = await prisma.perfume.findUnique({ where: { slug } });
-    if (existing) {
-      return { success: false, error: "This perfume already exists in our database." };
-    }
-
-    await prisma.perfume.create({
+    await prisma.suggestedPerfume.create({
       data: {
         name: data.name.trim(),
         brand: data.brand.trim(),
-        slug,
-        description: data.description?.trim() || "",
         gender: data.gender?.trim() || null,
-        image_url: "/placeholder-bottle.png",
-        scraped: false,
+        description: data.description?.trim() || null,
+        perfumer: data.perfumer?.trim() || null,
+        releaseYear: data.releaseYear ?? null,
+        topNotes: data.topNotes?.trim() || "[]",
+        heartNotes: data.heartNotes?.trim() || "[]",
+        baseNotes: data.baseNotes?.trim() || "[]",
+        accords: data.accords?.trim() || "[]",
+        userId: session.user.id,
       },
     });
 
-    revalidatePath("/perfume");
+    revalidatePath("/admin");
     return { success: true };
   } catch (err) {
     return { success: false, error: err instanceof Error ? err.message : "Unknown error" };
   }
+}
+
+// ── Admin: Get Suggested Perfumes ─────────────────────────────────────────────
+export async function getAdminSuggestedPerfumes(status?: string) {
+  await requireAdmin();
+  return prisma.suggestedPerfume.findMany({
+    where: status ? { status } : undefined,
+    orderBy: { createdAt: "desc" },
+    include: { user: { select: { id: true, name: true, email: true, image: true } } },
+  });
+}
+
+// ── Admin: Approve Suggested Perfume (creates real Perfume) ───────────────────
+export async function approveSuggestedPerfume(id: string) {
+  await requireAdmin();
+
+  const suggestion = await prisma.suggestedPerfume.findUnique({ where: { id } });
+  if (!suggestion) return { success: false, error: "Suggestion not found" };
+
+  const slug = slugify(suggestion.brand, suggestion.name);
+  const existing = await prisma.perfume.findUnique({ where: { slug } });
+  if (existing) return { success: false, error: "A perfume with this name/brand already exists" };
+
+  await prisma.perfume.create({
+    data: {
+      name: suggestion.name,
+      brand: suggestion.brand,
+      slug,
+      gender: suggestion.gender,
+      description: suggestion.description || "",
+      perfumer: suggestion.perfumer,
+      release_year: suggestion.releaseYear,
+      top_notes: suggestion.topNotes,
+      heart_notes: suggestion.heartNotes,
+      base_notes: suggestion.baseNotes,
+      accords: suggestion.accords,
+      image_url: suggestion.imageUrl || "/placeholder-bottle.png",
+      scraped: false,
+    },
+  });
+
+  await prisma.suggestedPerfume.update({ where: { id }, data: { status: "APPROVED" } });
+  revalidatePath("/admin");
+  revalidatePath("/perfume");
+  return { success: true };
+}
+
+// ── Admin: Reject Suggested Perfume ───────────────────────────────────────────
+export async function rejectSuggestedPerfume(id: string, reason?: string) {
+  await requireAdmin();
+  await prisma.suggestedPerfume.update({
+    where: { id },
+    data: { status: "REJECTED", adminNotes: reason || null },
+  });
+  revalidatePath("/admin");
+  return { success: true };
 }

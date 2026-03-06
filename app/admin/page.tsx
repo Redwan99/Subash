@@ -20,7 +20,7 @@ async function getAdminData() {
     try { return await fn(); } catch { return fallback; }
   };
 
-  const [totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, scrapedPerfumes, ratedPerfumes, recentReviews, users, featureToggles, auditLogs, brandClaims] =
+  const [totalUsers, totalReviews, totalPerfumes, pendingReviews, spamReviews, scrapedPerfumes, ratedPerfumes, pendingSuggestions, recentReviews, users, featureToggles, auditLogs, brandClaims] =
     await Promise.all([
       safe(() => prisma.user.count(), 0),
       safe(() => prisma.review.count(), 0),
@@ -29,6 +29,7 @@ async function getAdminData() {
       safe(() => db.review.count({ where: { status: "SPAM" } }), 0),
       safe(() => db.perfume.count({ where: { scraped: true } }), 0),
       safe(() => db.perfume.count({ where: { rating_value: { not: null } } }), 0),
+      safe(() => db.suggestedPerfume.count({ where: { status: "PENDING" } }), 0),
       safe(() => db.review.findMany({
         take: 50,
         orderBy: { createdAt: "desc" },
@@ -79,6 +80,7 @@ async function getAdminData() {
     ratedPerfumes: ratedPerfumes as number,
     pendingReviews: pendingReviews as number,
     spamReviews: spamReviews as number,
+    pendingSuggestions: pendingSuggestions as number,
     recentReviews: recentReviews as Review[],
     users: users as AdminUser[],
     featureToggles: featureToggles,

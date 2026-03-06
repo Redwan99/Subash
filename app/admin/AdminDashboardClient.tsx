@@ -8,9 +8,10 @@ import {
     Users, Star, Sparkles, ShieldAlert, Trash2, Crown,
     BarChart3, ShieldCheck, AlertTriangle, CheckCircle2,
     ChevronDown, Search, RefreshCw, Settings2, Power, Store, Droplet, Users2, Activity,
-    Briefcase, Database, Globe, Camera, Trophy, Layers, MessageCircle, ShoppingBag, Key, Plus, Eye, EyeOff, Loader2, Save
+    Briefcase, Database, Globe, Camera, Trophy, Layers, MessageCircle, ShoppingBag, Key, Plus, Eye, EyeOff, Loader2, Save,
+    Lightbulb, X, Mail
 } from "lucide-react";
-import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus, toggleBanUser, adminResetUserPassword, adminDeleteUser, getAdminPerfumes, adminCreatePerfume, adminUpdatePerfume, adminDeletePerfume, type AdminPerfumeData } from "@/lib/actions/admin";
+import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus, toggleBanUser, adminResetUserPassword, adminDeleteUser, getAdminPerfumes, adminCreatePerfume, adminUpdatePerfume, adminDeletePerfume, type AdminPerfumeData, getAdminSuggestedPerfumes, approveSuggestedPerfume, rejectSuggestedPerfume } from "@/lib/actions/admin";
 import { Pencil } from "lucide-react";
 import { getEnvVariables, upsertEnvVariable, deleteEnvVariable, getEnvVariableDecrypted, type EnvVarItem } from "@/lib/actions/envvars";
 import type { Role, FeatureToggle } from "@prisma/client";
@@ -28,6 +29,7 @@ type Props = {
     ratedPerfumes: number;
     pendingReviews: number;
     spamReviews: number;
+    pendingSuggestions: number;
     recentReviews: Review[];
     users: AdminUser[];
     featureToggles: FeatureToggle[];
@@ -547,9 +549,9 @@ function AuditLogsTable({ logs }: { logs: AuditLog[] }) {
 
 // -- Main Dashboard -------------------------------------------------------------
 
-type Tab = "overview" | "reviews" | "users" | "perfumes" | "system" | "env" | "audit" | "claims" | "import";
+type Tab = "overview" | "reviews" | "users" | "perfumes" | "suggestions" | "system" | "env" | "audit" | "claims" | "import";
 
-export default function AdminDashboardClient({ totalUsers, totalReviews, totalPerfumes, scrapedPerfumes, ratedPerfumes, pendingReviews, spamReviews, recentReviews, users, featureToggles, auditLogs, brandClaims }: Props) {
+export default function AdminDashboardClient({ totalUsers, totalReviews, totalPerfumes, scrapedPerfumes, ratedPerfumes, pendingReviews, spamReviews, pendingSuggestions, recentReviews, users, featureToggles, auditLogs, brandClaims }: Props) {
     const [tab, setTab] = useState<Tab>("overview");
 
     const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
@@ -557,11 +559,12 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
         { id: "reviews", label: "Reviews", icon: <Star size={15} /> },
         { id: "users", label: "Users", icon: <Users size={15} /> },
         { id: "perfumes", label: "Perfumes", icon: <Droplet size={15} /> },
-        { id: "system", label: "System Features", icon: <Settings2 size={15} /> },
-        { id: "env", label: "Env Variables", icon: <Key size={15} /> },
+        { id: "suggestions", label: "Suggestions", icon: <Lightbulb size={15} /> },
+        { id: "system", label: "Features", icon: <Settings2 size={15} /> },
+        { id: "env", label: "Env & SMTP", icon: <Key size={15} /> },
         { id: "audit", label: "Audit Logs", icon: <Activity size={15} /> },
         { id: "claims", label: "B2B Claims", icon: <Briefcase size={15} /> },
-        { id: "import", label: "Import Data", icon: <Database size={15} /> },
+        { id: "import", label: "Import", icon: <Database size={15} /> },
     ];
 
     // Local toggle state to sync UI immediately
@@ -639,53 +642,52 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     ))}
                 </div>
 
-                {/* -- Overview Tab -- */}
+                {/* -- Overview Tab — Grid Dashboard -- */}
                 {tab === "overview" && (
                     <div className="space-y-8">
                         {/* Stat cards */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <MetricCard label="Total Users" value={totalUsers} icon={<Users size={16} />} accent="text-[#F783AC]" glow="shadow-[0_0_30px_rgba(232,67,147,0.1)]" />
                             <MetricCard label="Total Reviews" value={totalReviews} icon={<Star size={16} />} accent="text-[#F59E0B]" glow="shadow-[0_0_30px_rgba(245,158,11,0.1)]" />
                             <MetricCard label="Total Perfumes" value={totalPerfumes} icon={<Sparkles size={16} />} accent="text-[#F783AC]" glow="shadow-[0_0_30px_rgba(247,131,172,0.1)]" />
-                            <MetricCard label="Imported" value={scrapedPerfumes} icon={<Database size={16} />} accent="text-[#38BDF8]" glow="shadow-[0_0_30px_rgba(56,189,248,0.1)]" />
-                            <MetricCard label="With Ratings" value={ratedPerfumes} icon={<BarChart3 size={16} />} accent="text-[#A78BFA]" glow="shadow-[0_0_30px_rgba(167,139,250,0.1)]" />
-                            <MetricCard label="Pending" value={pendingReviews} icon={<AlertTriangle size={16} />} accent="text-[#F59E0B]" glow="shadow-[0_0_30px_rgba(245,158,11,0.1)]" />
-                            <MetricCard label="Spam Caught" value={spamReviews} icon={<ShieldCheck size={16} />} accent="text-[#EF4444]" glow="shadow-[0_0_30px_rgba(239,68,68,0.1)]" />
+                            <MetricCard label="Suggestions" value={pendingSuggestions} icon={<Lightbulb size={16} />} accent="text-[#A78BFA]" glow="shadow-[0_0_30px_rgba(167,139,250,0.1)]" />
                         </div>
 
-                        {/* Quick info */}
-                        <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
-                            style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}>
-                            <div className="flex items-center gap-2 mb-4">
-                                <RefreshCw size={14} className="text-[rgba(255,255,255,0.4)]" />
-                                <span className="text-xs font-bold tracking-widest uppercase text-[rgba(255,255,255,0.35)]">Quick Actions</span>
+                        {/* Navigation Grid — clickable cards that open respective tabs */}
+                        <div>
+                            <p className="text-xs font-bold tracking-widest uppercase text-[rgba(255,255,255,0.3)] mb-4">Quick Navigation</p>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {[
+                                    { tab: "reviews" as Tab, label: "Reviews", desc: `${pendingReviews + spamReviews} flagged`, icon: <Star size={20} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
+                                    { tab: "users" as Tab, label: "Users", desc: `${totalUsers} members`, icon: <Users size={20} />, color: "text-[#F783AC]", bg: "rgba(232,67,147,0.06)", border: "rgba(232,67,147,0.2)" },
+                                    { tab: "perfumes" as Tab, label: "Perfumes", desc: `${totalPerfumes.toLocaleString()} total`, icon: <Droplet size={20} />, color: "text-[#A78BFA]", bg: "rgba(167,139,250,0.06)", border: "rgba(167,139,250,0.2)" },
+                                    { tab: "suggestions" as Tab, label: "Suggestions", desc: `${pendingSuggestions} pending`, icon: <Lightbulb size={20} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
+                                    { tab: "system" as Tab, label: "Features", desc: "Kill switches", icon: <Settings2 size={20} />, color: "text-[#38BDF8]", bg: "rgba(56,189,248,0.06)", border: "rgba(56,189,248,0.2)" },
+                                    { tab: "env" as Tab, label: "Env & SMTP", desc: "Secrets & mailer", icon: <Key size={20} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
+                                    { tab: "audit" as Tab, label: "Audit Logs", desc: `${auditLogs.length} events`, icon: <Activity size={20} />, color: "text-[#F783AC]", bg: "rgba(247,131,172,0.06)", border: "rgba(247,131,172,0.2)" },
+                                    { tab: "claims" as Tab, label: "B2B Claims", desc: `${brandClaims.filter(c => c.status === "PENDING").length} pending`, icon: <Briefcase size={20} />, color: "text-[#38BDF8]", bg: "rgba(56,189,248,0.06)", border: "rgba(56,189,248,0.2)" },
+                                    { tab: "import" as Tab, label: "Import Data", desc: `${scrapedPerfumes} imported`, icon: <Database size={20} />, color: "text-[#A78BFA]", bg: "rgba(167,139,250,0.06)", border: "rgba(167,139,250,0.2)" },
+                                ].map(item => (
+                                    <button key={item.tab} onClick={() => setTab(item.tab)}
+                                        className="flex items-start gap-3 p-5 rounded-2xl border hover:scale-[1.02] transition-all text-left group"
+                                        style={{ background: item.bg, borderColor: item.border }}>
+                                        <div className={`mt-0.5 ${item.color} group-hover:scale-110 transition-transform`}>
+                                            {item.icon}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-white">{item.label}</p>
+                                            <p className="text-xs text-[rgba(255,255,255,0.4)] mt-0.5">{item.desc}</p>
+                                        </div>
+                                    </button>
+                                ))}
                             </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <button onClick={() => setTab("reviews")}
-                                    className="flex items-center gap-3 p-4 rounded-xl border border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.05)] hover:bg-[rgba(245,158,11,0.1)] transition-all text-left">
-                                    <ShieldAlert size={18} className="text-[#F59E0B]" />
-                                    <div>
-                                        <p className="text-sm font-bold text-white">{pendingReviews + spamReviews} flagged</p>
-                                        <p className="text-xs text-[rgba(255,255,255,0.35)]">Reviews need attention</p>
-                                    </div>
-                                </button>
-                                <button onClick={() => setTab("users")}
-                                    className="flex items-center gap-3 p-4 rounded-xl border border-[rgba(232,67,147,0.2)] bg-[rgba(232,67,147,0.05)] hover:bg-[rgba(232,67,147,0.1)] transition-all text-left">
-                                    <Users size={18} className="text-[#F783AC]" />
-                                    <div>
-                                        <p className="text-sm font-bold text-white">{totalUsers} users</p>
-                                        <p className="text-xs text-[rgba(255,255,255,0.35)]">Manage roles & access</p>
-                                    </div>
-                                </button>
-                                <button onClick={() => setTab("claims")}
-                                    className="flex items-center gap-3 p-4 rounded-xl border border-[rgba(56,189,248,0.2)] bg-[rgba(56,189,248,0.05)] hover:bg-[rgba(56,189,248,0.1)] transition-all text-left">
-                                    <Briefcase size={18} className="text-[#38BDF8]" />
-                                    <div>
-                                        <p className="text-sm font-bold text-white">{brandClaims.filter((c) => c.status === "PENDING").length} pending</p>
-                                        <p className="text-xs text-[rgba(255,255,255,0.35)]">B2B Brand Claims</p>
-                                    </div>
-                                </button>
-                            </div>
+                        </div>
+
+                        {/* Quick stats row */}
+                        <div className="grid grid-cols-3 gap-4">
+                            <MetricCard label="Imported" value={scrapedPerfumes} icon={<Database size={16} />} accent="text-[#38BDF8]" glow="shadow-[0_0_30px_rgba(56,189,248,0.1)]" />
+                            <MetricCard label="With Ratings" value={ratedPerfumes} icon={<BarChart3 size={16} />} accent="text-[#A78BFA]" glow="shadow-[0_0_30px_rgba(167,139,250,0.1)]" />
+                            <MetricCard label="Spam Caught" value={spamReviews} icon={<ShieldCheck size={16} />} accent="text-[#EF4444]" glow="shadow-[0_0_30px_rgba(239,68,68,0.1)]" />
                         </div>
                     </div>
                 )}
@@ -726,6 +728,9 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
 
                 {/* -- Perfumes Tab -- */}
                 {tab === "perfumes" && <PerfumesManager />}
+
+                {/* -- Suggestions Tab -- */}
+                {tab === "suggestions" && <SuggestionsManager />}
 
                 {/* -- System Features Tab (Kill Switches) -- */}
                 {tab === "system" && (
@@ -1255,6 +1260,196 @@ function BrandClaimsTable({ claims }: { claims: BrandClaim[] }) {
     );
 }
 
+// -- Suggestions Manager --------------------------------------------------------
+
+function SuggestionsManager() {
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [filter, setFilter] = useState<"PENDING" | "APPROVED" | "REJECTED" | "ALL">("PENDING");
+    const [loading, setLoading] = useState(true);
+    const [pending, startTransition] = useTransition();
+    const [feedback, setFeedback] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+    const [rejectModal, setRejectModal] = useState<string | null>(null);
+    const [rejectReason, setRejectReason] = useState("");
+
+    const load = useCallback(async () => {
+        setLoading(true);
+        try {
+            const data = await getAdminSuggestedPerfumes(filter === "ALL" ? undefined : filter);
+            setSuggestions(data);
+        } catch { /* */ }
+        setLoading(false);
+    }, [filter]);
+
+    useEffect(() => { load(); }, [load]);
+
+    const flash = (type: "ok" | "err", msg: string) => {
+        setFeedback({ type, msg });
+        setTimeout(() => setFeedback(null), 4000);
+    };
+
+    const handleApprove = (id: string) => {
+        startTransition(async () => {
+            const res = await approveSuggestedPerfume(id);
+            if (res.success) {
+                flash("ok", "Perfume approved and added to catalog!");
+                load();
+            } else {
+                flash("err", ("error" in res ? res.error : null) || "Failed to approve");
+            }
+        });
+    };
+
+    const handleReject = () => {
+        if (!rejectModal) return;
+        startTransition(async () => {
+            const res = await rejectSuggestedPerfume(rejectModal, rejectReason || undefined);
+            if (res.success) {
+                flash("ok", "Suggestion rejected");
+                load();
+            } else {
+                flash("err", "Failed to reject");
+            }
+            setRejectModal(null);
+            setRejectReason("");
+        });
+    };
+
+    const parseNotes = (v: string | null) => {
+        if (!v) return [];
+        try { const a = JSON.parse(v); return Array.isArray(a) ? a : []; } catch { return []; }
+    };
+
+    return (
+        <div className="space-y-4">
+            {feedback && (
+                <div className={`px-4 py-2.5 rounded-xl text-sm font-medium border ${
+                    feedback.type === "ok" ? "bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.3)] text-emerald-400" : "bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.3)] text-red-400"
+                }`}>{feedback.msg}</div>
+            )}
+
+            <div className="rounded-2xl p-6 border border-[rgba(255,255,255,0.06)]"
+                style={{ background: "rgba(255,255,255,0.025)", backdropFilter: "blur(24px)" }}>
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <Lightbulb size={18} className="text-[#F59E0B]" />
+                        <h2 className="text-lg font-bold text-white">User Suggestions</h2>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {(["PENDING", "APPROVED", "REJECTED", "ALL"] as const).map(f => (
+                            <button key={f} onClick={() => setFilter(f)}
+                                className={`px-3 py-1.5 text-[11px] font-bold rounded-lg border transition-all ${
+                                    filter === f
+                                        ? "bg-brand-500/20 border-brand-500/30 text-brand-500"
+                                        : "border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
+                                }`}>
+                                {f.charAt(0) + f.slice(1).toLowerCase()}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {loading ? (
+                    <div className="flex items-center justify-center py-16">
+                        <Loader2 size={24} className="animate-spin text-brand-500" />
+                    </div>
+                ) : suggestions.length === 0 ? (
+                    <p className="text-center py-16 text-[rgba(255,255,255,0.25)] text-sm">No suggestions found.</p>
+                ) : (
+                    <div className="space-y-4">
+                        {suggestions.map((s: any) => {
+                            const top = parseNotes(s.topNotes);
+                            const heart = parseNotes(s.heartNotes);
+                            const base = parseNotes(s.baseNotes);
+                            const accords = parseNotes(s.accords);
+                            return (
+                                <div key={s.id} className="rounded-xl border border-[rgba(255,255,255,0.06)] p-5 hover:border-[rgba(255,255,255,0.12)] transition-colors"
+                                    style={{ background: "rgba(255,255,255,0.02)" }}>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <h3 className="text-white font-bold text-base">{s.name}</h3>
+                                                <span className="text-[rgba(255,255,255,0.4)] text-sm">by {s.brand}</span>
+                                                {s.gender && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border text-[#F783AC] bg-[rgba(247,131,172,0.1)] border-[rgba(247,131,172,0.25)] capitalize">{s.gender}</span>}
+                                                {s.releaseYear && <span className="text-[10px] text-[rgba(255,255,255,0.35)]">({s.releaseYear})</span>}
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                                    s.status === "PENDING" ? "text-[#F59E0B] bg-[rgba(245,158,11,0.1)] border-[rgba(245,158,11,0.25)]" :
+                                                    s.status === "APPROVED" ? "text-emerald-400 bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.25)]" :
+                                                    "text-red-400 bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.25)]"
+                                                }`}>{s.status}</span>
+                                            </div>
+                                            {s.perfumer && <p className="text-xs text-[rgba(255,255,255,0.4)] mt-1">Perfumer: <span className="text-[rgba(255,255,255,0.6)]">{s.perfumer}</span></p>}
+                                            {s.description && <p className="text-[12px] text-[rgba(255,255,255,0.45)] mt-2 line-clamp-2">{s.description}</p>}
+
+                                            {/* Notes */}
+                                            <div className="flex flex-wrap gap-3 mt-3">
+                                                {top.length > 0 && (
+                                                    <div><span className="text-[9px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)]">Top:</span>{" "}
+                                                        <span className="text-[11px] text-[rgba(255,255,255,0.5)]">{top.join(", ")}</span></div>
+                                                )}
+                                                {heart.length > 0 && (
+                                                    <div><span className="text-[9px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)]">Heart:</span>{" "}
+                                                        <span className="text-[11px] text-[rgba(255,255,255,0.5)]">{heart.join(", ")}</span></div>
+                                                )}
+                                                {base.length > 0 && (
+                                                    <div><span className="text-[9px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)]">Base:</span>{" "}
+                                                        <span className="text-[11px] text-[rgba(255,255,255,0.5)]">{base.join(", ")}</span></div>
+                                                )}
+                                            </div>
+                                            {accords.length > 0 && (
+                                                <div className="flex flex-wrap gap-1 mt-2">
+                                                    {accords.map((a: string, i: number) => (
+                                                        <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-full border border-[rgba(255,255,255,0.08)] text-[rgba(255,255,255,0.5)] bg-[rgba(255,255,255,0.03)]">{a}</span>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Submitter info */}
+                                            <p className="text-[10px] text-[rgba(255,255,255,0.25)] mt-3">
+                                                Submitted by {s.user?.name || s.user?.email || "Unknown"} • {new Date(s.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "2-digit" })}
+                                            </p>
+                                            {s.adminNotes && <p className="text-[10px] text-red-400/60 mt-1">Admin: {s.adminNotes}</p>}
+                                        </div>
+
+                                        {/* Actions */}
+                                        {s.status === "PENDING" && (
+                                            <div className="flex flex-col gap-1.5 shrink-0">
+                                                <button onClick={() => handleApprove(s.id)} disabled={pending}
+                                                    className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors disabled:opacity-50">
+                                                    <CheckCircle2 size={12} className="inline mr-1" /> Approve
+                                                </button>
+                                                <button onClick={() => setRejectModal(s.id)} disabled={pending}
+                                                    className="px-3 py-1.5 text-xs font-bold rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50">
+                                                    <X size={12} className="inline mr-1" /> Reject
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Reject Modal */}
+            {rejectModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setRejectModal(null); setRejectReason(""); }}>
+                    <div className="bg-[#1A1530] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-white font-bold text-lg mb-1">Reject Suggestion</h3>
+                        <p className="text-[rgba(255,255,255,0.5)] text-sm mb-4">Provide an optional reason for rejection.</p>
+                        <textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Reason (optional)..."
+                            className="w-full mb-4 p-3 rounded-xl text-sm bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none resize-none h-20" />
+                        <div className="flex gap-2 justify-end">
+                            <button onClick={() => { setRejectModal(null); setRejectReason(""); }} className="px-4 py-2 text-sm rounded-xl border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] transition-all">Cancel</button>
+                            <button onClick={handleReject} disabled={pending} className="px-4 py-2 text-sm rounded-xl font-semibold bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-all disabled:opacity-50">{pending ? "..." : "Reject"}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 // -- Env Variables Panel --------------------------------------------------------
 
 function EnvVariablesPanel() {
@@ -1468,6 +1663,47 @@ function EnvVariablesPanel() {
                         </div>
                     ))
                 )}
+            </div>
+
+            {/* SMTP Quick Setup */}
+            <div className="rounded-2xl p-5 border border-[rgba(255,255,255,0.08)]" style={{ background: "rgba(255,255,255,0.025)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                    <Mail size={16} className="text-[#38BDF8]" />
+                    <h3 className="text-sm font-bold text-white">SMTP / Email Quick Setup</h3>
+                </div>
+                <p className="text-[12px] text-[rgba(255,255,255,0.4)] mb-3">
+                    Add these variables to enable transactional email (password resets, notifications). Use the &quot;Add Variable&quot; button above.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                    {[
+                        { key: "SMTP_HOST", hint: "smtp.gmail.com" },
+                        { key: "SMTP_PORT", hint: "587" },
+                        { key: "SMTP_USER", hint: "you@gmail.com" },
+                        { key: "SMTP_PASSWORD", hint: "app password" },
+                        { key: "SMTP_FROM", hint: "noreply@subash.com" },
+                        { key: "SMTP_SECURE", hint: "true / false" },
+                    ].map(item => {
+                        const exists = vars.some(v => v.key === item.key);
+                        return (
+                            <div key={item.key} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                                exists ? "border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.04)]" : "border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]"
+                            }`}>
+                                <div>
+                                    <p className="text-xs font-mono font-bold text-[rgba(255,255,255,0.7)]">{item.key}</p>
+                                    <p className="text-[10px] text-[rgba(255,255,255,0.25)]">{item.hint}</p>
+                                </div>
+                                {exists ? (
+                                    <span className="text-[9px] font-bold text-emerald-400/70">SET</span>
+                                ) : (
+                                    <button onClick={() => { setNewKey(item.key); setNewValue(""); setNewMasked(item.key === "SMTP_PASSWORD"); setShowAdd(true); }}
+                                        className="text-[10px] font-bold text-[#38BDF8] hover:underline">
+                                        Configure
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Help Text */}

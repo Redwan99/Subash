@@ -223,17 +223,36 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
   const [submitBrand, setSubmitBrand] = useState("");
   const [submitGender, setSubmitGender] = useState("");
   const [submitDesc, setSubmitDesc] = useState("");
+  const [submitPerfumer, setSubmitPerfumer] = useState("");
+  const [submitYear, setSubmitYear] = useState("");
+  const [submitTopNotes, setSubmitTopNotes] = useState("");
+  const [submitHeartNotes, setSubmitHeartNotes] = useState("");
+  const [submitBaseNotes, setSubmitBaseNotes] = useState("");
+  const [submitAccords, setSubmitAccords] = useState("");
   const [submitPending, setSubmitPending] = useState(false);
   const [submitFeedback, setSubmitFeedback] = useState<{ ok: boolean; msg: string } | null>(null);
 
   const handleUserSubmit = async () => {
     setSubmitPending(true);
     setSubmitFeedback(null);
-    const res = await userSubmitPerfume({ name: submitName, brand: submitBrand, gender: submitGender || undefined, description: submitDesc || undefined });
+    const res = await userSubmitPerfume({
+      name: submitName,
+      brand: submitBrand,
+      gender: submitGender || undefined,
+      description: submitDesc || undefined,
+      perfumer: submitPerfumer || undefined,
+      releaseYear: submitYear ? parseInt(submitYear, 10) : null,
+      topNotes: submitTopNotes ? JSON.stringify(submitTopNotes.split(",").map(s => s.trim()).filter(Boolean)) : "[]",
+      heartNotes: submitHeartNotes ? JSON.stringify(submitHeartNotes.split(",").map(s => s.trim()).filter(Boolean)) : "[]",
+      baseNotes: submitBaseNotes ? JSON.stringify(submitBaseNotes.split(",").map(s => s.trim()).filter(Boolean)) : "[]",
+      accords: submitAccords ? JSON.stringify(submitAccords.split(",").map(s => s.trim()).filter(Boolean)) : "[]",
+    });
     setSubmitPending(false);
     if (res.success) {
-      setSubmitFeedback({ ok: true, msg: "Perfume submitted successfully! It will appear in the catalog shortly." });
+      setSubmitFeedback({ ok: true, msg: "Perfume submitted for review! Our team will review and add it shortly." });
       setSubmitName(""); setSubmitBrand(""); setSubmitGender(""); setSubmitDesc("");
+      setSubmitPerfumer(""); setSubmitYear(""); setSubmitTopNotes(""); setSubmitHeartNotes("");
+      setSubmitBaseNotes(""); setSubmitAccords("");
       setTimeout(() => { setShowSubmitModal(false); setSubmitFeedback(null); }, 2500);
     } else {
       setSubmitFeedback({ ok: false, msg: res.error || "Failed to submit." });
@@ -615,52 +634,86 @@ export default function EncyclopediaMatrix({ initialData }: { initialData: any[]
         </div>
       )}
 
-      {/* Submit Perfume Modal */}
+      {/* Submit Perfume Modal — portal-level z-index like WriteReviewModal */}
       {showSubmitModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowSubmitModal(false); setSubmitFeedback(null); }}>
-          <div className="bg-[#1A1530] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 w-full max-w-md shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h3 className="text-white font-bold text-lg mb-1">Suggest a Perfume</h3>
-            <p className="text-[rgba(255,255,255,0.4)] text-sm mb-5">Know a fragrance that&apos;s missing? Add it to our database.</p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowSubmitModal(false); setSubmitFeedback(null); }}>
+          <div className="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" onClick={e => e.stopPropagation()}>
+            <h3 className="text-[var(--text-primary)] font-bold text-lg mb-1">Suggest a Perfume</h3>
+            <p className="text-[var(--text-muted)] text-sm mb-5">Know a fragrance that&apos;s missing? Submit details for admin review.</p>
 
             {submitFeedback && (
               <div className={`mb-4 px-4 py-2.5 rounded-xl text-sm font-medium border ${
-                submitFeedback.ok ? "bg-[rgba(16,185,129,0.1)] border-[rgba(16,185,129,0.3)] text-emerald-400" : "bg-[rgba(239,68,68,0.1)] border-[rgba(239,68,68,0.3)] text-red-400"
+                submitFeedback.ok ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400" : "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
               }`}>{submitFeedback.msg}</div>
             )}
 
             <div className="space-y-3">
-              <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Name *</label>
-                <input type="text" value={submitName} onChange={e => setSubmitName(e.target.value)} placeholder="Aventus"
-                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-[var(--accent)]/50" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Name *</label>
+                  <input type="text" value={submitName} onChange={e => setSubmitName(e.target.value)} placeholder="Aventus"
+                    className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Brand *</label>
+                  <input type="text" value={submitBrand} onChange={e => setSubmitBrand(e.target.value)} placeholder="Creed"
+                    className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Gender</label>
+                  <select value={submitGender} onChange={e => setSubmitGender(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] outline-none focus:border-[var(--accent)]/50 appearance-none cursor-pointer">
+                    <option value="">Any</option>
+                    <option value="men">Men</option>
+                    <option value="women">Women</option>
+                    <option value="unisex">Unisex</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Creator / Perfumer</label>
+                  <input type="text" value={submitPerfumer} onChange={e => setSubmitPerfumer(e.target.value)} placeholder="Oliver Creed"
+                    className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Release Year</label>
+                  <input type="number" value={submitYear} onChange={e => setSubmitYear(e.target.value)} placeholder="2010" min="1900" max="2030"
+                    className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50" />
+                </div>
               </div>
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Brand *</label>
-                <input type="text" value={submitBrand} onChange={e => setSubmitBrand(e.target.value)} placeholder="Creed"
-                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-[var(--accent)]/50" />
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Top Notes <span className="normal-case font-normal">(comma-separated)</span></label>
+                <input type="text" value={submitTopNotes} onChange={e => setSubmitTopNotes(e.target.value)} placeholder="Bergamot, Pink Pepper, Blackcurrant"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50" />
               </div>
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Gender</label>
-                <select value={submitGender} onChange={e => setSubmitGender(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white outline-none focus:border-[var(--accent)]/50 appearance-none cursor-pointer">
-                  <option value="" className="bg-[#0D0A1E]">Any</option>
-                  <option value="men" className="bg-[#0D0A1E]">Men</option>
-                  <option value="women" className="bg-[#0D0A1E]">Women</option>
-                  <option value="unisex" className="bg-[#0D0A1E]">Unisex</option>
-                </select>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Heart Notes <span className="normal-case font-normal">(comma-separated)</span></label>
+                <input type="text" value={submitHeartNotes} onChange={e => setSubmitHeartNotes(e.target.value)} placeholder="Rose, Jasmine, Birch"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50" />
               </div>
               <div>
-                <label className="text-xs font-bold uppercase tracking-widest text-[rgba(255,255,255,0.4)] mb-1 block">Description <span className="normal-case font-normal">(optional)</span></label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Base Notes <span className="normal-case font-normal">(comma-separated)</span></label>
+                <input type="text" value={submitBaseNotes} onChange={e => setSubmitBaseNotes(e.target.value)} placeholder="Musk, Ambergris, Vanilla"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Accords <span className="normal-case font-normal">(comma-separated)</span></label>
+                <input type="text" value={submitAccords} onChange={e => setSubmitAccords(e.target.value)} placeholder="Woody, Fresh, Citrus"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50" />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-1 block">Description <span className="normal-case font-normal">(optional)</span></label>
                 <textarea value={submitDesc} onChange={e => setSubmitDesc(e.target.value)} rows={2} placeholder="What makes this fragrance special?"
-                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.2)] outline-none focus:border-[var(--accent)]/50 resize-none" />
+                  className="w-full px-3 py-2.5 rounded-xl text-sm bg-[var(--bg-glass)] border border-[var(--border-color)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-[var(--accent)]/50 resize-none" />
               </div>
             </div>
 
             <div className="flex gap-2 justify-end mt-5">
-              <button onClick={() => { setShowSubmitModal(false); setSubmitFeedback(null); }} className="px-4 py-2 text-sm rounded-xl border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.6)] hover:bg-[rgba(255,255,255,0.05)] transition-all">Cancel</button>
+              <button onClick={() => { setShowSubmitModal(false); setSubmitFeedback(null); }} className="px-4 py-2 text-sm rounded-xl border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-glass)] transition-all">Cancel</button>
               <button onClick={handleUserSubmit} disabled={submitPending || !submitName.trim() || !submitBrand.trim()}
-                className="px-5 py-2 text-sm rounded-xl font-semibold bg-[var(--accent)]/20 text-[var(--accent)] border border-[var(--accent)]/30 hover:bg-[var(--accent)]/25 transition-all disabled:opacity-50">
-                {submitPending ? "Submitting..." : "Submit"}
+                className="px-5 py-2 text-sm rounded-xl font-semibold bg-[var(--accent)]/15 text-[var(--accent)] border border-[var(--accent)]/30 hover:bg-[var(--accent)]/20 transition-all disabled:opacity-50">
+                {submitPending ? "Submitting..." : "Submit for Review"}
               </button>
             </div>
           </div>

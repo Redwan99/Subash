@@ -271,6 +271,8 @@ export function TopNavbar() {
     return null;
   }
 
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <motion.header
       initial={{ opacity: 0, y: -16 }}
@@ -299,15 +301,19 @@ export function TopNavbar() {
         </motion.div>
       </Link>
 
-      {/* -- Center: Search (scroll-aware on homepage) ---------- */}
-      <div className="flex-1 max-w-md mx-auto">
-        {showSearch && <GlobalSearch />}
-      </div>
+      {/* -- Center: Search (hidden on admin) ------------------- */}
+      {!isAdmin && (
+        <div className="flex-1 max-w-md mx-auto">
+          {showSearch && <GlobalSearch />}
+        </div>
+      )}
+      {isAdmin && <div className="flex-1" />}
 
       {/* -- Right: Nav Links + Theme + Avatar ------------------ */}
       <div className="flex items-center gap-1 shrink-0">
-        {/* Nav links — hidden on very small screens */}
-        <nav className="hidden sm:flex items-center gap-0.5">
+        {/* Nav links — hidden on admin and very small screens */}
+        {!isAdmin && (
+          <nav className="hidden sm:flex items-center gap-0.5">
           {NAV_LINKS.filter(l => {
             if (l.label === "Perfumes" && featureToggles.ENABLE_ENCYCLOPEDIA === false) return false;
             if (l.label === "Creators" && featureToggles.ENABLE_CREATORS === false) return false;
@@ -325,9 +331,10 @@ export function TopNavbar() {
             );
           })}
         </nav>
+        )}
 
         {/* Divider */}
-        <div className="hidden sm:block w-px h-5 mx-2 bg-[var(--border-color)]" />
+        {!isAdmin && <div className="hidden sm:block w-px h-5 mx-2 bg-[var(--border-color)]" />}
 
         {/* Theme toggle (compact pill) */}
         <ThemeToggle compact />
@@ -335,8 +342,8 @@ export function TopNavbar() {
         {/* Spacer */}
         <div className="w-1" />
 
-        {/* Currently Wearing status trigger */}
-        <WearingStatusModal />
+        {/* Currently Wearing status trigger (hidden on admin) */}
+        {!isAdmin && <WearingStatusModal />}
 
         {/* Spacer */}
         <div className="w-1" />

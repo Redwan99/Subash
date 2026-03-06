@@ -96,6 +96,7 @@ model User {
   brandClaims     BrandClaim[]
   comments        Comment[]
   wearingStatus   WearingStatus?
+  suggestedPerfumes SuggestedPerfume[]
 
   @@index([reputationScore])  // smart review sort: high-rep authors first
   @@index([review_count])     // fast leaderboard sorts
@@ -614,5 +615,34 @@ model ImportJob {
 
   @@index([status])
   @@map("import_jobs")
+}
+
+// =============================================
+//  User-Suggested Perfumes (Admin Review Queue)
+// =============================================
+
+model SuggestedPerfume {
+  id          String   @id @default(cuid())
+  name        String
+  brand       String
+  gender      String?
+  description String?
+  perfumer    String?
+  releaseYear Int?
+  topNotes    String   @default("[]")
+  heartNotes  String   @default("[]")
+  baseNotes   String   @default("[]")
+  accords     String   @default("[]")
+  imageUrl    String?
+  status      String   @default("PENDING")  // PENDING | APPROVED | REJECTED
+  adminNotes  String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
+  @@map("suggested_perfumes")
 }
 

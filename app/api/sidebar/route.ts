@@ -182,6 +182,12 @@ export async function GET() {
   try {
     const { potd, trendingBrands, trendingPerfumes, activity, stats } = await getCachedSidebarData();
 
+    // Active sessions = online users (always fresh, not cached)
+    const onlineUsers = await prisma.session.groupBy({
+      by: ["userId"],
+      where: { expires: { gt: new Date() } },
+    }).then((rows) => rows.length).catch(() => 0);
+
     // Sort by timestamp descending — latest activity first
     const freshActivity = [...activity].sort((a, b) => b._ts - a._ts);
 
@@ -190,7 +196,7 @@ export async function GET() {
       trendingBrands,
       trendingPerfumes,
       activity: freshActivity,
-      stats,
+      stats: { ...stats, onlineUsers },
     });
   } catch (err) {
     console.error("[/api/sidebar]", err);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
@@ -83,13 +83,51 @@ export function LeaderboardWidget() {
                 </div>
             </div>
 
-            <div className="p-3 space-y-4">
+            <div className="p-3 flex-1 min-h-0 relative">
                 {loading ? (
                     <div className="h-40 flex items-center justify-center">
                         <div className="w-5 h-5 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" />
                     </div>
                 ) : (
-                    <AnimatePresence mode="wait">
+                    <LeaderboardScrollArea timeframe={timeframe} listView={listView} perfumes={perfumes} users={users} />
+                )}
+            </div>
+        </div>
+    );
+}
+
+function LeaderboardScrollArea({ timeframe, listView, perfumes, users }: { timeframe: string; listView: string; perfumes: TopPerfume[]; users: TopUser[] }) {
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [fadeTop, setFadeTop] = useState(false);
+    const [fadeBottom, setFadeBottom] = useState(false);
+
+    const updateFade = useCallback(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        setFadeTop(el.scrollTop > 4);
+        setFadeBottom(el.scrollTop + el.clientHeight < el.scrollHeight - 4);
+    }, []);
+
+    useEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        updateFade();
+        el.addEventListener("scroll", updateFade, { passive: true });
+        return () => el.removeEventListener("scroll", updateFade);
+    }, [timeframe, listView, updateFade]);
+
+    return (
+        <div className="relative h-full">
+            <div
+                className="pointer-events-none absolute top-0 left-0 right-0 h-6 z-10 transition-opacity duration-300"
+                style={{ opacity: fadeTop ? 1 : 0, background: "linear-gradient(to bottom, var(--bg-glass), transparent)" }}
+            />
+            <div
+                className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 z-10 transition-opacity duration-300"
+                style={{ opacity: fadeBottom ? 1 : 0, background: "linear-gradient(to top, var(--bg-glass), transparent)" }}
+            />
+            <div ref={scrollRef} className="h-full overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                <AnimatePresence mode="wait">
                         <motion.div
                             key={`${timeframe}-${listView}`}
                             initial={{ opacity: 0, y: 5 }}
@@ -135,7 +173,7 @@ export function LeaderboardWidget() {
                                     Top Reviewers (Top 50)
                                 </h3>
                                 {users.length > 0 ? (
-                                    <div className="max-h-40 overflow-y-auto pr-1 space-y-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                    <div className="space-y-1">
                                         {users.map((u, i) => (
                                             <div
                                                 key={u.id}
@@ -168,7 +206,6 @@ export function LeaderboardWidget() {
                             )}
                         </motion.div>
                     </AnimatePresence>
-                )}
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ interface Stats {
   totalUsers: number;
   totalPerfumes: number;
   totalReviews: number;
+  onlineUsers?: number;
 }
 
 export function PlatformStats() {
@@ -27,7 +28,7 @@ export function PlatformStats() {
     { label: "Users", value: stats.totalUsers, icon: Users, color: "text-[#60A5FA]" },
     { label: "Perfumes", value: stats.totalPerfumes, icon: FlaskConical, color: "text-[#F783AC]" },
     { label: "Reviews", value: stats.totalReviews, icon: MessageSquare, color: "text-[#F59E0B]" },
-    { label: "Online", value: "—" as string | number, icon: Wifi, color: "text-[#34D399]" },
+    { label: "Online", value: stats.onlineUsers ?? 0, icon: Wifi, color: "text-[#34D399]" },
   ];
 
   return (
