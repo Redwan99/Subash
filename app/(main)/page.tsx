@@ -250,6 +250,13 @@ export default async function HomePage() {
     console.warn("[homepage] climate picks failed", e);
   }
 
+  // Shuffle reviews for variety on each render cycle
+  const shuffledReviews = [...(latestReviews ?? [])];
+  for (let i = shuffledReviews.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledReviews[i], shuffledReviews[j]] = [shuffledReviews[j], shuffledReviews[i]];
+  }
+
   const feedInitialReviews: LiveReview[] = (latestReviews ?? []).map((review) => ({
     ...review,
     createdAt:
@@ -318,7 +325,7 @@ export default async function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-[minmax(0,1fr)] gap-4 contain-paint">
-          {latestReviews.map((review, i) => {
+          {shuffledReviews.map((review, i) => {
             // Bento pattern: positions 0,3 are featured (tall or wide)
             const isFeatured = i === 0 || i === 3;
             return (

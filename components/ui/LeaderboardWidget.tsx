@@ -26,6 +26,7 @@ interface TopUser {
 
 export function LeaderboardWidget() {
     const [timeframe, setTimeframe] = useState<Timeframe>("week");
+    const [listView, setListView] = useState<"perfumes" | "reviewers">("perfumes");
     const [perfumes, setPerfumes] = useState<TopPerfume[]>([]);
     const [users, setUsers] = useState<TopUser[]>([]);
     const [loading, setLoading] = useState(true);
@@ -66,6 +67,20 @@ export function LeaderboardWidget() {
                         </button>
                     ))}
                 </div>
+                <div className="flex p-1 bg-gray-100 dark:bg-[rgba(255,255,255,0.03)] rounded-lg mt-2">
+                    {(["perfumes", "reviewers"] as const).map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setListView(tab)}
+                            className={`flex-1 text-[10px] font-bold py-1.5 capitalize rounded-md transition-colors ${listView === tab
+                                    ? "bg-[rgba(245,158,11,0.15)] text-[#F59E0B] shadow-sm"
+                                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                                }`}
+                        >
+                            {tab === "perfumes" ? "Top Perfumes" : "Top Reviewers"}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             <div className="p-3 space-y-4">
@@ -76,14 +91,13 @@ export function LeaderboardWidget() {
                 ) : (
                     <AnimatePresence mode="wait">
                         <motion.div
-                            key={timeframe}
+                            key={`${timeframe}-${listView}`}
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -5 }}
                             transition={{ duration: 0.2 }}
-                            className="space-y-4"
                         >
-                            {/* Top Perfumes */}
+                            {listView === "perfumes" ? (
                             <div>
                                 <h3 className="text-[10px] font-bold uppercase text-[var(--text-muted)] mb-2 px-1">
                                     Most Reviewed (Top 10)
@@ -115,8 +129,7 @@ export function LeaderboardWidget() {
                                     )}
                                 </div>
                             </div>
-
-                            {/* Top Users */}
+                            ) : (
                             <div>
                                 <h3 className="text-[10px] font-bold uppercase text-[var(--text-muted)] mb-2 px-1">
                                     Top Reviewers (Top 50)
@@ -152,6 +165,7 @@ export function LeaderboardWidget() {
                                     <p className="text-[10px] text-[var(--text-muted)] p-2">No active reviewers.</p>
                                 )}
                             </div>
+                            )}
                         </motion.div>
                     </AnimatePresence>
                 )}

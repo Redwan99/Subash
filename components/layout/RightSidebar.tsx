@@ -181,39 +181,43 @@ export function RightSidebar() {
           ? { duration: 0 }
           : { type: "spring", stiffness: 300, damping: 30, delay: 0.1 }
       }
-      className="fixed right-0 hidden lg:flex flex-col z-40 overflow-y-auto top-[var(--topnav-height,60px)] h-[calc(100vh-var(--topnav-height,60px))] w-[var(--sidebar-right-width)] bg-[var(--bg-glass)] backdrop-blur-[var(--blur-backdrop)] border-l border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)] [scrollbar-width:none]"
+      className="fixed right-0 hidden lg:flex flex-col z-40 top-[var(--topnav-height,60px)] h-[calc(100vh-var(--topnav-height,60px))] w-[var(--sidebar-right-width)] bg-[var(--bg-glass)] backdrop-blur-[var(--blur-backdrop)] border-l border-[var(--bg-glass-border)] shadow-[var(--shadow-glass)]"
       aria-label="Live community activity"
     >
-      <div className="pt-6 px-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">
-            Leaderboards
-          </span>
-          <Link href="/leaderboards" className="text-[10px] font-medium text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors flex items-center gap-1">
-            View All <TrendingUp size={10} />
-          </Link>
+      {/* Top half: Leaderboards */}
+      <div className="h-1/2 flex flex-col min-h-0 overflow-hidden">
+        <div className="pt-4 px-4 shrink-0">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">
+              Leaderboards
+            </span>
+            <Link href="/leaderboards" className="text-[10px] font-medium text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors flex items-center gap-1">
+              View All <TrendingUp size={10} />
+            </Link>
+          </div>
         </div>
-        <LeaderboardWidget />
-      </div>
-
-      {/* Header */}
-      <div className="px-4 pt-2 pb-3">
-        <div className="flex items-center gap-2">
-          <Activity size={14} className="text-[var(--accent)]" />
-          <h2 className="text-xs font-bold tracking-widest uppercase text-[var(--text-secondary)]">Live Activity</h2>
-          <motion.div
-            animate={shouldReduceMotion ? {} : { opacity: [1, 0.3, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-            className="w-1.5 h-1.5 rounded-full ml-auto bg-[#F783AC]"
-          />
+        <div className="flex-1 overflow-y-auto min-h-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <LeaderboardWidget />
         </div>
       </div>
 
-      <div className="mx-4 h-px bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)]" />
+      {/* Bottom half: Live Activity */}
+      <div className="h-1/2 flex flex-col min-h-0 border-t border-[var(--border-color)]">
+        <div className="px-4 pt-3 pb-2 shrink-0">
+          <div className="flex items-center gap-2">
+            <Activity size={14} className="text-[var(--accent)]" />
+            <h2 className="text-xs font-bold tracking-widest uppercase text-[var(--text-secondary)]">Live Activity</h2>
+            <motion.div
+              animate={shouldReduceMotion ? {} : { opacity: [1, 0.3, 1] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              className="w-1.5 h-1.5 rounded-full ml-auto bg-[#F783AC]"
+            />
+          </div>
+        </div>
 
-      {/* Activity Feed — scrollable with fade edges */}
-      <ActivityFeed data={data} activity={activity} shouldReduceMotion={shouldReduceMotion} />
-
+        {/* Activity Feed — scrollable with fade edges */}
+        <ActivityFeed data={data} activity={activity} shouldReduceMotion={shouldReduceMotion} />
+      </div>
     </motion.aside>
   );
 }

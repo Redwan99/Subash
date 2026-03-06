@@ -118,6 +118,7 @@ const getCachedSidebarData = unstable_cache(
 
     type ActivityItem = {
       id: string;
+      _ts: number;
       type: string;
       user: string;
       action: string;
@@ -130,6 +131,7 @@ const getCachedSidebarData = unstable_cache(
     const activity: ActivityItem[] = [
       ...recentReviews.map((r) => ({
         id: r.id,
+        _ts: r.createdAt.getTime(),
         type: "review",
         user: r.user.name ?? "Anon",
         action: "reviewed",
@@ -140,6 +142,7 @@ const getCachedSidebarData = unstable_cache(
       })),
       ...recentPosts.map((p) => ({
         id: p.id,
+        _ts: p.createdAt.getTime(),
         type: "fragram",
         user: p.user.name ?? "Anon",
         action: "posted to Fragram",
@@ -179,10 +182,8 @@ export async function GET() {
   try {
     const { potd, trendingBrands, trendingPerfumes, activity, stats } = await getCachedSidebarData();
 
-    // Dynamically recalculate timeAgo for activity so it's fresh even if cached
-    const freshActivity = activity.sort((a, b) => {
-      return a.time.localeCompare(b.time);
-    });
+    // Sort by timestamp descending — latest activity first
+    const freshActivity = [...activity].sort((a, b) => b._ts - a._ts);
 
     return NextResponse.json({
       potd,

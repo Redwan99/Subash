@@ -17,7 +17,7 @@ const RANK_STYLES = [
 ];
 
 export async function TrendingPerfumes() {
-    const trending = await getCachedTrendingPerfumes(5);
+    const trending = await getCachedTrendingPerfumes(5, 15);
 
     const trendingPerfumes = trending.filter(
         (p): p is NonNullable<(typeof trending)[number]> => Boolean(p)
