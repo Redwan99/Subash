@@ -59,18 +59,17 @@ export const metadata: Metadata = {
     title: "Subash | Bangladesh's Fragrance Community",
     description:
       "Discover, review, and buy authentic perfumes in Bangladesh.",
-    images: ["/og-default.jpg"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Subash | Bangladesh's Fragrance Community",
     description: "Discover, review, and buy authentic perfumes in Bangladesh.",
-    images: ["/og-default.jpg"],
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-icon.svg",
   },
   manifest: "/site.webmanifest",
 };

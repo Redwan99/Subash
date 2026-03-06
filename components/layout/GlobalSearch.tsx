@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search, Loader2, User as UserIcon, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { getOmnibarResults } from "@/lib/actions/search";
+import { getOmnibarResults, incrementSearchCount } from "@/lib/actions/search";
 import { useRouter } from "next/navigation";
 
 interface PerfumeResult {
@@ -114,7 +114,7 @@ export default function GlobalSearch() {
                   <Link
                     key={perfume.id}
                     href={`/perfume/${perfume.slug}`}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => { incrementSearchCount(perfume.id).catch(() => {}); setIsOpen(false); }}
                     className="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
                   >
                     <div className="w-10 h-10 relative bg-gray-100 dark:bg-white/5 rounded-lg p-1 flex-shrink-0">

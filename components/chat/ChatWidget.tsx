@@ -56,7 +56,7 @@ function PerfumeCard({ p }: { p: BotPerfume }) {
 
   return (
     <Link
-      href={`/perfume/${p.id}`}
+      href={`/perfume/${p.slug}`}
       className="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all
         bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10
         hover:bg-[var(--accent)]/15 hover:border-[var(--accent)]/35

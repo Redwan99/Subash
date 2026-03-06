@@ -11,14 +11,15 @@ export async function LeftSidebar() {
 
         {/* Trending Section */}
         <TrendingPerfumes />
-
-        {/* Platform Stats */}
-        <PlatformStats />
       </div>
 
-      <p className="text-center text-[10px] py-4 shrink-0 text-[var(--text-muted)] border-t border-black/10 dark:border-white/10">
-        Subash · সুবাশ
-      </p>
+      <div className="shrink-0 border-t border-black/10 dark:border-white/10 p-4 space-y-4">
+        {/* Platform Stats */}
+        <PlatformStats />
+        <p className="text-center text-[10px] text-[var(--text-muted)]">
+          Subash · সুবাশ
+        </p>
+      </div>
     </aside>
   );
 }

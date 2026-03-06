@@ -18,7 +18,7 @@ interface ProvidersProps {
 
 export function Providers({ children, session, featureToggles }: ProvidersProps) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange={false}>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange={false}>
       <FeatureToggleProvider initial={featureToggles ?? {}}>
         <SessionProvider session={session}>{children}</SessionProvider>
       </FeatureToggleProvider>

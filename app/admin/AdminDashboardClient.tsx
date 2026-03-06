@@ -628,19 +628,20 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                     </div>
                 </div>
 
-                {/* Tab Bar */}
-                <div className="flex items-center gap-1 mb-8 p-1 rounded-2xl w-fit"
-                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                    {tabs.map(({ id, label, icon }) => (
-                        <button key={id} onClick={() => setTab(id)}
-                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${tab === id
-                                ? "bg-brand-500/20 text-brand-500 border border-brand-500/30 shadow-[0_0_16px_rgba(232,67,147,0.2)]"
-                                : "text-[rgba(255,255,255,0.4)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
-                                }`}>
-                            {icon} {label}
+                {/* Tab Bar — only show when NOT on overview (as a back navigation) */}
+                {tab !== "overview" && (
+                    <div className="flex items-center gap-2 mb-8">
+                        <button onClick={() => setTab("overview")}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-brand-500/20 text-brand-500 border border-brand-500/30 shadow-[0_0_16px_rgba(232,67,147,0.2)]">
+                            <BarChart3 size={15} /> ← Overview
                         </button>
-                    ))}
-                </div>
+                        <div className="h-6 w-px bg-[rgba(255,255,255,0.1)]" />
+                        <span className="text-sm font-semibold text-[rgba(255,255,255,0.6)]">
+                            {tabs.find(t => t.id === tab)?.icon}
+                            <span className="ml-2">{tabs.find(t => t.id === tab)?.label}</span>
+                        </span>
+                    </div>
+                )}
 
                 {/* -- Overview Tab — Grid Dashboard -- */}
                 {tab === "overview" && (
@@ -656,22 +657,22 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
                         {/* Navigation Grid — clickable cards that open respective tabs */}
                         <div>
                             <p className="text-xs font-bold tracking-widest uppercase text-[rgba(255,255,255,0.3)] mb-4">Quick Navigation</p>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                                 {[
-                                    { tab: "reviews" as Tab, label: "Reviews", desc: `${pendingReviews + spamReviews} flagged`, icon: <Star size={20} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
-                                    { tab: "users" as Tab, label: "Users", desc: `${totalUsers} members`, icon: <Users size={20} />, color: "text-[#F783AC]", bg: "rgba(232,67,147,0.06)", border: "rgba(232,67,147,0.2)" },
-                                    { tab: "perfumes" as Tab, label: "Perfumes", desc: `${totalPerfumes.toLocaleString()} total`, icon: <Droplet size={20} />, color: "text-[#A78BFA]", bg: "rgba(167,139,250,0.06)", border: "rgba(167,139,250,0.2)" },
-                                    { tab: "suggestions" as Tab, label: "Suggestions", desc: `${pendingSuggestions} pending`, icon: <Lightbulb size={20} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
-                                    { tab: "system" as Tab, label: "Features", desc: "Kill switches", icon: <Settings2 size={20} />, color: "text-[#38BDF8]", bg: "rgba(56,189,248,0.06)", border: "rgba(56,189,248,0.2)" },
-                                    { tab: "env" as Tab, label: "Env & SMTP", desc: "Secrets & mailer", icon: <Key size={20} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
-                                    { tab: "audit" as Tab, label: "Audit Logs", desc: `${auditLogs.length} events`, icon: <Activity size={20} />, color: "text-[#F783AC]", bg: "rgba(247,131,172,0.06)", border: "rgba(247,131,172,0.2)" },
-                                    { tab: "claims" as Tab, label: "B2B Claims", desc: `${brandClaims.filter(c => c.status === "PENDING").length} pending`, icon: <Briefcase size={20} />, color: "text-[#38BDF8]", bg: "rgba(56,189,248,0.06)", border: "rgba(56,189,248,0.2)" },
-                                    { tab: "import" as Tab, label: "Import Data", desc: `${scrapedPerfumes} imported`, icon: <Database size={20} />, color: "text-[#A78BFA]", bg: "rgba(167,139,250,0.06)", border: "rgba(167,139,250,0.2)" },
+                                    { tab: "reviews" as Tab, label: "Reviews", desc: `${pendingReviews + spamReviews} flagged`, icon: <Star size={22} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
+                                    { tab: "users" as Tab, label: "Users", desc: `${totalUsers} members`, icon: <Users size={22} />, color: "text-[#F783AC]", bg: "rgba(232,67,147,0.06)", border: "rgba(232,67,147,0.2)" },
+                                    { tab: "perfumes" as Tab, label: "Perfumes", desc: `${totalPerfumes.toLocaleString()} total`, icon: <Droplet size={22} />, color: "text-[#A78BFA]", bg: "rgba(167,139,250,0.06)", border: "rgba(167,139,250,0.2)" },
+                                    { tab: "suggestions" as Tab, label: "Suggestions", desc: `${pendingSuggestions} pending`, icon: <Lightbulb size={22} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
+                                    { tab: "system" as Tab, label: "Features", desc: "Kill switches", icon: <Settings2 size={22} />, color: "text-[#38BDF8]", bg: "rgba(56,189,248,0.06)", border: "rgba(56,189,248,0.2)" },
+                                    { tab: "env" as Tab, label: "Env & SMTP", desc: "Secrets & mailer", icon: <Key size={22} />, color: "text-[#F59E0B]", bg: "rgba(245,158,11,0.06)", border: "rgba(245,158,11,0.2)" },
+                                    { tab: "audit" as Tab, label: "Audit Logs", desc: `${auditLogs.length} events`, icon: <Activity size={22} />, color: "text-[#F783AC]", bg: "rgba(247,131,172,0.06)", border: "rgba(247,131,172,0.2)" },
+                                    { tab: "claims" as Tab, label: "B2B Claims", desc: `${brandClaims.filter(c => c.status === "PENDING").length} pending`, icon: <Briefcase size={22} />, color: "text-[#38BDF8]", bg: "rgba(56,189,248,0.06)", border: "rgba(56,189,248,0.2)" },
+                                    { tab: "import" as Tab, label: "Import Data", desc: `${scrapedPerfumes} imported`, icon: <Database size={22} />, color: "text-[#A78BFA]", bg: "rgba(167,139,250,0.06)", border: "rgba(167,139,250,0.2)" },
                                 ].map(item => (
                                     <button key={item.tab} onClick={() => setTab(item.tab)}
-                                        className="flex items-start gap-3 p-5 rounded-2xl border hover:scale-[1.02] transition-all text-left group"
+                                        className="flex flex-col items-start gap-3 p-5 rounded-2xl border hover:scale-[1.02] transition-all text-left group"
                                         style={{ background: item.bg, borderColor: item.border }}>
-                                        <div className={`mt-0.5 ${item.color} group-hover:scale-110 transition-transform`}>
+                                        <div className={`${item.color} group-hover:scale-110 transition-transform`}>
                                             {item.icon}
                                         </div>
                                         <div>
@@ -1706,13 +1707,231 @@ function EnvVariablesPanel() {
                 </div>
             </div>
 
-            {/* Help Text */}
-            <div className="rounded-xl p-4 border border-[rgba(255,255,255,0.06)]" style={{ background: "rgba(255,255,255,0.02)" }}>
-                <p className="text-xs text-[rgba(255,255,255,0.35)] leading-relaxed">
-                    <strong className="text-[rgba(255,255,255,0.5)]">Common variables:</strong>{" "}
-                    NEXT_PUBLIC_TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
-                    AUTH_SECRET, NEXT_PUBLIC_SITE_URL, OPENAI_API_KEY, ENV_ENCRYPTION_KEY
+            {/* Auth & Security Quick Setup */}
+            <div className="rounded-2xl p-5 border border-[rgba(255,255,255,0.08)]" style={{ background: "rgba(255,255,255,0.025)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                    <ShieldCheck size={16} className="text-[#A78BFA]" />
+                    <h3 className="text-sm font-bold text-white">Auth & Security</h3>
+                </div>
+                <p className="text-[12px] text-[rgba(255,255,255,0.4)] mb-3">
+                    Core authentication secrets. AUTH_SECRET is required for session encryption.
                 </p>
+                <div className="grid grid-cols-2 gap-2">
+                    {[
+                        { key: "AUTH_SECRET", hint: "random 32+ char string", masked: true },
+                        { key: "AUTH_URL", hint: "https://subash.rico.bd", masked: false },
+                        { key: "NEXT_PUBLIC_SITE_URL", hint: "https://subash.rico.bd", masked: false },
+                        { key: "ENV_ENCRYPTION_KEY", hint: "AES-256 key for env vars", masked: true },
+                    ].map(item => {
+                        const exists = vars.some(v => v.key === item.key);
+                        return (
+                            <div key={item.key} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                                exists ? "border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.04)]" : "border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]"
+                            }`}>
+                                <div>
+                                    <p className="text-xs font-mono font-bold text-[rgba(255,255,255,0.7)]">{item.key}</p>
+                                    <p className="text-[10px] text-[rgba(255,255,255,0.25)]">{item.hint}</p>
+                                </div>
+                                {exists ? (
+                                    <span className="text-[9px] font-bold text-emerald-400/70">SET</span>
+                                ) : (
+                                    <button onClick={() => { setNewKey(item.key); setNewValue(""); setNewMasked(item.masked); setShowAdd(true); }}
+                                        className="text-[10px] font-bold text-[#A78BFA] hover:underline">
+                                        Configure
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Google OAuth Quick Setup */}
+            <div className="rounded-2xl p-5 border border-[rgba(255,255,255,0.08)]" style={{ background: "rgba(255,255,255,0.025)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                    <Globe size={16} className="text-[#F59E0B]" />
+                    <h3 className="text-sm font-bold text-white">Google OAuth</h3>
+                </div>
+                <p className="text-[12px] text-[rgba(255,255,255,0.4)] mb-3">
+                    Enable &quot;Sign in with Google&quot;. Get credentials from Google Cloud Console.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                    {[
+                        { key: "GOOGLE_CLIENT_ID", hint: "xxxxx.apps.googleusercontent.com" },
+                        { key: "GOOGLE_CLIENT_SECRET", hint: "GOCSPX-xxxxx" },
+                    ].map(item => {
+                        const exists = vars.some(v => v.key === item.key);
+                        return (
+                            <div key={item.key} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                                exists ? "border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.04)]" : "border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]"
+                            }`}>
+                                <div>
+                                    <p className="text-xs font-mono font-bold text-[rgba(255,255,255,0.7)]">{item.key}</p>
+                                    <p className="text-[10px] text-[rgba(255,255,255,0.25)]">{item.hint}</p>
+                                </div>
+                                {exists ? (
+                                    <span className="text-[9px] font-bold text-emerald-400/70">SET</span>
+                                ) : (
+                                    <button onClick={() => { setNewKey(item.key); setNewValue(""); setNewMasked(true); setShowAdd(true); }}
+                                        className="text-[10px] font-bold text-[#F59E0B] hover:underline">
+                                        Configure
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Facebook OAuth Quick Setup */}
+            <div className="rounded-2xl p-5 border border-[rgba(255,255,255,0.08)]" style={{ background: "rgba(255,255,255,0.025)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                    <Users2 size={16} className="text-[#60A5FA]" />
+                    <h3 className="text-sm font-bold text-white">Facebook OAuth</h3>
+                </div>
+                <p className="text-[12px] text-[rgba(255,255,255,0.4)] mb-3">
+                    Enable &quot;Sign in with Facebook&quot;. Get credentials from Meta Developers.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                    {[
+                        { key: "FACEBOOK_CLIENT_ID", hint: "App ID" },
+                        { key: "FACEBOOK_CLIENT_SECRET", hint: "App Secret" },
+                    ].map(item => {
+                        const exists = vars.some(v => v.key === item.key);
+                        return (
+                            <div key={item.key} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                                exists ? "border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.04)]" : "border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]"
+                            }`}>
+                                <div>
+                                    <p className="text-xs font-mono font-bold text-[rgba(255,255,255,0.7)]">{item.key}</p>
+                                    <p className="text-[10px] text-[rgba(255,255,255,0.25)]">{item.hint}</p>
+                                </div>
+                                {exists ? (
+                                    <span className="text-[9px] font-bold text-emerald-400/70">SET</span>
+                                ) : (
+                                    <button onClick={() => { setNewKey(item.key); setNewValue(""); setNewMasked(true); setShowAdd(true); }}
+                                        className="text-[10px] font-bold text-[#60A5FA] hover:underline">
+                                        Configure
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Firebase Quick Setup */}
+            <div className="rounded-2xl p-5 border border-[rgba(255,255,255,0.08)]" style={{ background: "rgba(255,255,255,0.025)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                    <Database size={16} className="text-[#F59E0B]" />
+                    <h3 className="text-sm font-bold text-white">Firebase (Analytics & Real-time)</h3>
+                </div>
+                <p className="text-[12px] text-[rgba(255,255,255,0.4)] mb-3">
+                    Powers online user counter and analytics. Get from Firebase Console → Project Settings.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                    {[
+                        { key: "NEXT_PUBLIC_FIREBASE_API_KEY", hint: "AIzaSy..." },
+                        { key: "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", hint: "project.firebaseapp.com" },
+                        { key: "NEXT_PUBLIC_FIREBASE_PROJECT_ID", hint: "my-project-id" },
+                        { key: "NEXT_PUBLIC_FIREBASE_APP_ID", hint: "1:xxxx:web:xxxx" },
+                        { key: "NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID", hint: "G-XXXXXXXXXX" },
+                    ].map(item => {
+                        const exists = vars.some(v => v.key === item.key);
+                        return (
+                            <div key={item.key} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                                exists ? "border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.04)]" : "border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]"
+                            }`}>
+                                <div>
+                                    <p className="text-xs font-mono font-bold text-[rgba(255,255,255,0.7)]">{item.key}</p>
+                                    <p className="text-[10px] text-[rgba(255,255,255,0.25)]">{item.hint}</p>
+                                </div>
+                                {exists ? (
+                                    <span className="text-[9px] font-bold text-emerald-400/70">SET</span>
+                                ) : (
+                                    <button onClick={() => { setNewKey(item.key); setNewValue(""); setNewMasked(false); setShowAdd(true); }}
+                                        className="text-[10px] font-bold text-[#F59E0B] hover:underline">
+                                        Configure
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Cloudflare Turnstile Quick Setup */}
+            <div className="rounded-2xl p-5 border border-[rgba(255,255,255,0.08)]" style={{ background: "rgba(255,255,255,0.025)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                    <ShieldCheck size={16} className="text-[#38BDF8]" />
+                    <h3 className="text-sm font-bold text-white">Cloudflare Turnstile (CAPTCHA)</h3>
+                </div>
+                <p className="text-[12px] text-[rgba(255,255,255,0.4)] mb-3">
+                    Bot protection on registration &amp; login. Get keys from Cloudflare Dashboard → Turnstile.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                    {[
+                        { key: "NEXT_PUBLIC_TURNSTILE_SITE_KEY", hint: "0x4AAAA..." },
+                        { key: "TURNSTILE_SECRET_KEY", hint: "0x4AAAA..." },
+                    ].map(item => {
+                        const exists = vars.some(v => v.key === item.key);
+                        return (
+                            <div key={item.key} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                                exists ? "border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.04)]" : "border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]"
+                            }`}>
+                                <div>
+                                    <p className="text-xs font-mono font-bold text-[rgba(255,255,255,0.7)]">{item.key}</p>
+                                    <p className="text-[10px] text-[rgba(255,255,255,0.25)]">{item.hint}</p>
+                                </div>
+                                {exists ? (
+                                    <span className="text-[9px] font-bold text-emerald-400/70">SET</span>
+                                ) : (
+                                    <button onClick={() => { setNewKey(item.key); setNewValue(""); setNewMasked(item.key === "TURNSTILE_SECRET_KEY"); setShowAdd(true); }}
+                                        className="text-[10px] font-bold text-[#38BDF8] hover:underline">
+                                        Configure
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Weather API Quick Setup */}
+            <div className="rounded-2xl p-5 border border-[rgba(255,255,255,0.08)]" style={{ background: "rgba(255,255,255,0.025)" }}>
+                <div className="flex items-center gap-2 mb-3">
+                    <Globe size={16} className="text-[#34D399]" />
+                    <h3 className="text-sm font-bold text-white">Weather & Location</h3>
+                </div>
+                <p className="text-[12px] text-[rgba(255,255,255,0.4)] mb-3">
+                    Powers weather-based scent recommendations. Get API key from OpenWeatherMap.
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                    {[
+                        { key: "OPENWEATHERMAP_API_KEY", hint: "abcdef123456...", masked: true },
+                        { key: "NEXT_PUBLIC_DEFAULT_CITY", hint: "Dhaka", masked: false },
+                    ].map(item => {
+                        const exists = vars.some(v => v.key === item.key);
+                        return (
+                            <div key={item.key} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${
+                                exists ? "border-[rgba(16,185,129,0.2)] bg-[rgba(16,185,129,0.04)]" : "border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]"
+                            }`}>
+                                <div>
+                                    <p className="text-xs font-mono font-bold text-[rgba(255,255,255,0.7)]">{item.key}</p>
+                                    <p className="text-[10px] text-[rgba(255,255,255,0.25)]">{item.hint}</p>
+                                </div>
+                                {exists ? (
+                                    <span className="text-[9px] font-bold text-emerald-400/70">SET</span>
+                                ) : (
+                                    <button onClick={() => { setNewKey(item.key); setNewValue(""); setNewMasked(item.masked); setShowAdd(true); }}
+                                        className="text-[10px] font-bold text-[#34D399] hover:underline">
+                                        Configure
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

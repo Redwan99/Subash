@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Users, FlaskConical, MessageSquare, Wifi } from "lucide-react";
 
 interface Stats {
@@ -10,9 +10,22 @@ interface Stats {
   onlineUsers?: number;
 }
 
+function getSessionId() {
+  if (typeof window === "undefined") return "";
+  let sid = sessionStorage.getItem("_hb_sid");
+  if (!sid) {
+    sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    sessionStorage.setItem("_hb_sid", sid);
+  }
+  return sid;
+}
+
 export function PlatformStats() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [online, setOnline] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Fetch sidebar stats once
   useEffect(() => {
     fetch("/api/sidebar")
       .then((r) => r.json())
@@ -22,13 +35,33 @@ export function PlatformStats() {
       .catch(() => {});
   }, []);
 
+  // Heartbeat every 30s
+  useEffect(() => {
+    const sendHeartbeat = () => {
+      const sid = getSessionId();
+      if (!sid) return;
+      fetch("/api/heartbeat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sid }),
+      })
+        .then((r) => r.json())
+        .then((d) => { if (typeof d?.online === "number") setOnline(d.online); })
+        .catch(() => {});
+    };
+
+    sendHeartbeat();
+    intervalRef.current = setInterval(sendHeartbeat, 30_000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, []);
+
   if (!stats) return null;
 
   const items = [
     { label: "Users", value: stats.totalUsers, icon: Users, color: "text-[#60A5FA]" },
     { label: "Perfumes", value: stats.totalPerfumes, icon: FlaskConical, color: "text-[#F783AC]" },
     { label: "Reviews", value: stats.totalReviews, icon: MessageSquare, color: "text-[#F59E0B]" },
-    { label: "Online", value: stats.onlineUsers ?? 0, icon: Wifi, color: "text-[#34D399]" },
+    { label: "Online", value: online, icon: Wifi, color: "text-[#34D399]" },
   ];
 
   return (

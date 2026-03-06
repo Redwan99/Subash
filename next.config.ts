@@ -2,6 +2,8 @@
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  poweredByHeader: false,
+  compress: true,
 
   async headers() {
     return [
@@ -32,6 +34,35 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://*.firebaseio.com https://*.googleapis.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "img-src 'self' data: blob: https: http:",
+              "font-src 'self' https://fonts.gstatic.com",
+              "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://challenges.cloudflare.com wss://*.firebaseio.com https://api.dicebear.com",
+              "frame-src 'self' https://challenges.cloudflare.com",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'self'",
+            ].join("; "),
+          },
+        ],
+      },
+      {
+        source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
         ],
       },
     ];
@@ -54,7 +85,7 @@ const nextConfig: NextConfig = {
   },
 
   experimental: {
-    optimizePackageImports: ["lucide-react", "date-fns"],
+    optimizePackageImports: ["lucide-react", "date-fns", "framer-motion"],
     serverActions: {
       bodySizeLimit: "10mb",
       // Local dev + production domain + CasaOS allowed
