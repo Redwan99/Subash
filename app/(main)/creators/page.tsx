@@ -7,7 +7,7 @@ import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { Users, Sparkles, Droplets } from "lucide-react";
 import { getFeatureMap } from "@/lib/features";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
     title: "The Noses — Master Perfumers | Subash",
@@ -22,7 +22,7 @@ type CreatorEntry = { id: string | null; name: string; count: number; bio: strin
 export default async function CreatorsPage() {
     const features = await getFeatureMap();
     if (features.ENABLE_CREATORS === false) {
-        notFound();
+        redirect("/");
     }
 
     const [dbCreators, topPerfumers] = await Promise.all([

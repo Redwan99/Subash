@@ -4,7 +4,7 @@
 import { Metadata } from "next";
 import { ShopsClient } from "@/components/shops/ShopsClient";
 import { getFeatureMap } from "@/lib/features";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 export default async function ShopsPage() {
     const features = await getFeatureMap();
     if (features.ENABLE_SHOPS === false) {
-        notFound();
+        redirect("/");
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const anyPrisma = prisma as any;

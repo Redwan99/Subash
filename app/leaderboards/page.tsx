@@ -8,6 +8,8 @@ import { Trophy, Star, Award, Sprout, Crown, Gem } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { type LucideIcon } from "lucide-react";
+import { redirect } from "next/navigation";
+import { getFeatureMap } from "@/lib/features";
 
 // Always render at request time — no DB connection available at build time.
 export const dynamic = 'force-dynamic';
@@ -204,6 +206,9 @@ function LeaderRow({
 // --- Page ----------------------------------------------------------------------
 
 export default async function LeaderboardsPage() {
+  const features = await getFeatureMap();
+  if (features.ENABLE_LEADERBOARDS === false) redirect("/");
+
   let users: { id: string; name: string | null; username: string | null; image: string | null; review_count: number; role: string }[] = [];
   try {
     users = await prisma.user.findMany({

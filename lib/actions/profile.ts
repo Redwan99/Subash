@@ -80,14 +80,15 @@ export async function changePassword(
 
   if (!user) return { success: false, error: "User not found." };
 
-  // OAuth-only users cannot change password
-  if (!user.password) {
-    return { success: false, error: "Your account uses social login. Password change is not available." };
-  }
-
-  const isMatch = await bcrypt.compare(currentPassword, user.password);
-  if (!isMatch) {
-    return { success: false, error: "Current password is incorrect." };
+  // If user already has a password, verify the current one
+  if (user.password) {
+    if (!currentPassword) {
+      return { success: false, error: "Current password is required." };
+    }
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return { success: false, error: "Current password is incorrect." };
+    }
   }
 
   const hashed = await bcrypt.hash(newPassword, 12);

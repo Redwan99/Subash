@@ -75,15 +75,13 @@ export default async function ProfileEditPage() {
           <UsernameForm initialUsername={user.username ?? ""} />
         </section>
 
-        {/* ─── Change Password (credentials users only) ──────── */}
-        {user.password && (
-          <section>
-            <h2 className="text-xs font-bold uppercase tracking-widest mb-4 text-[var(--text-muted)] flex items-center gap-2">
-              <Lock size={13} /> Change Password
-            </h2>
-            <ChangePasswordForm />
-          </section>
-        )}
+        {/* ─── Change Password ────────────────────────────── */}
+        <section>
+          <h2 className="text-xs font-bold uppercase tracking-widest mb-4 text-[var(--text-muted)] flex items-center gap-2">
+            <Lock size={13} /> {user.password ? "Change Password" : "Set Password"}
+          </h2>
+          <ChangePasswordForm hasExistingPassword={!!user.password} />
+        </section>
 
         {/* ─── Phone verification status ─────────────────────────── */}
         <section>

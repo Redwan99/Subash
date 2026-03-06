@@ -10,6 +10,7 @@ import { WardrobePanel } from "@/components/wardrobe/WardrobePanel";
 import type { WardrobePerfume } from "@/types/wardrobe";
 import type { Metadata } from "next";
 import { Archive } from "lucide-react";
+import { getFeatureMap } from "@/lib/features";
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -54,6 +55,9 @@ async function getWardrobe(userId: string): Promise<Record<string, WardrobePerfu
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default async function WardrobePage() {
+  const features = await getFeatureMap();
+  if (features.ENABLE_WARDROBE === false) redirect("/");
+
   const session = await auth();
 
   if (!session?.user?.id) {

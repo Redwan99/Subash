@@ -68,7 +68,7 @@ export function HomeFeedSection({
 
       {/* Content */}
       {tab === "TRENDING" ? (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5 sm:gap-6 w-full">
+        <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-5 w-full">
           {trendingPerfumes.map((p) => {
             const weekly = p.weeklySearchCount ?? 0;
             const hasTraffic = weekly > 0;

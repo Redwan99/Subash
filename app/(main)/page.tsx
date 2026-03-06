@@ -327,7 +327,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-[minmax(0,1fr)] gap-4 contain-paint">
+        <div className="grid grid-cols-2 lg:grid-cols-3 auto-rows-[minmax(0,1fr)] gap-3 sm:gap-4 contain-paint">
           {shuffledReviews.map((review, i) => {
             // Bento pattern: positions 0,3 are featured (tall or wide)
             const isFeatured = i === 0 || i === 3;

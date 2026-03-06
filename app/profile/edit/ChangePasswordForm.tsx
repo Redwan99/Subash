@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Lock, Loader2, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { changePassword, type ChangePasswordState } from "@/lib/actions/profile";
 
-export function ChangePasswordForm() {
+export function ChangePasswordForm({ hasExistingPassword = true }: { hasExistingPassword?: boolean }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,7 +26,7 @@ export function ChangePasswordForm() {
       return;
     }
     setLoading(true);
-    const result = await changePassword(currentPassword, newPassword);
+    const result = await changePassword(hasExistingPassword ? currentPassword : "", newPassword);
     setState(result);
     setLoading(false);
     if (result.success) {
@@ -56,32 +56,34 @@ export function ChangePasswordForm() {
       )}
 
       {/* Current password */}
-      <div>
-        <label
-          htmlFor="currentPassword"
-          className="text-xs font-bold uppercase tracking-widest mb-2 block text-[var(--text-muted)]"
-        >
-          Current Password
-        </label>
-        <div className="relative">
-          <input
-            id="currentPassword"
-            type={showCurrent ? "text" : "password"}
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            required
-            className="w-full px-3 py-2.5 pr-10 rounded-xl text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] outline-none transition-colors text-[var(--text-primary)] placeholder:text-[var(--text-muted)] caret-[var(--accent)] focus:border-[#E84393]/50"
-            placeholder="Enter current password"
-          />
-          <button
-            type="button"
-            onClick={() => setShowCurrent(!showCurrent)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+      {hasExistingPassword && (
+        <div>
+          <label
+            htmlFor="currentPassword"
+            className="text-xs font-bold uppercase tracking-widest mb-2 block text-[var(--text-muted)]"
           >
-            {showCurrent ? <EyeOff size={14} /> : <Eye size={14} />}
-          </button>
+            Current Password
+          </label>
+          <div className="relative">
+            <input
+              id="currentPassword"
+              type={showCurrent ? "text" : "password"}
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              required
+              className="w-full px-3 py-2.5 pr-10 rounded-xl text-sm bg-[var(--bg-surface)] border border-[var(--border-color)] outline-none transition-colors text-[var(--text-primary)] placeholder:text-[var(--text-muted)] caret-[var(--accent)] focus:border-[#E84393]/50"
+              placeholder="Enter current password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowCurrent(!showCurrent)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+            >
+              {showCurrent ? <EyeOff size={14} /> : <Eye size={14} />}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* New password */}
       <div>
@@ -147,7 +149,7 @@ export function ChangePasswordForm() {
         ) : (
           <Lock size={14} />
         )}
-        {loading ? "Changing..." : "Change Password"}
+        {loading ? "Saving..." : hasExistingPassword ? "Change Password" : "Set Password"}
       </button>
     </form>
   );

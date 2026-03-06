@@ -10,8 +10,8 @@ export default function MainLayout({
 }) {
     return (
         <>
-            {/* pb-32 protects content from being hidden behind the floating bottom nav on mobile */}
-            <div className="max-w-[1600px] mx-auto w-full flex justify-center pb-32 md:pb-6">
+            {/* pb-20 protects content from being hidden behind the floating bottom nav on mobile */}
+            <div className="max-w-[1600px] mx-auto w-full flex justify-center pb-20 md:pb-6">
                 {/* Hide on mobile/tablet, show on lg desktop */}
                 <div className="hidden lg:block w-[var(--sidebar-width)] shrink-0">
                     <LeftSidebarWrapper>

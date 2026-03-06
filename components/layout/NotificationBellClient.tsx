@@ -122,9 +122,9 @@ export function NotificationBellClient() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ type: "spring", stiffness: 260, damping: 24 }}
-            className="absolute right-0 mt-2 w-[320px] sm:w-[360px] rounded-xl border border-[var(--border-color)] bg-[var(--surface-1)] shadow-lg z-[60] overflow-hidden"
+            className="absolute right-0 mt-2 w-[320px] sm:w-[360px] rounded-xl border border-[var(--border-color)] bg-white dark:bg-[#1a1a1a] shadow-xl z-[60] overflow-hidden"
           >
-            <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--surface-2)]/70 backdrop-blur">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--border-color)] bg-gray-50 dark:bg-[#111]">
               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">
                 Notifications
               </span>
@@ -148,7 +148,7 @@ export function NotificationBellClient() {
                   <button
                     key={n.id}
                     onClick={() => handleNotificationClick(n)}
-                    className={`w-full flex items-start gap-2 px-3 py-2.5 text-left text-xs transition-colors hover:bg-[var(--surface-2)] ${n.isRead ? "opacity-70" : "bg-[var(--surface-2)]/60"}`}
+                    className={`w-full flex items-start gap-2 px-3 py-2.5 text-left text-xs transition-colors hover:bg-gray-100 dark:hover:bg-white/5 ${n.isRead ? "opacity-70" : "bg-gray-50 dark:bg-white/[0.03]"}`}
                   >
                     <div className="mt-0.5 text-base">
                       {ICON_FOR_TYPE[n.type] ?? <Bell className="w-4 h-4 text-[var(--text-muted)]" />}
