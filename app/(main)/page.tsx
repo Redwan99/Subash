@@ -104,7 +104,7 @@ const getLatestReviews = unstable_cache(
         return await prisma.review.findMany({
           where: { status: "APPROVED" },
           orderBy: { createdAt: "desc" },
-          take: 6,
+          take: 12,
           select: {
             id: true, text: true, title: true, imageUrl: true, overall_rating: true,
             longevity_score: true,
@@ -229,7 +229,7 @@ export default async function HomePage() {
 
   const [weather, trending, latestReviews, session, followingFeed] = await Promise.all([
       getWeather(city).catch(() => null),
-      getCachedTrendingPerfumes(12, 7).catch(() => [] as TrendingPerfumeCard[]),
+      getCachedTrendingPerfumes(16, 7).catch(() => [] as TrendingPerfumeCard[]),
       getLatestReviews().catch(() => [] as LatestReview[]),
       auth().catch(() => null),
       getFollowingFeed().catch(() => []),
@@ -321,6 +321,9 @@ export default async function HomePage() {
           </div>
           <Link href="/perfume" className="text-sm font-semibold text-[var(--accent)] hover:underline">
             Write a Review →
+          </Link>
+          <Link href="/reviews" className="text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--accent)] hover:underline ml-4">
+            View All →
           </Link>
         </div>
 

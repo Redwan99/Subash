@@ -7,18 +7,21 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 
+const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "";
+
 const firebaseConfig = {
-  apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "",
+  apiKey,
   authDomain:        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "",
   projectId:         process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "",
   appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "",
   measurementId:     process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// On the server (during build prerendering) we export a null placeholder.
-// Firebase SDK is never actually called server-side — all usage is inside
-// useEffect / event handlers that only execute in the browser.
-export const firebaseAuth: Auth =
-  typeof window === "undefined"
-    ? (null as unknown as Auth)
-    : getAuth(getApps().length ? getApp() : initializeApp(firebaseConfig));
+// On the server (during build prerendering) or when env vars are missing,
+// we export a null placeholder. Firebase SDK is never actually called
+// server-side — all usage is inside useEffect / event handlers.
+const canInit = typeof window !== "undefined" && apiKey.length > 0;
+
+export const firebaseAuth: Auth | null = canInit
+  ? getAuth(getApps().length ? getApp() : initializeApp(firebaseConfig))
+  : null;

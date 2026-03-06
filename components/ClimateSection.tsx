@@ -99,15 +99,33 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
       void fetchIpWeather();
       return;
     }
-    setGeoStatus("requesting");
 
-    const timeout = setTimeout(() => {
-      // Geolocation timed out — try IP fallback
-      setGeoStatus("ip");
-      void fetchIpWeather();
-    }, 6000);
+    // Check permissions before calling getCurrentPosition to avoid
+    // Permissions-Policy violation console spam in restricted contexts.
+    async function tryGeolocation() {
+      if (navigator.permissions) {
+        try {
+          const status = await navigator.permissions.query({ name: "geolocation" });
+          if (status.state === "denied") {
+            setGeoStatus("ip");
+            void fetchIpWeather();
+            return;
+          }
+        } catch {
+          // permissions.query not supported for geolocation in some browsers — continue
+        }
+      }
 
-    navigator.geolocation.getCurrentPosition(
+      setGeoStatus("requesting");
+
+      const timeout = setTimeout(() => {
+        // Geolocation timed out — try IP fallback
+        setGeoStatus("ip");
+        void fetchIpWeather();
+      }, 6000);
+
+      try {
+        navigator.geolocation.getCurrentPosition(
       async (position) => {
         clearTimeout(timeout);
         setGeoStatus("granted");
@@ -140,6 +158,14 @@ export function ClimateSection({ initialWeather, initialTags, initialTheme, init
       },
       { timeout: 5500, maximumAge: 300_000 }
     );
+      } catch {
+        // Permissions policy blocked geolocation — fall back to IP
+        setGeoStatus("ip");
+        void fetchIpWeather();
+      }
+    }
+
+    void tryGeolocation();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

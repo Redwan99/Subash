@@ -94,22 +94,45 @@ export function WeatherThemeProvider() {
     }
 
     // Try browser geolocation; fall back to server default city
-    if (typeof navigator !== "undefined" && "geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-          fetchWeather(
-            `/api/weather?lat=${coords.latitude}&lon=${coords.longitude}`
-          );
-        },
-        () => {
-          // Permission denied or unavailable — use server default city
-          fetchWeather("/api/weather");
-        },
-        { timeout: 5000, maximumAge: 300_000 }
-      );
-    } else {
-      fetchWeather("/api/weather");
+    async function tryGeo() {
+      if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+        fetchWeather("/api/weather");
+        return;
+      }
+
+      // Check permissions first to avoid Permissions-Policy violation console spam
+      if (navigator.permissions) {
+        try {
+          const status = await navigator.permissions.query({ name: "geolocation" });
+          if (status.state === "denied") {
+            fetchWeather("/api/weather");
+            return;
+          }
+        } catch {
+          // permissions.query not supported for geolocation — continue
+        }
+      }
+
+      try {
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            fetchWeather(
+              `/api/weather?lat=${coords.latitude}&lon=${coords.longitude}`
+            );
+          },
+          () => {
+            // Permission denied or unavailable — use server default city
+            fetchWeather("/api/weather");
+          },
+          { timeout: 5000, maximumAge: 300_000 }
+        );
+      } catch {
+        // Permissions policy blocked — fall back
+        fetchWeather("/api/weather");
+      }
     }
+
+    void tryGeo();
 
     return () => {
       cancelled = true;

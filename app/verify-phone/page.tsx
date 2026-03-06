@@ -47,7 +47,7 @@ export default function VerifyPhonePage() {
 
   // Initialise invisible reCAPTCHA once the component mounts
   useEffect(() => {
-    if (!recaptchaContainerRef.current || recaptchaVerifierRef.current) return;
+    if (!firebaseAuth || !recaptchaContainerRef.current || recaptchaVerifierRef.current) return;
     recaptchaVerifierRef.current = new RecaptchaVerifier(
       firebaseAuth,
       recaptchaContainerRef.current,
@@ -63,8 +63,8 @@ export default function VerifyPhonePage() {
       setError("Enter a valid Bangladeshi number, e.g. +8801XXXXXXXXX");
       return;
     }
-    if (!recaptchaVerifierRef.current) {
-      setError("reCAPTCHA not ready. Please reload the page.");
+    if (!recaptchaVerifierRef.current || !firebaseAuth) {
+      setError("Phone verification is not configured. Please contact support.");
       return;
     }
 
