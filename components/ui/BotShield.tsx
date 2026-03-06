@@ -1,6 +1,6 @@
 "use client";
 import { Turnstile, TurnstileInstance } from "@marsidev/react-turnstile";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { AlertTriangle } from "lucide-react";
 
@@ -12,13 +12,20 @@ export function BotShield({ onVerify }: BotShieldProps) {
     const ref = useRef<TurnstileInstance>(null);
     const { theme } = useTheme();
 
-    // Provide a safe fallback if the site key is missing in dev
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+    // Auto-verify in dev when site key is missing
+    useEffect(() => {
+        if (!siteKey && process.env.NODE_ENV === "development") {
+            onVerify("dev-bypass-token");
+        }
+    }, [siteKey, onVerify]);
+
     if (!siteKey) {
         if (process.env.NODE_ENV === "development") {
             return (
                 <div className="text-xs text-yellow-500 border border-yellow-500/20 bg-yellow-500/10 p-2 rounded">
-                    <AlertTriangle className="w-4 h-4 inline mr-1" /> Turnstile missing site key.
+                    <AlertTriangle className="w-4 h-4 inline mr-1" /> Turnstile bypassed (dev mode).
                 </div>
             );
         }
