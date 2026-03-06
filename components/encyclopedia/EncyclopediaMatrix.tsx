@@ -181,15 +181,19 @@ function GenderOption({
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PAGE_SIZE = 40;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PerfumeCard = React.memo(function PerfumeCard({ perfume }: { perfume: any }) {
+const PerfumeCard = React.memo(function PerfumeCard({ perfume, isTrending }: { perfume: any; isTrending?: boolean }) {
   return (
     <Link href={`/perfume/${perfume.slug}`} className="flex flex-col bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] rounded-2xl overflow-hidden hover:-translate-y-0.5 hover:border-[var(--accent)]/30 hover:shadow-lg hover:shadow-[var(--accent)]/8 transition-[transform,border-color,box-shadow] duration-200 group will-change-[transform]">
       <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] bg-gradient-to-b from-white/5 to-transparent p-3 sm:p-5 flex items-center justify-center">
         <Image src={perfume.transparentImageUrl || perfume.image_url} alt={perfume.name} fill className="object-contain p-4 drop-shadow-xl group-hover:scale-105 transition-transform duration-500 ease-out" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" loading="lazy" />
+        {isTrending && (
+          <span className="absolute top-2 left-2 flex items-center gap-1 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 backdrop-blur-sm border border-amber-500/20 text-amber-400 uppercase tracking-wider">
+            <TrendingUp size={9} /> Trending
+          </span>
+        )}
         {perfume.gender && (
           <span className={`absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full capitalize border ${
             perfume.gender.toLowerCase() === 'men' ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' : perfume.gender.toLowerCase() === 'women' ? 'text-pink-400 bg-pink-500/10 border-pink-500/20' : 'text-[var(--accent)] bg-[var(--accent)]/10 border-[var(--accent)]/20'
@@ -206,18 +210,8 @@ const PerfumeCard = React.memo(function PerfumeCard({ perfume }: { perfume: any 
   );
 });
 
-interface TrendingPerfume {
-  id: string;
-  slug: string;
-  name: string;
-  brand: string;
-  image_url: string | null;
-  transparentImageUrl: string | null;
-  weeklySearchCount: number;
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function EncyclopediaMatrix({ initialData, monthlyTrending = [] }: { initialData: any[]; monthlyTrending?: TrendingPerfume[] }) {
+export default function EncyclopediaMatrix({ initialData }: { initialData: any[] }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [results, setResults] = useState<any[]>(initialData);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -580,102 +574,27 @@ export default function EncyclopediaMatrix({ initialData, monthlyTrending = [] }
         </div>
       )}
 
-      {/* ── Monthly Trending section (always visible when no filters) ── */}
-      {!isPending && !hasActiveFilters && monthlyTrending.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose-500/20 to-orange-500/20 flex items-center justify-center">
-              <Flame size={14} className="text-rose-400" />
-            </div>
-            <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-wide">
-              Trending This Month
-            </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-rose-500/20 to-transparent" />
-          </div>
-          <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-[var(--accent)]/20 scrollbar-track-transparent -mx-1 px-1">
-            {monthlyTrending.map((perfume, i) => (
-              <Link
-                key={`monthly-${perfume.id}`}
-                href={`/perfume/${perfume.slug}`}
-                className="flex-shrink-0 w-36 sm:w-40 group"
-              >
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-b from-rose-500/5 to-transparent border border-rose-500/15 hover:border-rose-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-rose-500/10">
-                  <Image
-                    src={perfume.transparentImageUrl || perfume.image_url || ''}
-                    alt={perfume.name}
-                    fill
-                    className="object-contain p-3 drop-shadow-lg group-hover:scale-105 transition-transform duration-500"
-                    sizes="160px"
-                    loading={i < 4 ? "eager" : "lazy"}
-                  />
-                  <div className="absolute top-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-rose-500/15 backdrop-blur-sm border border-rose-500/20">
-                    <Flame size={9} className="text-rose-400" />
-                    <span className="text-[8px] font-bold text-rose-400 uppercase tracking-wider">#{i + 1}</span>
-                  </div>
-                </div>
-                <div className="mt-2 px-0.5">
-                  <p className="text-xs font-semibold text-[var(--text-primary)] line-clamp-1 group-hover:text-rose-400 transition-colors">{perfume.name}</p>
-                  <p className="text-[10px] text-[var(--text-muted)] line-clamp-1">{perfume.brand}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Trending section when filters active ── */}
-      {!isPending && trendingResults.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center gap-2.5 mb-4">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
-              <TrendingUp size={14} className="text-amber-400" />
-            </div>
-            <h3 className="text-sm font-bold text-[var(--text-primary)] tracking-wide">
-              Trending in your search
-            </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-amber-500/20 to-transparent" />
-          </div>
-          <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-[var(--accent)]/20 scrollbar-track-transparent -mx-1 px-1">
-            {trendingResults.map(perfume => (
-              <Link
-                key={`trending-${perfume.id}`}
-                href={`/perfume/${perfume.slug}`}
-                className="flex-shrink-0 w-36 sm:w-40 group"
-              >
-                <div className="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-b from-amber-500/5 to-transparent border border-amber-500/15 hover:border-amber-400/40 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10">
-                  <Image
-                    src={perfume.transparentImageUrl || perfume.image_url}
-                    alt={perfume.name}
-                    fill
-                    className="object-contain p-3 drop-shadow-lg group-hover:scale-105 transition-transform duration-500"
-                    sizes="160px"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-1.5 left-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-amber-500/15 backdrop-blur-sm border border-amber-500/20">
-                    <TrendingUp size={9} className="text-amber-400" />
-                    <span className="text-[8px] font-bold text-amber-400 uppercase tracking-wider">Hot</span>
-                  </div>
-                </div>
-                <div className="mt-2 px-0.5">
-                  <p className="text-xs font-semibold text-[var(--text-primary)] line-clamp-1 group-hover:text-amber-400 transition-colors">{perfume.name}</p>
-                  <p className="text-[10px] text-[var(--text-muted)] line-clamp-1">{perfume.brand}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* ── Full-width results grid ── */}
       {isPending ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 text-[var(--accent)] animate-spin" />
         </div>
-      ) : results.length > 0 ? (
+      ) : results.length > 0 || trendingResults.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 w-full contain-paint">
-          {results.map(perfume => (
-            <PerfumeCard key={perfume.id} perfume={perfume} />
-          ))}
+          {(() => {
+            const trendingIds = new Set(trendingResults.map((p: any) => p.id));
+            const deduped = results.filter((p: any) => !trendingIds.has(p.id));
+            return (
+              <>
+                {trendingResults.map((perfume: any) => (
+                  <PerfumeCard key={perfume.id} perfume={perfume} isTrending />
+                ))}
+                {deduped.map((perfume: any) => (
+                  <PerfumeCard key={perfume.id} perfume={perfume} />
+                ))}
+              </>
+            );
+          })()}
         </div>
       ) : (
         <div className="py-20 text-center w-full">

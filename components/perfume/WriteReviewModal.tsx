@@ -62,7 +62,7 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
 
           {/* Modal panel */}
           <motion.div
-            className="relative w-[94vw] max-w-3xl max-h-[88vh] flex flex-col rounded-3xl overflow-hidden border border-white/[0.08] shadow-[0_32px_80px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05),inset_0_1px_0_rgba(255,255,255,0.06)]"
+            className="relative w-[94vw] max-w-5xl max-h-[88vh] flex flex-col rounded-3xl overflow-hidden border border-white/[0.08] shadow-[0_32px_80px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.05),inset_0_1px_0_rgba(255,255,255,0.06)]"
             style={{
               background: 'linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-base) 100%)',
             }}
@@ -75,7 +75,7 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
             <div className="h-[3px] w-full bg-[linear-gradient(90deg,#E84393,#D6336C,#F783AC,#E84393)] shrink-0" />
 
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 shrink-0">
+            <div className="flex items-center justify-between px-5 py-3 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#E84393,#D6336C)] shadow-[0_4px_16px_rgba(232,67,147,0.3)]">
                   <Sparkles size={16} className="text-white" />
@@ -103,7 +103,7 @@ export function WriteReviewModal({ perfumeId, variant }: { perfumeId: string; va
             <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mx-4 shrink-0" />
 
             {/* Form body — scrollable */}
-            <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-5">
+            <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4">
               <ReviewForm
                 perfumeId={perfumeId}
                 onSubmitted={() => setOpen(false)}

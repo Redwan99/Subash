@@ -1,10 +1,20 @@
 "use server";
 // lib/actions/email.ts
-// Phase 12 — Email Engine powered by Resend
+// Server-action email wrappers (newsletter, etc.) — uses the shared SMTP transport.
 
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || "localhost",
+  port: Number(process.env.SMTP_PORT) || 587,
+  secure: process.env.SMTP_SECURE === "true",
+  auth:
+    process.env.SMTP_USER && process.env.SMTP_PASS
+      ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+      : undefined,
+});
+
+const FROM = process.env.SMTP_FROM || "Subash <noreply@subash.rico.bd>";
 
 // ── Welcome Email ─────────────────────────────────────────────────────────────
 export async function sendWelcomeEmail(userEmail: string, userName: string) {
@@ -118,19 +128,14 @@ export async function sendWelcomeEmail(userEmail: string, userName: string) {
 </html>`;
 
     try {
-        const { data, error } = await resend.emails.send({
-            from: "Subash <welcome@subash.app>",
-            to: [userEmail],
+        if (!process.env.SMTP_HOST) return { success: true };
+        await transporter.sendMail({
+            from: FROM,
+            to: userEmail,
             subject: `Welcome to Subash, ${firstName}!`,
             html,
         });
-
-        if (error) {
-            console.error("[email] sendWelcomeEmail error:", error);
-            return { success: false, error: error.message };
-        }
-
-        return { success: true, id: data?.id };
+        return { success: true };
     } catch (err) {
         console.error("[email] sendWelcomeEmail threw:", err);
         return { success: false, error: String(err) };
@@ -174,14 +179,14 @@ export async function sendNewsletterConfirmation(email: string) {
 </html>`;
 
     try {
-        const { data, error } = await resend.emails.send({
-            from: "Subash <newsletter@subash.app>",
-            to: [email],
+        if (!process.env.SMTP_HOST) return { success: true };
+        await transporter.sendMail({
+            from: FROM,
+            to: email,
             subject: "You're subscribed to Subash",
             html,
         });
-        if (error) return { success: false, error: error.message };
-        return { success: true, id: data?.id };
+        return { success: true };
     } catch (err) {
         return { success: false, error: String(err) };
     }

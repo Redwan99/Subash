@@ -9,12 +9,12 @@ import { type LucideIcon } from "lucide-react";
 
 type ConsensusProps = {
   reviewCount: number;
-  avgRating: number; // 1–5 scale from ReviewForm
+  avgRating: number; // 1–10 scale from ReviewForm
   ratingCounts?: { love: number; like: number; ok: number; mixed: number; dislike: number };
-  avgLongevity?: number; // 1–5
-  avgSillage?: number;   // 1–5
-  avgProjection?: number; // 1–5 (actual from reviews)
-  avgIntensity?: number;  // 1–5 (actual from reviews)
+  avgLongevity?: number; // 1–10
+  avgSillage?: number;   // 1–10
+  avgProjection?: number; // 1–10 (actual from reviews)
+  avgIntensity?: number;  // 1–10 (actual from reviews)
 };
 
 const SEASONS: { key: string; label: string; icon: LucideIcon }[] = [
@@ -56,12 +56,12 @@ function deriveVerdictBars(avgRating: number, reviewCount: number, ratingCounts?
 const ACTIVE_SEASONS = ["winter", "autumn"];
 const ACTIVE_TIMES   = ["night"];
 
-const PERF_LABELS = ["Very Weak", "Weak", "Moderate", "Strong", "Enormous"];
+const PERF_LABELS = ["Minimal", "Very Weak", "Weak", "Mild", "Moderate", "Noticeable", "Strong", "Very Strong", "Powerful", "Enormous"];
 
 function PerfBar({ label, value, icon: Icon, color, shouldReduceMotion }: {
   label: string; value: number; icon: LucideIcon; color: string; shouldReduceMotion: boolean | null;
 }) {
-  const pct = Math.max(0, ((value - 1) / 4) * 100);
+  const pct = Math.max(0, ((value - 1) / 9) * 100);
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
@@ -70,9 +70,9 @@ function PerfBar({ label, value, icon: Icon, color, shouldReduceMotion }: {
           <span className="text-xs font-semibold text-[var(--text-secondary)]">{label}</span>
         </div>
         <span className="text-xs font-bold tabular-nums" style={{ color }}>
-          {value.toFixed(1)} / 5
+          {value.toFixed(1)} / 10
           <span className="text-[10px] font-normal text-[var(--text-muted)] ml-1">
-            ({PERF_LABELS[Math.min(4, Math.max(0, Math.round(value) - 1))]})
+            ({PERF_LABELS[Math.min(9, Math.max(0, Math.round(value) - 1))]})
           </span>
         </span>
       </div>
@@ -97,8 +97,8 @@ export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLo
 
   const total = reviewCount;
   // Use actual review data if available, otherwise derive from longevity/sillage
-  const projection = avgProjection && avgProjection > 0 ? avgProjection : (avgSillage > 0 ? Math.min(5, avgSillage * 0.95 + 0.15) : 0);
-  const intensity = avgIntensity && avgIntensity > 0 ? avgIntensity : (avgLongevity > 0 && avgSillage > 0 ? Math.min(5, (avgLongevity * 0.6 + avgSillage * 0.4)) : 0);
+  const projection = avgProjection && avgProjection > 0 ? avgProjection : (avgSillage > 0 ? Math.min(10, avgSillage * 0.95 + 0.15) : 0);
+  const intensity = avgIntensity && avgIntensity > 0 ? avgIntensity : (avgLongevity > 0 && avgSillage > 0 ? Math.min(10, (avgLongevity * 0.6 + avgSillage * 0.4)) : 0);
 
   return (
     <div className="rounded-3xl border border-[var(--bg-glass-border)] bg-[var(--bg-glass)] backdrop-blur-xl p-6 shadow-[var(--shadow-glass)]">

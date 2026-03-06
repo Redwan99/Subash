@@ -4,7 +4,6 @@
 import { Metadata } from "next";
 import EncyclopediaMatrix from "@/components/encyclopedia/EncyclopediaMatrix";
 import { searchEncyclopedia } from "@/lib/actions/encyclopedia";
-import { getTrendingPerfumes } from "@/lib/actions/search";
 
 export const revalidate = 3600;
 
@@ -15,12 +14,8 @@ export const metadata: Metadata = {
 
 export default async function PerfumesPage() {
     let initialData: Awaited<ReturnType<typeof searchEncyclopedia>> = [];
-    let monthlyTrending: { id: string; slug: string; name: string; brand: string; image_url: string | null; transparentImageUrl: string | null; weeklySearchCount: number }[] = [];
     try {
-        [initialData, monthlyTrending] = await Promise.all([
-            searchEncyclopedia({ sort: "trending", take: 40 }),
-            getTrendingPerfumes(12, 30),
-        ]);
+        initialData = await searchEncyclopedia({ sort: "trending", take: 40 });
     } catch (e) {
         console.error("[PerfumesPage] Failed to load initial data", e);
     }
@@ -36,7 +31,7 @@ export default async function PerfumesPage() {
                 </p>
             </div>
 
-            <EncyclopediaMatrix initialData={initialData} monthlyTrending={monthlyTrending} />
+            <EncyclopediaMatrix initialData={initialData} />
         </div>
     );
 }
