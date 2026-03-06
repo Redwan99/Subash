@@ -706,7 +706,7 @@ export default function EncyclopediaMatrix({ initialData, initialQuery = "" }: {
 
       {/* Submit Perfume Modal — portal-level z-index like WriteReviewModal */}
       {showSubmitModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowSubmitModal(false); setSubmitFeedback(null); }}>
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => { setShowSubmitModal(false); setSubmitFeedback(null); }}>
           <div className="bg-[var(--bg-surface)] border border-[var(--border-color)] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" onClick={e => e.stopPropagation()}>
             <h3 className="text-[var(--text-primary)] font-bold text-lg mb-1">Suggest a Perfume</h3>
             <p className="text-[var(--text-muted)] text-sm mb-5">Know a fragrance that&apos;s missing? Submit details for admin review.</p>

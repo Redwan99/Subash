@@ -456,9 +456,10 @@ export default async function PerfumePage({
                 text: string; createdAt: Date;
                 user: { id: string; name: string | null; image: string | null; username: string | null };
               }) => (
-                <div
+                <Link
                   key={r.id}
-                  className="rounded-2xl px-4 py-4 transition-all bg-[var(--bg-surface)] border border-[var(--bg-glass-border)] hover:border-[rgba(232,67,147,0.25)]"
+                  href={`/review/${r.id}`}
+                  className="block rounded-2xl px-4 py-4 transition-all bg-[var(--bg-surface)] border border-[var(--bg-glass-border)] hover:border-[rgba(232,67,147,0.25)]"
                 >
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2 min-w-0">
@@ -490,7 +491,7 @@ export default async function PerfumePage({
                       {new Date(r.createdAt).toLocaleDateString("en-GB")}
                     </span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </section>

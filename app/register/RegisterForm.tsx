@@ -133,6 +133,7 @@ export function RegisterForm() {
       )}
 
       <Input id="name" name="name" type="text" placeholder="Full Name" errors={fieldErrors.name} />
+      <Input id="username" name="username" type="text" placeholder="Username" errors={fieldErrors.username} />
       <Input id="email" name="email" type="email" placeholder="Email Address" errors={fieldErrors.email} />
       <Input id="password" name="password" type="password" placeholder="Password (min. 8 characters)" errors={fieldErrors.password} />
       <Input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm Password" errors={fieldErrors.confirmPassword} />

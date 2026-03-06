@@ -621,6 +621,18 @@ export async function userSubmitPerfume(
   }
 }
 
+// ── Admin: Update Suggested Perfume fields ────────────────────────────────────
+export async function updateSuggestedPerfume(id: string, data: {
+  name?: string; brand?: string; gender?: string; description?: string;
+  perfumer?: string; releaseYear?: number | null;
+  topNotes?: string; heartNotes?: string; baseNotes?: string; accords?: string;
+}) {
+  await requireAdmin();
+  await prisma.suggestedPerfume.update({ where: { id }, data });
+  revalidatePath("/admin");
+  return { success: true };
+}
+
 // ── Admin: Get Suggested Perfumes ─────────────────────────────────────────────
 export async function getAdminSuggestedPerfumes(status?: string) {
   await requireAdmin();

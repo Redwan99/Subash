@@ -59,6 +59,10 @@ export function PlatformStats() {
 
   if (!stats) return null;
 
+  // Only show to admins/moderators
+  const role = (session?.user as any)?.role;
+  if (!role || !["SUPER_ADMIN", "ADMIN", "MODERATOR"].includes(role)) return null;
+
   const items = [
     { label: "Users", value: stats.totalUsers, icon: Users, color: "text-[#60A5FA]" },
     { label: "Perfumes", value: stats.totalPerfumes, icon: FlaskConical, color: "text-[#F783AC]" },

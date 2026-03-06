@@ -14,7 +14,7 @@ interface Props {
 
 export function CredentialsForm({ callbackUrl = "/" }: Props) {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -25,7 +25,7 @@ export function CredentialsForm({ callbackUrl = "/" }: Props) {
     setError(null);
 
     const result = await signIn("credentials", {
-      email,
+      email: identifier,
       password,
       redirect: false,
     });
@@ -33,7 +33,7 @@ export function CredentialsForm({ callbackUrl = "/" }: Props) {
     setPending(false);
 
     if (result?.error) {
-      setError("Invalid email or password.");
+      setError("Invalid email/username or password.");
     } else {
       router.push(callbackUrl);
       router.refresh();
@@ -51,10 +51,10 @@ export function CredentialsForm({ callbackUrl = "/" }: Props) {
       )}
 
       <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email address"
+        type="text"
+        value={identifier}
+        onChange={(e) => setIdentifier(e.target.value)}
+        placeholder="Email or Username"
         required
         className="w-full px-4 py-2.5 rounded-xl text-sm outline-none transition-all bg-[var(--bg-surface)] border border-[var(--border-color)] text-[var(--text-primary)]"
       />
@@ -77,7 +77,7 @@ export function CredentialsForm({ callbackUrl = "/" }: Props) {
             : "w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-400 text-white dark:text-black font-semibold shadow-lg shadow-brand-500/20 hover:shadow-brand-500/40 transition-all active:scale-[0.98]"
         }
       >
-        {pending ? "Signing in…" : "Sign in with Email"}
+        {pending ? "Signing in…" : "Sign in"}
       </button>
 
       <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">

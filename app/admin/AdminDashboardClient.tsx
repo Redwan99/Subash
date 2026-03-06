@@ -11,7 +11,7 @@ import {
     Briefcase, Database, Globe, Camera, Trophy, Layers, MessageCircle, ShoppingBag, Key, Plus, Eye, EyeOff, Loader2, Save,
     Lightbulb, X, Mail
 } from "lucide-react";
-import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus, toggleBanUser, adminResetUserPassword, adminDeleteUser, getAdminPerfumes, adminCreatePerfume, adminUpdatePerfume, adminDeletePerfume, type AdminPerfumeData, getAdminSuggestedPerfumes, approveSuggestedPerfume, rejectSuggestedPerfume } from "@/lib/actions/admin";
+import { deleteReviewAsAdmin, markReviewAsSpam, updateUserRole, updateFeatureToggle, updateBrandClaimStatus, toggleBanUser, adminResetUserPassword, adminDeleteUser, getAdminPerfumes, adminCreatePerfume, adminUpdatePerfume, adminDeletePerfume, type AdminPerfumeData, getAdminSuggestedPerfumes, approveSuggestedPerfume, rejectSuggestedPerfume, updateSuggestedPerfume } from "@/lib/actions/admin";
 import { Pencil } from "lucide-react";
 import { getEnvVariables, upsertEnvVariable, deleteEnvVariable, getEnvVariableDecrypted, type EnvVarItem } from "@/lib/actions/envvars";
 import type { Role, FeatureToggle } from "@prisma/client";
@@ -1271,6 +1271,8 @@ function SuggestionsManager() {
     const [feedback, setFeedback] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
     const [rejectModal, setRejectModal] = useState<string | null>(null);
     const [rejectReason, setRejectReason] = useState("");
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editData, setEditData] = useState<Record<string, string>>({});
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -1296,6 +1298,47 @@ function SuggestionsManager() {
                 load();
             } else {
                 flash("err", ("error" in res ? res.error : null) || "Failed to approve");
+            }
+        });
+    };
+
+    const startEdit = (s: any) => {
+        setEditingId(s.id);
+        setEditData({
+            name: s.name || "",
+            brand: s.brand || "",
+            gender: s.gender || "",
+            description: s.description || "",
+            perfumer: s.perfumer || "",
+            releaseYear: s.releaseYear?.toString() || "",
+            topNotes: (() => { try { const v = typeof s.topNotes === "string" ? JSON.parse(s.topNotes) : s.topNotes; return Array.isArray(v) ? v.join(", ") : ""; } catch { return ""; } })(),
+            heartNotes: (() => { try { const v = typeof s.heartNotes === "string" ? JSON.parse(s.heartNotes) : s.heartNotes; return Array.isArray(v) ? v.join(", ") : ""; } catch { return ""; } })(),
+            baseNotes: (() => { try { const v = typeof s.baseNotes === "string" ? JSON.parse(s.baseNotes) : s.baseNotes; return Array.isArray(v) ? v.join(", ") : ""; } catch { return ""; } })(),
+            accords: (() => { try { const v = typeof s.accords === "string" ? JSON.parse(s.accords) : s.accords; return Array.isArray(v) ? v.join(", ") : ""; } catch { return ""; } })(),
+        });
+    };
+
+    const saveEdit = (id: string) => {
+        startTransition(async () => {
+            const toJsonArray = (v: string) => JSON.stringify(v.split(",").map(s => s.trim()).filter(Boolean));
+            const res = await updateSuggestedPerfume(id, {
+                name: editData.name,
+                brand: editData.brand,
+                gender: editData.gender || undefined,
+                description: editData.description || undefined,
+                perfumer: editData.perfumer || undefined,
+                releaseYear: editData.releaseYear ? parseInt(editData.releaseYear) : null,
+                topNotes: toJsonArray(editData.topNotes),
+                heartNotes: toJsonArray(editData.heartNotes),
+                baseNotes: toJsonArray(editData.baseNotes),
+                accords: toJsonArray(editData.accords),
+            });
+            if (res.success) {
+                flash("ok", "Suggestion updated");
+                setEditingId(null);
+                load();
+            } else {
+                flash("err", "Failed to update");
             }
         });
     };
@@ -1362,9 +1405,63 @@ function SuggestionsManager() {
                             const heart = parseNotes(s.heartNotes);
                             const base = parseNotes(s.baseNotes);
                             const accords = parseNotes(s.accords);
+                            const isEditing = editingId === s.id;
+                            const inputCls = "w-full p-2 rounded-lg text-sm bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-[rgba(255,255,255,0.25)] outline-none";
                             return (
                                 <div key={s.id} className="rounded-xl border border-[rgba(255,255,255,0.06)] p-5 hover:border-[rgba(255,255,255,0.12)] transition-colors"
                                     style={{ background: "rgba(255,255,255,0.02)" }}>
+                                    {isEditing ? (
+                                        <div className="space-y-3">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Name</label>
+                                                    <input value={editData.name} onChange={e => setEditData(d => ({ ...d, name: e.target.value }))} className={inputCls} />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Brand</label>
+                                                    <input value={editData.brand} onChange={e => setEditData(d => ({ ...d, brand: e.target.value }))} className={inputCls} />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Gender</label>
+                                                    <input value={editData.gender} onChange={e => setEditData(d => ({ ...d, gender: e.target.value }))} placeholder="e.g. unisex, male, female" className={inputCls} />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Perfumer</label>
+                                                    <input value={editData.perfumer} onChange={e => setEditData(d => ({ ...d, perfumer: e.target.value }))} className={inputCls} />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Release Year</label>
+                                                    <input value={editData.releaseYear} onChange={e => setEditData(d => ({ ...d, releaseYear: e.target.value }))} type="number" className={inputCls} />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Description</label>
+                                                <textarea value={editData.description} onChange={e => setEditData(d => ({ ...d, description: e.target.value }))} className={inputCls + " resize-none h-16"} />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Top Notes (comma-separated)</label>
+                                                    <input value={editData.topNotes} onChange={e => setEditData(d => ({ ...d, topNotes: e.target.value }))} className={inputCls} />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Heart Notes (comma-separated)</label>
+                                                    <input value={editData.heartNotes} onChange={e => setEditData(d => ({ ...d, heartNotes: e.target.value }))} className={inputCls} />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Base Notes (comma-separated)</label>
+                                                    <input value={editData.baseNotes} onChange={e => setEditData(d => ({ ...d, baseNotes: e.target.value }))} className={inputCls} />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-[rgba(255,255,255,0.3)] mb-1 block">Accords (comma-separated)</label>
+                                                    <input value={editData.accords} onChange={e => setEditData(d => ({ ...d, accords: e.target.value }))} className={inputCls} />
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2 justify-end">
+                                                <button onClick={() => setEditingId(null)} className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[rgba(255,255,255,0.1)] text-[rgba(255,255,255,0.5)] hover:bg-[rgba(255,255,255,0.05)] transition-colors">Cancel</button>
+                                                <button onClick={() => saveEdit(s.id)} disabled={pending} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors disabled:opacity-50">Save Changes</button>
+                                            </div>
+                                        </div>
+                                    ) : (
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
@@ -1414,6 +1511,10 @@ function SuggestionsManager() {
                                         {/* Actions */}
                                         {s.status === "PENDING" && (
                                             <div className="flex flex-col gap-1.5 shrink-0">
+                                                <button onClick={() => startEdit(s)} disabled={pending}
+                                                    className="px-3 py-1.5 text-xs font-bold rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-400 hover:bg-blue-500/30 transition-colors disabled:opacity-50">
+                                                    <Pencil size={12} className="inline mr-1" /> Edit
+                                                </button>
                                                 <button onClick={() => handleApprove(s.id)} disabled={pending}
                                                     className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-colors disabled:opacity-50">
                                                     <CheckCircle2 size={12} className="inline mr-1" /> Approve
@@ -1425,6 +1526,7 @@ function SuggestionsManager() {
                                             </div>
                                         )}
                                     </div>
+                                    )}
                                 </div>
                             );
                         })}

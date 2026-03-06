@@ -110,13 +110,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
       async authorize(credentials) {
         try {
-          const email = (credentials?.email as string | undefined)?.trim().toLowerCase();
+          const identifier = (credentials?.email as string | undefined)?.trim().toLowerCase();
           const password = credentials?.password as string | undefined;
 
-          if (!email || !password) return null;
+          if (!identifier || !password) return null;
 
-          const user = await prisma.user.findUnique({
-            where: { email },
+          // Look up by email first, then by username
+          const user = await prisma.user.findFirst({
+            where: {
+              OR: [
+                { email: identifier },
+                { username: identifier },
+              ],
+            },
           });
 
           // No account found, or account belongs to an OAuth provider (no password)

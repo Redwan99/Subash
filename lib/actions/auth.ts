@@ -20,6 +20,11 @@ const RegisterSchema = z.object({
     .string()
     .min(2, "Name must be at least 2 characters")
     .max(60, "Name is too long"),
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(20, "Username must be at most 20 characters")
+    .regex(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, and underscores"),
   email: z.string().email("Invalid email address"),
   password: z
     .string()
@@ -33,7 +38,7 @@ const RegisterSchema = z.object({
 });
 
 const LoginSchema = z.object({
-  email: z.string().email("Invalid email address"),
+  identifier: z.string().min(1, "Email or username is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -51,6 +56,7 @@ export async function registerUser(
 ): Promise<ActionResult> {
   const raw = {
     name: formData.get("name"),
+    username: formData.get("username"),
     email: formData.get("email"),
     password: formData.get("password"),
     confirmPassword: formData.get("confirmPassword"),
@@ -63,7 +69,7 @@ export async function registerUser(
     return { success: false, errors: parsed.error.flatten().fieldErrors };
   }
 
-  const { name, email, password, turnstileToken } = parsed.data;
+  const { name, username, email, password, turnstileToken } = parsed.data;
 
   // 1.5 Verify bot token
   const isHuman = await verifyTurnstile(turnstileToken);
@@ -83,6 +89,15 @@ export async function registerUser(
     };
   }
 
+  // 2.5 Check for existing username
+  const existingUsername = await prisma.user.findUnique({ where: { username } });
+  if (existingUsername) {
+    return {
+      success: false,
+      errors: { username: ["This username is already taken."] },
+    };
+  }
+
   // 3. Hash password — NEVER store plain text
   const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -93,6 +108,7 @@ export async function registerUser(
   await prisma.user.create({
     data: {
       name,
+      username,
       email,
       password: hashedPassword,
       role: assignedRole,
@@ -131,7 +147,7 @@ export async function loginWithCredentials(
   formData: FormData
 ): Promise<ActionResult> {
   const raw = {
-    email: formData.get("email"),
+    identifier: formData.get("identifier"),
     password: formData.get("password"),
   };
 
@@ -141,12 +157,12 @@ export async function loginWithCredentials(
     return { success: false, errors: parsed.error.flatten().fieldErrors };
   }
 
-  const { email, password } = parsed.data;
+  const { identifier, password } = parsed.data;
 
   // 2. Attempt sign-in via NextAuth CredentialsProvider
   try {
     await signIn("credentials", {
-      email,
+      email: identifier,
       password,
       redirect: false,
     });
