@@ -185,7 +185,7 @@ export function RightSidebar() {
       aria-label="Live community activity"
     >
       {/* Top half: Leaderboards */}
-      <div className="h-1/2 flex flex-col min-h-0 overflow-hidden">
+      <div className="h-1/2 flex flex-col min-h-0">
         <div className="pt-4 px-4 shrink-0">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--accent)]">
@@ -196,7 +196,7 @@ export function RightSidebar() {
             </Link>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto min-h-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex-1 min-h-0 flex flex-col">
           <LeaderboardWidget />
         </div>
       </div>

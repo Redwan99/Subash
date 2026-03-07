@@ -146,16 +146,57 @@ export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLo
             );
           })}
         </div>
-        {/* ── Key Performance Metrics ─────────────────── */}
+        {/* ── Key Performance Metrics + Best Occasion ──── */}
         {(avgLongevity > 0 || avgSillage > 0) && (
-          <div className="space-y-3">
-            <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-4">
-              Key Performance
-            </p>
-            <PerfBar label="Longevity" value={avgLongevity} icon={Timer} color="#F59E0B" shouldReduceMotion={shouldReduceMotion} />
-            <PerfBar label="Sillage" value={avgSillage} icon={Volume2} color="#F783AC" shouldReduceMotion={shouldReduceMotion} />
-            <PerfBar label="Projection" value={projection} icon={Radio} color="#60A5FA" shouldReduceMotion={shouldReduceMotion} />
-            <PerfBar label="Intensity" value={intensity} icon={Gauge} color="#A78BFA" shouldReduceMotion={shouldReduceMotion} />
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-4">
+                Key Performance
+              </p>
+              <PerfBar label="Longevity" value={avgLongevity} icon={Timer} color="#F59E0B" shouldReduceMotion={shouldReduceMotion} />
+              <PerfBar label="Sillage" value={avgSillage} icon={Volume2} color="#F783AC" shouldReduceMotion={shouldReduceMotion} />
+              <PerfBar label="Projection" value={projection} icon={Radio} color="#60A5FA" shouldReduceMotion={shouldReduceMotion} />
+              <PerfBar label="Intensity" value={intensity} icon={Gauge} color="#A78BFA" shouldReduceMotion={shouldReduceMotion} />
+            </div>
+
+            {/* Best Occasion */}
+            {Object.keys(occasionCounts).length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-3">
+                  Best Occasion
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {OCCASIONS.map(({ key, label, icon: Icon }) => {
+                    const count = occasionCounts[key] || 0;
+                    const active = count > 0;
+                    return (
+                      <div
+                        key={key}
+                        className={`flex items-center gap-1.5 py-2 px-3 rounded-2xl border text-center transition-all duration-200 ${
+                          active
+                            ? "bg-brand-500/10 border-brand-500/50 shadow-[0_0_14px_rgba(232,67,147,0.25)]"
+                            : "bg-gray-100 dark:bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
+                        }`}
+                      >
+                        <Icon className={`w-4 h-4 ${active ? "text-brand-400" : "text-[var(--text-muted)]"}`} />
+                        <span
+                          className={`text-[10px] font-bold uppercase tracking-wider ${
+                            active ? "text-brand-400" : "text-[var(--text-muted)]"
+                          }`}
+                        >
+                          {label}
+                        </span>
+                        {active && (
+                          <span className="text-[9px] font-bold text-brand-300 bg-brand-500/15 px-1.5 py-0.5 rounded-full">
+                            {count}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
         {/* ── Season & Time ─────────────────────────── */}
@@ -220,44 +261,6 @@ export function CommunityConsensus({ reviewCount, avgRating, ratingCounts, avgLo
             </div>
           </div>
 
-          {/* Best Occasion */}
-          {Object.keys(occasionCounts).length > 0 && (
-            <div>
-              <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-widest mb-3">
-                Best Occasion
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {OCCASIONS.map(({ key, label, icon: Icon }) => {
-                  const count = occasionCounts[key] || 0;
-                  const active = count > 0;
-                  return (
-                    <div
-                      key={key}
-                      className={`flex items-center gap-1.5 py-2 px-3 rounded-2xl border text-center transition-all duration-200 ${
-                        active
-                          ? "bg-brand-500/10 border-brand-500/50 shadow-[0_0_14px_rgba(232,67,147,0.25)]"
-                          : "bg-gray-100 dark:bg-white/[0.03] border-[var(--bg-glass-border)] opacity-50"
-                      }`}
-                    >
-                      <Icon className={`w-4 h-4 ${active ? "text-brand-400" : "text-[var(--text-muted)]"}`} />
-                      <span
-                        className={`text-[10px] font-bold uppercase tracking-wider ${
-                          active ? "text-brand-400" : "text-[var(--text-muted)]"
-                        }`}
-                      >
-                        {label}
-                      </span>
-                      {active && (
-                        <span className="text-[9px] font-bold text-brand-300 bg-brand-500/15 px-1.5 py-0.5 rounded-full">
-                          {count}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

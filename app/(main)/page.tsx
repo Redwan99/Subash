@@ -268,7 +268,7 @@ export default async function HomePage() {
   }));
 
   return (
-    <main className="min-h-screen pt-10 md:pt-16 pb-20">
+    <main className="pt-10 md:pt-16">
 
       {/* ── Hero Search Section ────────────────────────────────────────────── */}
       <section className="max-w-4xl mx-auto text-center pt-4 pb-10 md:pt-12 md:pb-20">

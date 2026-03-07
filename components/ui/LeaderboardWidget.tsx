@@ -44,9 +44,9 @@ export function LeaderboardWidget() {
     }, [timeframe]);
 
     return (
-        <div className="mx-4 mb-4 rounded-xl bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--border-color)] overflow-hidden flex flex-col">
-            {/* Header & Tabs — sticky within scroll container */}
-            <div className="p-3 border-b border-[var(--border-color)] shrink-0 sticky top-0 z-10 bg-[var(--bg-glass)] backdrop-blur-[8px] rounded-t-xl">
+        <div className="mx-4 mb-4 rounded-xl bg-[var(--bg-glass)] backdrop-blur-[8px] border border-[var(--border-color)] flex flex-col flex-1 min-h-0">
+            {/* Header & Tabs — fixed, list scrolls below */}
+            <div className="p-3 border-b border-[var(--border-color)] shrink-0 bg-[var(--bg-glass)] backdrop-blur-[8px] rounded-t-xl">
                 <div className="flex items-center gap-2 mb-3">
                     <Trophy size={14} className="text-[#F59E0B]" />
                     <h2 className="text-xs font-bold tracking-widest uppercase text-[#F59E0B]">
@@ -83,7 +83,7 @@ export function LeaderboardWidget() {
                 </div>
             </div>
 
-            <div className="p-3 flex-1 min-h-0 relative overflow-hidden">
+            <div className="p-3 flex-1 min-h-0 relative overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {loading ? (
                     <div className="h-40 flex items-center justify-center">
                         <div className="w-5 h-5 rounded-full border-2 border-[var(--accent)] border-t-transparent animate-spin" />

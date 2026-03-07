@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Flame, Users, Star } from "lucide-react";
+import { Flame, Users, Star, ArrowRight } from "lucide-react";
 import { FollowingFeed, type TimelineItem } from "@/components/social/FollowingFeed";
 
 type TrendingPerfumeItem = {
@@ -113,6 +113,19 @@ export function HomeFeedSection({
         </div>
       ) : (
         <FollowingFeed timeline={followingFeed} />
+      )}
+
+      {/* View More — links to full perfumes page */}
+      {tab === "TRENDING" && (
+        <Link
+          href="/perfume"
+          className="flex items-center justify-center gap-2 py-4 mt-2 rounded-2xl border border-dashed border-gray-300 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02] hover:border-brand-500/50 hover:bg-brand-500/5 transition-all duration-300 group"
+        >
+          <span className="text-sm font-semibold text-[var(--text-muted)] group-hover:text-brand-500 transition-colors">
+            View More Perfumes
+          </span>
+          <ArrowRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-brand-500 group-hover:translate-x-0.5 transition-all" />
+        </Link>
       )}
     </div>
   );

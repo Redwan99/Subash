@@ -198,7 +198,13 @@ export function LiveReviewFeed({ initialReviews = [] }: { initialReviews?: LiveR
         }
     );
 
-    const reviews = React.useMemo(() => data ?? [], [data]);
+    const reviews = React.useMemo(() => {
+        const all = data ?? [];
+        // Show top 8 most engaged reviews (by upvotes, then recency)
+        return [...all]
+            .sort((a, b) => (b.upvote_count - a.upvote_count) || (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()))
+            .slice(0, 8);
+    }, [data]);
 
     // Detect newly arrived reviews after each SWR poll
     React.useEffect(() => {
