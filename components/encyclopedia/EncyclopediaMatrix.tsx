@@ -806,7 +806,7 @@ export default function EncyclopediaMatrix({ initialData, initialQuery = "" }: {
                   <PerfumeCard key={perfume.id} perfume={perfume} isTrending />
                 ))}
                 {deduped.map((perfume: any) => (
-                  <PerfumeCard key={perfume.id} perfume={perfume} />
+                  <PerfumeCard key={perfume.id} perfume={perfume} isTrending={sort === "trending"} />
                 ))}
               </>
             );

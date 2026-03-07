@@ -28,12 +28,12 @@ export function NewsletterFooter() {
     };
 
     return (
-        <footer className="mt-16">
+        <footer className="mt-8">
             {/* Soft gradient separator instead of hard border */}
-            <div className="h-px mx-6 bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)] mb-12" />
-            <div className="max-w-7xl mx-auto px-4 md:px-6 py-12">
+            <div className="h-px mx-6 bg-[linear-gradient(90deg,transparent,var(--border-color),transparent)] mb-6" />
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
                 {/* Newsletter section */}
-                <div className="relative rounded-3xl overflow-hidden p-8 md:p-12 glass border border-[var(--bg-glass-border)] mb-10">
+                <div className="relative rounded-3xl overflow-hidden p-8 md:p-12 glass border border-[var(--bg-glass-border)] mb-4">
                     {/* Ambient glow */}
                     <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-[var(--accent)] opacity-[0.06] blur-3xl pointer-events-none" />
                     <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-[#F59E0B] opacity-[0.04] blur-3xl pointer-events-none" />
