@@ -60,7 +60,7 @@ export function PlatformStats() {
   if (!stats) return null;
 
   // Only show to admins/moderators
-  const role = (session?.user as any)?.role;
+  const role = session?.user?.role;
   if (!role || !["SUPER_ADMIN", "ADMIN", "MODERATOR"].includes(role)) return null;
 
   const items = [

@@ -4,6 +4,7 @@
 import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import Image from "next/image";
 
 // ISR: refresh perfume pages every 60s
 export const revalidate = 60;
@@ -464,7 +465,7 @@ export default async function PerfumePage({
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex items-center gap-2 min-w-0">
                       {r.user.image ? (
-                        <img src={r.user.image} alt="" className="w-6 h-6 rounded-full object-cover" />
+                        <Image src={r.user.image} alt="" width={24} height={24} className="w-6 h-6 rounded-full object-cover" />
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-[linear-gradient(135deg,#E84393,#C2255C)] flex items-center justify-center text-[8px] font-black text-white">
                           {(r.user.name ?? "?").charAt(0).toUpperCase()}

@@ -76,10 +76,8 @@ async function _getClimatePicks(climateTags: string[]) {
     }),
   ]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const seen = new Set<string>();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const results: any[] = [];
+  const results: Array<{ id: string; slug: string; name: string; brand: string; image_url: string | null; rating: number; reviewCount: number }> = [];
 
   if (grouped.length) {
     const perfumes = await prisma.perfume.findMany({

@@ -186,12 +186,21 @@ function GenderOption({
 
 const PAGE_SIZE = 40;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PerfumeCard = React.memo(function PerfumeCard({ perfume, isTrending }: { perfume: any; isTrending?: boolean }) {
+type EncyclopediaPerfume = {
+  id: string;
+  name: string;
+  brand: string;
+  slug: string;
+  image_url: string | null;
+  transparentImageUrl?: string | null;
+  gender?: string | null;
+};
+
+const PerfumeCard = React.memo(function PerfumeCard({ perfume, isTrending }: { perfume: EncyclopediaPerfume; isTrending?: boolean }) {
   return (
     <Link href={`/perfume/${perfume.slug}`} className="flex flex-col bg-[var(--bg-glass)] border border-[var(--bg-glass-border)] rounded-2xl overflow-hidden hover:-translate-y-0.5 hover:border-[var(--accent)]/30 hover:shadow-lg hover:shadow-[var(--accent)]/8 transition-[transform,border-color,box-shadow] duration-200 group will-change-[transform]">
       <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] bg-gradient-to-b from-white/5 to-transparent p-3 sm:p-5 flex items-center justify-center">
-        <Image src={perfume.transparentImageUrl || perfume.image_url} alt={perfume.name} fill className="object-contain p-4 drop-shadow-xl group-hover:scale-105 transition-transform duration-500 ease-out" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" loading="lazy" />
+        <Image src={perfume.transparentImageUrl || perfume.image_url || "/placeholder-perfume.jpg"} alt={perfume.name} fill className="object-contain p-4 drop-shadow-xl group-hover:scale-105 transition-transform duration-500 ease-out" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" loading="lazy" />
         {isTrending && (
           <span className="absolute top-2 left-2 flex items-center gap-1 text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 backdrop-blur-sm border border-amber-500/20 text-amber-400 uppercase tracking-wider">
             <TrendingUp size={9} /> Trending
@@ -213,8 +222,7 @@ const PerfumeCard = React.memo(function PerfumeCard({ perfume, isTrending }: { p
   );
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function EncyclopediaMatrix({ initialData, initialQuery = "" }: { initialData: any[]; initialQuery?: string }) {
+export default function EncyclopediaMatrix({ initialData, initialQuery = "" }: { initialData: EncyclopediaPerfume[]; initialQuery?: string }) {
   const { isEnabled } = useFeatureToggles();
 
   // User submit perfume modal
@@ -259,10 +267,8 @@ export default function EncyclopediaMatrix({ initialData, initialQuery = "" }: {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [results, setResults] = useState<any[]>(initialData);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [trendingResults, setTrendingResults] = useState<any[]>([]);
+  const [results, setResults] = useState<EncyclopediaPerfume[]>(initialData);
+  const [trendingResults, setTrendingResults] = useState<EncyclopediaPerfume[]>([]);
   const [isPending, startTransition] = useTransition();
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -798,14 +804,14 @@ export default function EncyclopediaMatrix({ initialData, initialQuery = "" }: {
       ) : results.length > 0 || trendingResults.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 w-full contain-paint">
           {(() => {
-            const trendingIds = new Set(trendingResults.map((p: any) => p.id));
-            const deduped = results.filter((p: any) => !trendingIds.has(p.id));
+            const trendingIds = new Set(trendingResults.map((p: EncyclopediaPerfume) => p.id));
+            const deduped = results.filter((p: EncyclopediaPerfume) => !trendingIds.has(p.id));
             return (
               <>
-                {trendingResults.map((perfume: any) => (
+                {trendingResults.map((perfume: EncyclopediaPerfume) => (
                   <PerfumeCard key={perfume.id} perfume={perfume} isTrending />
                 ))}
-                {deduped.map((perfume: any) => (
+                {deduped.map((perfume: EncyclopediaPerfume) => (
                   <PerfumeCard key={perfume.id} perfume={perfume} isTrending={sort === "trending"} />
                 ))}
               </>

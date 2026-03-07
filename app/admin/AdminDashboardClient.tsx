@@ -21,6 +21,45 @@ import type { ReviewStatus, AdminReview as Review, AdminUser, BrandClaim, AuditL
 
 // -- Types ---------------------------------------------------------------------
 
+type AdminPerfumeItem = {
+    id: string;
+    name: string;
+    brand: string;
+    slug: string;
+    image_url: string | null;
+    gender: string | null;
+    release_year: number | null;
+    scraped: boolean;
+    createdAt: Date;
+    description?: string;
+    perfumer?: string | null;
+    top_notes?: unknown;
+    heart_notes?: unknown;
+    base_notes?: unknown;
+    accords?: unknown;
+    country?: string | null;
+    source_url?: string | null;
+};
+
+type SuggestedPerfumeItem = {
+    id: string;
+    name: string;
+    brand: string;
+    gender: string | null;
+    description: string | null;
+    perfumer: string | null;
+    releaseYear: number | null;
+    topNotes: string | null;
+    heartNotes: string | null;
+    baseNotes: string | null;
+    accords: string | null;
+    imageUrl: string | null;
+    status: string;
+    adminNotes: string | null;
+    createdAt: Date;
+    user: { id: string; name: string | null; email: string | null; image: string | null };
+};
+
 type Props = {
     totalUsers: number;
     totalReviews: number;
@@ -846,7 +885,7 @@ export default function AdminDashboardClient({ totalUsers, totalReviews, totalPe
 
 // -- Perfumes Manager ---------------------------------------------------------
 function PerfumesManager() {
-    const [perfumes, setPerfumes] = useState<any[]>([]);
+    const [perfumes, setPerfumes] = useState<AdminPerfumeItem[]>([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
@@ -908,10 +947,11 @@ function PerfumesManager() {
         setShowForm(true);
     };
 
-    const openEdit = (p: any) => {
-        const parse = (v: any) => {
+    const openEdit = (p: AdminPerfumeItem) => {
+        const parse = (v: unknown): string[] => {
             if (!v) return [];
             if (Array.isArray(v)) return v;
+            if (typeof v !== "string") return [];
             try { const parsed = JSON.parse(v); return Array.isArray(parsed) ? parsed : []; } catch { return []; }
         };
         setEditingId(p.id);
@@ -1264,7 +1304,7 @@ function BrandClaimsTable({ claims }: { claims: BrandClaim[] }) {
 // -- Suggestions Manager --------------------------------------------------------
 
 function SuggestionsManager() {
-    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [suggestions, setSuggestions] = useState<SuggestedPerfumeItem[]>([]);
     const [filter, setFilter] = useState<"PENDING" | "APPROVED" | "REJECTED" | "ALL">("PENDING");
     const [loading, setLoading] = useState(true);
     const [pending, startTransition] = useTransition();
@@ -1302,7 +1342,7 @@ function SuggestionsManager() {
         });
     };
 
-    const startEdit = (s: any) => {
+    const startEdit = (s: SuggestedPerfumeItem) => {
         setEditingId(s.id);
         setEditData({
             name: s.name || "",
@@ -1400,7 +1440,7 @@ function SuggestionsManager() {
                     <p className="text-center py-16 text-[rgba(255,255,255,0.25)] text-sm">No suggestions found.</p>
                 ) : (
                     <div className="space-y-4">
-                        {suggestions.map((s: any) => {
+                        {suggestions.map((s: SuggestedPerfumeItem) => {
                             const top = parseNotes(s.topNotes);
                             const heart = parseNotes(s.heartNotes);
                             const base = parseNotes(s.baseNotes);

@@ -10,7 +10,7 @@ import crypto from "crypto";
 import { z } from "zod";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
-import { verifyTurnstile } from "@/lib/turnstile";
+
 import { sendWelcomeEmail, sendAdminNewUserNotification, sendAccountInfoEmail, sendPasswordResetEmail, sendPasswordChangedEmail } from "@/lib/email";
 
 // ─── Validation schemas ───────────────────────────────────────────────────────

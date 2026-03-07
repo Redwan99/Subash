@@ -425,7 +425,17 @@ export async function getAdminPerfumes(
   page: number = 1,
   search?: string,
   pageSize: number = 50
-): Promise<{ perfumes: any[]; total: number }> {
+): Promise<{ perfumes: Array<{
+  id: string;
+  name: string;
+  brand: string;
+  slug: string;
+  image_url: string | null;
+  gender: string | null;
+  release_year: number | null;
+  scraped: boolean;
+  createdAt: Date;
+}>; total: number }> {
   await requireAdmin();
 
   const where: AnyWhere = {};
