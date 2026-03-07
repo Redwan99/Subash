@@ -53,9 +53,9 @@ const TIME_OPTIONS: { value: string; label: string; icon: LucideIcon; color: str
 ];
 
 const GENDERS: { value: string; label: string; icon: LucideIcon; color: string }[] = [
-  { value: "men", label: "Masculine", icon: User, color: "#60A5FA" },
-  { value: "women", label: "Feminine", icon: User, color: "#F472B6" },
-  { value: "unisex", label: "Unisex", icon: Users, color: "#A78BFA" },
+  { value: "for men", label: "Masculine", icon: User, color: "#60A5FA" },
+  { value: "for women", label: "Feminine", icon: User, color: "#F472B6" },
+  { value: "for women and men", label: "Unisex", icon: Users, color: "#A78BFA" },
 ];
 
 const SORT_OPTIONS: { value: string; label: string; icon: LucideIcon }[] = [
@@ -199,9 +199,9 @@ const PerfumeCard = React.memo(function PerfumeCard({ perfume, isTrending }: { p
         )}
         {perfume.gender && (
           <span className={`absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full capitalize border ${
-            perfume.gender.toLowerCase() === 'men' ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' : perfume.gender.toLowerCase() === 'women' ? 'text-pink-400 bg-pink-500/10 border-pink-500/20' : 'text-[var(--accent)] bg-[var(--accent)]/10 border-[var(--accent)]/20'
+            perfume.gender.toLowerCase().includes('men') && !perfume.gender.toLowerCase().includes('women') ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' : perfume.gender.toLowerCase().includes('women') && !perfume.gender.toLowerCase().includes('men') ? 'text-pink-400 bg-pink-500/10 border-pink-500/20' : 'text-[var(--accent)] bg-[var(--accent)]/10 border-[var(--accent)]/20'
           }`}>
-            {perfume.gender}
+            {perfume.gender.replace(/^for /i, '').replace(/and /i, '& ')}
           </span>
         )}
       </div>

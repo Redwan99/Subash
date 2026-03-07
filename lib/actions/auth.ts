@@ -31,7 +31,7 @@ const RegisterSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .max(100, "Password is too long"),
   confirmPassword: z.string(),
-  turnstileToken: z.string().min(1, "Please complete the security check"),
+  turnstileToken: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -71,14 +71,8 @@ export async function registerUser(
 
   const { name, username, email, password, turnstileToken } = parsed.data;
 
-  // 1.5 Verify bot token
-  const isHuman = await verifyTurnstile(turnstileToken);
-  if (!isHuman) {
-    return {
-      success: false,
-      errors: { _form: ["Security check failed. Automated bots are not allowed."] },
-    };
-  }
+  // Turnstile disabled for now
+  void turnstileToken;
 
   // 2. Check for existing account
   const existing = await prisma.user.findUnique({ where: { email } });

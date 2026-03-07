@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { Star, MessageCircle, Calendar, ArrowLeft, Droplets } from "lucide-react";
+import { Star, MessageCircle, Calendar, ArrowLeft, Droplets, Edit3 } from "lucide-react";
 import { CommentSection } from "@/components/reviews/CommentSection";
+import { auth } from "@/auth";
 
 // Force dynamic since we have comments and user sessions
 export const dynamic = "force-dynamic";
@@ -33,6 +34,9 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
     const review = await getFullReview(id);
 
     if (!review) notFound();
+
+    const session = await auth();
+    const isOwner = session?.user?.id === review.userId;
 
     const displayImage = review.imageUrl || review.perfume.image_url;
 
@@ -119,6 +123,15 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
                     </div>
 
                     <div className="flex items-center gap-2">
+                        {isOwner && (
+                            <Link
+                                href={`/perfume/${review.perfume.slug}#edit-review`}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--accent)]/10 border border-[var(--accent)]/20 text-[var(--accent)] hover:bg-[var(--accent)]/20 transition-colors"
+                            >
+                                <Edit3 size={13} />
+                                <span className="text-xs font-bold">Edit Review</span>
+                            </Link>
+                        )}
                         <Link
                             href={`https://wa.me/?text=Check out this review of ${review.perfume.name} on Subash! ${process.env.NEXT_PUBLIC_SITE_URL || 'https://subash.com'}/review/${review.id}`}
                             target="_blank"

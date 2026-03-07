@@ -168,6 +168,14 @@ export default async function SignInPage({
         {/* Email + Password Form */}
         <CredentialsForm callbackUrl={params.callbackUrl ?? "/"} />
 
+        {/* Return to home */}
+        <Link
+          href="/"
+          className="block w-full text-center py-2.5 rounded-xl text-sm font-medium transition-all border border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]"
+        >
+          ← Return to Home
+        </Link>
+
         {/* Footer note */}
         <p
           className="text-xs text-center leading-relaxed text-[var(--text-muted)]"
